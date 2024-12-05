@@ -6,10 +6,7 @@ module.exports = {
   theme: {
     container: {
       center: true,
-      padding: '2rem',
-      screens: {
-        '2xl': '1400px',
-      },
+      padding: '1rem',
     },
     extend: {
       colors: {
@@ -68,5 +65,20 @@ module.exports = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [
+    require('tailwindcss-animate'),
+    function ({ addUtilities }) {
+      addUtilities({
+        '.fixed-mobile': {
+          '@apply fixed left-1/2 w-full max-w-[375px] -translate-x-1/2': {},
+        },
+        '.fixed-mobile-top': {
+          '@apply fixed-mobile top-0': {},
+        },
+        '.fixed-mobile-bottom': {
+          '@apply fixed-mobile bottom-0': {},
+        },
+      });
+    },
+  ],
 };

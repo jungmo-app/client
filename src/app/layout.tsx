@@ -1,7 +1,7 @@
 import { Toaster } from 'react-hot-toast';
 import { Noto_Sans_KR } from 'next/font/google';
-import 'swiper/css';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import MobileLayout from '@/components/layouts/MobileLayout';
 import { metadataConfig, viewportConfig } from '@/constants/layout';
 import { Providers } from '@/contexts';
 import { StrictPropsWithChildren } from '@/types/common';
@@ -18,9 +18,11 @@ export const viewport = viewportConfig;
 const RootLayout = ({ children }: StrictPropsWithChildren) => {
   return (
     <html suppressHydrationWarning lang="ko">
-      <body className={`${noto_sans_kr.className} flex min-h-screen flex-col bg-background text-primary`}>
+      <body className={noto_sans_kr.className}>
         <Providers>
-          <ErrorBoundary>{children}</ErrorBoundary>
+          <ErrorBoundary>
+            <MobileLayout>{children}</MobileLayout>
+          </ErrorBoundary>
         </Providers>
         <Toaster position="top-right" />
       </body>

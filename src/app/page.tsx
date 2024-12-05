@@ -1,5 +1,7 @@
+import AppointmentDetail from '@/components/appointment-detail';
+
 const Home = () => {
-  return <main>main</main>;
+  return <AppointmentDetail />;
 };
 
 export default Home;
