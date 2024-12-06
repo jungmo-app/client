@@ -10,7 +10,7 @@ const FixedWrapper = ({ children, className, position = 'top' }: FixedWrapperPro
   return (
     <div
       className={cn(
-        'fixed left-1/2 w-full max-w-[375px] -translate-x-1/2 bg-white',
+        'max-w-mobile fixed left-1/2 w-full -translate-x-1/2 bg-white',
         position === 'top' ? 'top-0' : 'bottom-0',
         className
       )}

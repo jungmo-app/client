@@ -1,29 +1,19 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { QuestionMarkCircledIcon } from '@radix-ui/react-icons'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 
 const loginSchema = z.object({
   username: z.string().min(1, '아이디를 입력해주세요'),
   password: z.string().min(8, '비밀번호는 8자 이상이어야 합니다'),
-})
+});
 
-type LoginFormValues = z.infer<typeof loginSchema>
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const form = useForm<LoginFormValues>({
@@ -32,27 +22,24 @@ export default function LoginPage() {
       username: '',
       password: '',
     },
-    mode: "onChange",
-  })
+    mode: 'onChange',
+  });
 
   const onSubmit = (data: LoginFormValues) => {
-    console.log(data)
+    console.log(data);
     // Add login logic here
-  }
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-white p-4">
-      <div className="flex justify-end">
-        <QuestionMarkCircledIcon className="h-6 w-6 text-gray-400" />
-      </div>
       <div className="mx-auto w-full max-w-md flex-grow space-y-6">
         <div className="space-y-2 text-center">
           <h1 className="text-2xl font-bold">로그인</h1>
           <p className="text-gray-500">계정 정보를 입력해주세요</p>
         </div>
-        
+
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
             <FormField
               control={form.control}
               name="username"
@@ -88,7 +75,10 @@ export default function LoginPage() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="h-12 w-full rounded-full bg-blue-500 font-semibold text-white hover:bg-blue-600">
+            <Button
+              type="submit"
+              className="h-12 w-full rounded-full bg-blue-500 font-semibold text-white hover:bg-blue-600"
+            >
               로그인
             </Button>
           </form>
@@ -103,7 +93,10 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <Button variant="outline" className="h-12 w-full rounded-full border-2 border-yellow-400 bg-yellow-400 font-semibold text-black hover:bg-yellow-500">
+        <Button
+          variant="outline"
+          className="h-12 w-full rounded-full border-2 border-yellow-400 bg-yellow-400 font-semibold text-black hover:bg-yellow-500"
+        >
           카카오로 로그인하기
         </Button>
 
@@ -114,6 +107,5 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-

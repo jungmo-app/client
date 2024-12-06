@@ -9,6 +9,9 @@ module.exports = {
       padding: '1rem',
     },
     extend: {
+      maxWidth: {
+        mobile: '500px',
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -70,13 +73,16 @@ module.exports = {
     function ({ addUtilities }) {
       addUtilities({
         '.fixed-mobile': {
-          '@apply fixed left-1/2 w-full max-w-[375px] -translate-x-1/2': {},
+          '@apply fixed left-1/2 w-full max-w-mobile -translate-x-1/2': {},
         },
         '.fixed-mobile-top': {
           '@apply fixed-mobile top-0': {},
         },
         '.fixed-mobile-bottom': {
           '@apply fixed-mobile bottom-0': {},
+        },
+        '.mobile-container': {
+          '@apply w-full max-w-mobile mx-auto': {},
         },
       });
     },
