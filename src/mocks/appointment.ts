@@ -1,9 +1,9 @@
 export const PARTICIPANTS = [
-  { id: 1, name: 'User 1', image: 'https://picsum.photos/id/517/200/200' },
-  { id: 2, name: 'User 2', image: 'https://picsum.photos/id/517/200/200' },
-  { id: 3, name: 'User 3', image: 'https://picsum.photos/id/517/200/200' },
-  { id: 4, name: 'User 4', image: 'https://picsum.photos/id/517/200/200' },
-  { id: 5, name: 'User 5', image: 'https://picsum.photos/id/517/200/200' },
+  { id: 1, name: 'User 1', image: 'https://picsum.photos/id/517/200/200', email: 'user1@example.com' },
+  { id: 2, name: 'User 2', image: 'https://picsum.photos/id/517/200/200', email: 'user2@example.com' },
+  { id: 3, name: 'User 3', image: 'https://picsum.photos/id/517/200/200', email: 'user3@example.com' },
+  { id: 4, name: 'User 4', image: 'https://picsum.photos/id/517/200/200', email: 'user4@example.com' },
+  { id: 5, name: 'User 5', image: 'https://picsum.photos/id/517/200/200', email: 'user5@example.com' },
 ];
 
 export const LOCATION_TAGS = ['카페', '맛집', '숙소', '주차장'];

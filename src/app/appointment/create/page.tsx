@@ -5,6 +5,7 @@ import { Calendar, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import AttendeeInput from '@/components/AttendeeInput';
 import { DatePickerSheet } from '@/components/date-picker-sheet';
+import LocationInput from '@/components/LocationInput';
 import { TimePickerSheet } from '@/components/time-picker-sheet';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -83,14 +84,12 @@ export default function CreateAppointment() {
               <MapPin className="h-4 w-4" />
               <Label>장소</Label>
             </div>
-            <Input
-              placeholder="장소를 검색해주세요"
-              className="bg-white"
+            <LocationInput
               value={formData.location.name}
-              onChange={e =>
+              onChange={location =>
                 setFormData({
                   ...formData,
-                  location: { ...formData.location, name: e.target.value },
+                  location,
                 })
               }
             />

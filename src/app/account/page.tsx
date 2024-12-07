@@ -11,15 +11,9 @@ import { PARTICIPANTS } from '@/mocks/appointment';
 const myActivities = [
   { label: '신용 및 체크카드', info: '2개 카드', href: '/cards' },
   { label: '은행 계좌', info: '1개 계좌', href: '/accounts' },
-  { label: '간편결제', info: '서비스 없음', href: '/easy-payment' },
 ];
 
-const mySubscriptions = [
-  { label: '내 구독 모아보기', href: '/subscriptions' },
-  { label: '구독 일정', href: '/subscription-schedule' },
-  { label: '숨긴 고정 지출 보기', href: '/hidden-expenses' },
-  { label: '간편 해지', href: '/easy-cancel' },
-];
+const mySubscriptions = [{ label: '로그아웃', href: '/logout' }];
 
 export default function AccountPage() {
   const router = useRouter();
@@ -36,16 +30,16 @@ export default function AccountPage() {
       </div>
 
       {/* 프로필 섹션 */}
-      <div className="mb-6 px-4">
+      <div className="mb-6 mt-6 px-4">
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10">
             <AvatarImage src={user.image} />
             <AvatarFallback>{user.name[0]}</AvatarFallback>
           </Avatar>
-          <div>
-            <div>{user.name}</div>
+          <Link href="/account/edit">
+            <div className="font-semibold">{user.name}</div>
             <div className="text-sm text-gray-500">눌러서 내 정보 편집</div>
-          </div>
+          </Link>
           <ChevronRight className="ml-auto h-5 w-5 text-gray-400" />
         </div>
       </div>
@@ -63,7 +57,7 @@ export default function AccountPage() {
 
       {/* 내 연동 섹션 */}
       <div className="mb-6">
-        <h2 className="mb-2 px-4 text-base font-medium">내 연동</h2>
+        <h2 className="mb-2 px-4 text-base font-semibold">내 연동</h2>
         {myActivities.map((item, index) => (
           <Link key={index} href={item.href}>
             <div className="flex items-center justify-between px-4 py-3">
@@ -79,7 +73,6 @@ export default function AccountPage() {
 
       {/* 내 구독 섹션 */}
       <div>
-        <h2 className="mb-2 px-4 text-base font-medium">내 구독</h2>
         {mySubscriptions.map((item, index) => (
           <Link key={index} href={item.href}>
             <div className="flex items-center justify-between px-4 py-3">

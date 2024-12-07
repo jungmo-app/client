@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 
 const loginSchema = z.object({
-  username: z.string().min(1, '아이디를 입력해주세요'),
+  email: z.string().min(1, '이메일을 입력해주세요'),
   password: z.string().min(8, '비밀번호는 8자 이상이어야 합니다'),
 });
 
@@ -19,7 +19,7 @@ export default function LoginPage() {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: '',
+      email: '',
       password: '',
     },
     mode: 'onChange',
@@ -45,11 +45,12 @@ export default function LoginPage() {
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>아이디</FormLabel>
+                  <FormLabel>이메일</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder="아이디를 입력해주세요"
+                      type="email"
+                      placeholder="이메일을 입력해주세요"
                       className="h-12 rounded-full border-gray-300 bg-gray-100 px-4"
                     />
                   </FormControl>
