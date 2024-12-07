@@ -13,7 +13,7 @@ const Header = () => {
 
   return (
     <header className="z-10 bg-white fixed-mobile-top">
-      <div className="flex h-14 items-center justify-between px-4">
+      <div className="flex h-14 items-center justify-between">
         <div className="flex items-center">
           <Button variant="ghost" size="icon" className="mr-2" onClick={handleBack}>
             <ChevronLeft className="h-5 w-5" />

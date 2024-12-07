@@ -1,0 +1,94 @@
+'use client';
+
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { PARTICIPANTS } from '@/mocks/appointment';
+
+// 메뉴 아이템 데이터
+const myActivities = [
+  { label: '신용 및 체크카드', info: '2개 카드', href: '/cards' },
+  { label: '은행 계좌', info: '1개 계좌', href: '/accounts' },
+  { label: '간편결제', info: '서비스 없음', href: '/easy-payment' },
+];
+
+const mySubscriptions = [
+  { label: '내 구독 모아보기', href: '/subscriptions' },
+  { label: '구독 일정', href: '/subscription-schedule' },
+  { label: '숨긴 고정 지출 보기', href: '/hidden-expenses' },
+  { label: '간편 해지', href: '/easy-cancel' },
+];
+
+export default function AccountPage() {
+  const router = useRouter();
+  const user = PARTICIPANTS[0];
+
+  return (
+    <div className="h-full bg-white">
+      <div className="flex h-14 items-center gap-2 p-4">
+        <Button variant="ghost" size="icon" onClick={() => router.back()}>
+          <ChevronLeft className="h-5 w-5" />
+        </Button>
+        <div />
+        <h1 className="font-medium">메뉴</h1>
+      </div>
+
+      {/* 프로필 섹션 */}
+      <div className="mb-6 px-4">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={user.image} />
+            <AvatarFallback>{user.name[0]}</AvatarFallback>
+          </Avatar>
+          <div>
+            <div>{user.name}</div>
+            <div className="text-sm text-gray-500">눌러서 내 정보 편집</div>
+          </div>
+          <ChevronRight className="ml-auto h-5 w-5 text-gray-400" />
+        </div>
+      </div>
+
+      {/* 알림 배너 */}
+      <div className="mx-4 mb-6 rounded-lg bg-gray-50 p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <div>결제 내역 관리 서비스</div>
+            <div className="text-sm text-gray-500">일부 기능 임시 중지 안내 😢</div>
+          </div>
+          <ChevronRight className="h-5 w-5 text-gray-400" />
+        </div>
+      </div>
+
+      {/* 내 연동 섹션 */}
+      <div className="mb-6">
+        <h2 className="mb-2 px-4 text-base font-medium">내 연동</h2>
+        {myActivities.map((item, index) => (
+          <Link key={index} href={item.href}>
+            <div className="flex items-center justify-between px-4 py-3">
+              <div>{item.label}</div>
+              <div className="flex items-center">
+                <span className="text-sm text-blue-500">{item.info}</span>
+                <ChevronRight className="ml-2 h-5 w-5 text-gray-400" />
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      {/* 내 구독 섹션 */}
+      <div>
+        <h2 className="mb-2 px-4 text-base font-medium">내 구독</h2>
+        {mySubscriptions.map((item, index) => (
+          <Link key={index} href={item.href}>
+            <div className="flex items-center justify-between px-4 py-3">
+              <div>{item.label}</div>
+              <ChevronRight className="h-5 w-5 text-gray-400" />
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}

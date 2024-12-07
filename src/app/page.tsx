@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CalendarRange, Menu, PlusCircle, Search } from 'lucide-react';
+import { CalendarRange, Menu, PlusCircle, Search, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -55,10 +55,11 @@ export default function Main() {
 
   return (
     <main className="min-h-screen bg-background">
-      <div className="flex items-center justify-between border-b p-4">
+      <div className="flex h-14 items-center justify-between p-4">
         <Button variant="ghost" size="icon">
           <Menu className="h-5 w-5" />
         </Button>
+        <div />
         <div className="flex items-center gap-2">
           <h1 className="text-xl font-semibold">
             {currentMonth.getFullYear()}. {currentMonth.getMonth() + 1}
@@ -69,9 +70,11 @@ export default function Main() {
           <Button variant="ghost" size="icon">
             <Search className="h-5 w-5" />
           </Button>
-          <Button variant="ghost" size="icon">
-            <CalendarRange className="h-5 w-5" />
-          </Button>
+          <Link href="/account">
+            <Button variant="ghost" size="icon">
+              <User className="h-5 w-5" />
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -88,14 +91,14 @@ export default function Main() {
       <div className="space-y-6 p-4">
         <h2 className="text-lg font-semibold">나의 일정 {APPOINTMENT_DATA.length}</h2>
 
-        <Button variant="outline" className="h-auto w-full justify-start gap-2 py-4">
-          <PlusCircle className="h-5 w-5 text-blue-500" />
-          <span className="text-muted-foreground">새로운 일정을 추가해보세요</span>
+        <Button asChild variant="outline" className="h-auto w-full justify-start gap-2 py-4">
+          <Link href="/appointment/create">
+            <PlusCircle className="h-5 w-5 text-blue-500" />
+            <span className="text-muted-foreground">새로운 일정을 추가해보세요</span>
+          </Link>
         </Button>
 
         <div className="space-y-4">
-          <h3 className="text-sm font-medium text-muted-foreground">지난 여행</h3>
-
           {APPOINTMENT_DATA.map(trip => (
             <Link key={trip.id} href={`/appointment/${trip.id}`} className="flex items-center gap-4 p-2">
               <div className="relative h-16 w-16 overflow-hidden rounded-lg">

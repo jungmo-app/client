@@ -46,7 +46,7 @@ export default function ExpenseForm() {
             {categories.map(({ id, icon: Icon, label }) => (
               <button
                 key={id}
-                className={`flex flex-col items-center rounded-xl p-2 text-xs transition-colors ${selectedCategory === id ? 'bg-blue-50 text-blue-500' : 'text-gray-500'}`}
+                className={`flex flex-col items-center rounded-xl border border-gray-200 p-2 text-xs shadow-sm transition-colors ${selectedCategory === id ? '!border-blue-200 bg-blue-50 text-blue-500' : 'text-gray-500'}`}
                 onClick={() => setSelectedCategory(id)}
               >
                 <Icon className="mb-1 h-5 w-5" />
