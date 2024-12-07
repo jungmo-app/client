@@ -1,19 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  BookmarkIcon,
-  Camera,
-  Car,
-  ChevronLeft,
-  Home,
-  MoreHorizontal,
-  MoreVertical,
-  Plane,
-  Share2,
-  ShoppingBag,
-  Utensils,
-} from 'lucide-react';
+import { BookmarkIcon, ChevronLeft, MoreHorizontal, MoreVertical, Share2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { AddExpenseSheet } from '@/components/add-expense-sheet';
@@ -21,24 +9,7 @@ import TotalAmountSummary from '@/components/TotalAmountSummary';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-
-const categories = [
-  { id: 'all', label: '전체', icon: MoreHorizontal },
-  { id: 'accommodation', label: '숙소', icon: Home },
-  { id: 'flight', label: '항공', icon: Plane },
-  { id: 'transport', label: '교통', icon: Car },
-  { id: 'tourism', label: '관광', icon: Camera },
-  { id: 'food', label: '식비', icon: Utensils },
-  { id: 'shopping', label: '쇼핑', icon: ShoppingBag },
-];
-
-const mockExpenses = [
-  { id: 1, category: 'food', amount: 15000, date: '2023-12-07', description: '점심 식사', icon: Utensils },
-  { id: 2, category: 'transport', amount: 5000, date: '2023-12-07', description: '택시', icon: Car },
-  { id: 3, category: 'shopping', amount: 50000, date: '2023-12-06', description: '옷 구매', icon: ShoppingBag },
-  { id: 4, category: 'accommodation', amount: 100000, date: '2023-12-05', description: '호텔', icon: Home },
-  { id: 5, category: 'tourism', amount: 30000, date: '2023-12-05', description: '박물관 입장료', icon: Camera },
-];
+import { categories, mockExpenses } from '@/mocks/expenses';
 
 const formatAmount = (amount: number) => {
   return new Intl.NumberFormat('ko-KR').format(amount);
@@ -120,26 +91,30 @@ export default function ExpensesList() {
           <div key={date} className="mb-6">
             <h2 className="mb-2 text-sm font-medium text-gray-500">{date}</h2>
             <Card className="bg-[#F7F7F7]">
-              {expenses.map(expense => (
-                <Link
-                  key={expense.id}
-                  href={`/expenses/${expense.id}`}
-                  className="block [&+&]:border-t [&+&]:border-gray-100"
-                >
-                  <div className="flex items-center justify-between border-b border-gray-200 p-4 last:border-b-0">
-                    <div className="flex items-center">
-                      <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-white">
-                        <expense.icon className="h-5 w-5 text-gray-600" />
+              {expenses.map(expense => {
+                const Icon = categories.find(c => c.id === expense.category)?.icon || MoreHorizontal;
+
+                return (
+                  <Link
+                    key={expense.id}
+                    href={`/expenses/${expense.id}`}
+                    className="block [&+&]:border-t [&+&]:border-gray-100"
+                  >
+                    <div className="flex items-center justify-between border-b border-gray-200 p-4 last:border-b-0">
+                      <div className="flex items-center">
+                        <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-white">
+                          <Icon className="h-5 w-5 text-gray-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{expense.description}</p>
+                          <p className="text-sm text-gray-500">{expense.category}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium">{expense.description}</p>
-                        <p className="text-sm text-gray-500">{expense.category}</p>
-                      </div>
+                      <p className="font-medium">{formatAmount(expense.amount)}원</p>
                     </div>
-                    <p className="font-medium">{formatAmount(expense.amount)}원</p>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                );
+              })}
             </Card>
           </div>
         ))}

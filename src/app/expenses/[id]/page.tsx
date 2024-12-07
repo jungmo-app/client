@@ -1,118 +1,100 @@
 'use client';
 
 import { useState } from 'react';
-import { Camera, Car, ChevronLeft, Home, MoreHorizontal, Pencil, ShoppingBag, Trash, Utensils } from 'lucide-react';
+import { ChevronLeft, MoreHorizontal, Pencil } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+import MemoSheet from '@/components/memo/MemoSheet';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-
-const mockExpenses = [
-  { id: 1, category: 'food', amount: 15000, date: '2023-12-07', description: '점심 식사', icon: Utensils },
-  { id: 2, category: 'transport', amount: 5000, date: '2023-12-07', description: '택시', icon: Car },
-  { id: 3, category: 'shopping', amount: 50000, date: '2023-12-06', description: '옷 구매', icon: ShoppingBag },
-  { id: 4, category: 'accommodation', amount: 100000, date: '2023-12-05', description: '호텔', icon: Home },
-  { id: 5, category: 'tourism', amount: 30000, date: '2023-12-05', description: '박물관 입장료', icon: Camera },
-];
+import { categories, mockExpenses } from '@/mocks/expenses';
 
 const formatAmount = (amount: number) => {
   return new Intl.NumberFormat('ko-KR').format(amount);
 };
 
-const getCategoryIcon = (category: string) => {
-  switch (category) {
-    case 'food':
-      return Utensils;
-    case 'transport':
-      return Car;
-    case 'shopping':
-      return ShoppingBag;
-    case 'accommodation':
-      return Home;
-    case 'tourism':
-      return Camera;
-    default:
-      return MoreHorizontal;
-  }
-};
-
-export default function ExpenseDetail({ params }: { params: { id: string } }) {
+export default function ExpenseDetail() {
   const router = useRouter();
-  const [isDeleteSheetOpen, setIsDeleteSheetOpen] = useState(false);
-  const expense = mockExpenses.find(e => e.id === parseInt(params.id));
+  const { id } = useParams();
+  const expense = mockExpenses.find(e => e.id === parseInt(id[0]));
+  const [memo, setMemo] = useState(expense?.memo || '');
 
   if (!expense) {
     return <div>Expense not found</div>;
   }
 
-  const Icon = getCategoryIcon(expense.category);
+  const Icon = categories.find(c => c.id === expense.category)?.icon || MoreHorizontal;
 
   const handleDelete = () => {
-    // Implement delete logic here
     console.log('Deleting expense:', expense.id);
-    setIsDeleteSheetOpen(false);
     router.push('/expenses');
+  };
+
+  const handleMemoSave = (newMemo: string) => {
+    setMemo(newMemo);
   };
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="sticky top-0 z-10 h-14 bg-white">
-        <div className="flex h-14 items-center justify-between">
+      <div className="sticky top-0 z-10">
+        <div className="flex h-14 items-center justify-between px-4">
           <div className="flex items-center gap-4">
             <Link href="/expenses">
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <ChevronLeft className="h-5 w-5" />
               </Button>
             </Link>
-            <h1 className="text-lg font-medium">지출 상세</h1>
+            <h1 className="text-lg font-medium">상세 지출 내역</h1>
           </div>
+          <Button variant="ghost" className="text-primary">
+            수정
+          </Button>
         </div>
       </div>
 
       <div className="px-4 py-6">
-        <Card className="bg-[#F7F7F7] p-6">
-          <div className="mb-4 flex items-center">
-            <div className="mr-4 flex h-12 w-12 items-center justify-center rounded-full bg-white">
-              <Icon className="h-6 w-6 text-gray-600" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold">{expense.description}</h2>
-              <p className="text-sm text-gray-500">{expense.category}</p>
-            </div>
+        <div className="mb-6 flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+            <Icon className="h-6 w-6 text-blue-600" />
           </div>
-          <p className="mb-6 text-3xl font-semibold">{formatAmount(expense.amount)}원</p>
-          <div className="space-y-2">
-            <p>
-              <span className="font-medium">날짜:</span> {expense.date}
-            </p>
+          <div className="text-2xl font-semibold">{expense.description}</div>
+          <div className="text-blue-600">
+            <Pencil className="h-5 w-5" />
           </div>
-        </Card>
+        </div>
 
-        <div className="mt-6 flex space-x-4">
-          <Button className="flex-1" onClick={() => router.push(`/expenses/${expense.id}/edit`)}>
-            <Pencil className="mr-2 h-4 w-4" />
-            수정
+        <div className="space-y-6">
+          <div className="flex justify-between py-4">
+            <span className="text-gray-600">지출 금액</span>
+            <span className="font-medium">{formatAmount(expense.amount)}원</span>
+          </div>
+
+          <div className="flex justify-between py-4">
+            <span className="text-gray-600">지출일</span>
+            <span className="font-medium">{expense.date}</span>
+          </div>
+
+          <div className="flex justify-between py-4">
+            <span className="text-gray-600">지출 수단</span>
+            <span className="font-medium">{expense.method}</span>
+          </div>
+
+          <div className="flex justify-between py-4">
+            <span className="text-gray-600">카테고리</span>
+            <div className="flex items-center">
+              <span className="font-medium">{expense.category}</span>
+              <ChevronLeft className="h-5 w-5 rotate-180" />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <MemoSheet initialMemo={memo} onSave={handleMemoSave} />
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <Button className="w-full" variant="outline" size="lg" onClick={handleDelete}>
+            삭제하기
           </Button>
-          <Sheet open={isDeleteSheetOpen} onOpenChange={setIsDeleteSheetOpen}>
-            <SheetTrigger asChild>
-              <Button variant="outline" className="flex-1">
-                <Trash className="mr-2 h-4 w-4" />
-                삭제
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="bottom">
-              <SheetHeader>
-                <SheetTitle>정말 삭제하시겠습니까?</SheetTitle>
-                <SheetDescription>이 작업은 되돌릴 수 없습니다.</SheetDescription>
-              </SheetHeader>
-              <div className="mt-6">
-                <Button className="w-full bg-red-500 hover:bg-red-600" onClick={handleDelete}>
-                  삭제
-                </Button>
-              </div>
-            </SheetContent>
-          </Sheet>
         </div>
       </div>
     </div>

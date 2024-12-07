@@ -10,6 +10,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
 const categories = [
   { id: 'accommodation', icon: Home, label: '숙소' },
@@ -56,8 +57,8 @@ export default function ExpenseForm() {
           </div>
         </div>
 
-        <Card className="space-y-4 rounded-2xl bg-[#F7F7F7] p-4">
-          <div className="space-y-4">
+        <Card className="flex space-x-4 rounded-2xl bg-[#F7F7F7] p-4">
+          <div className="flex-1 space-y-4">
             <Label>통화</Label>
             <Select defaultValue="KRW">
               <SelectTrigger>
@@ -71,18 +72,18 @@ export default function ExpenseForm() {
             </Select>
           </div>
 
-          <div className="space-y-4">
+          <div className="flex-[2] space-y-4">
             <Label>금액</Label>
-            <Input type="number" placeholder="금액을 입력해주세요" className="bg-white" />
+            <Input type="text" placeholder="금액을 입력해주세요" className="bg-white" />
           </div>
         </Card>
 
-        <Card className="space-y-4 rounded-2xl bg-[#F7F7F7] p-4">
-          <div className="space-y-4">
+        <Card className="flex space-x-4 rounded-2xl bg-[#F7F7F7] p-4">
+          <div className="flex-1 space-y-4">
             <Label>날짜</Label>
             <DatePickerSheet onSelect={date => console.log(date)} />
           </div>
-          <div className="space-y-4">
+          <div className="flex-1 space-y-4">
             <Label>시간</Label>
             <TimePickerSheet onSelect={time => console.log(time)} />
           </div>
@@ -91,14 +92,14 @@ export default function ExpenseForm() {
         <Card className="rounded-2xl bg-[#F7F7F7] p-4">
           <div className="space-y-4">
             <Label>결제수단</Label>
-            <Input placeholder="현금" className="bg-white" />
+            <Input placeholder="현금, 카드, 계좌이체 등" className="bg-white" />
           </div>
         </Card>
 
         <Card className="rounded-2xl bg-[#F7F7F7] p-4">
           <div className="space-y-4">
-            <Label>내용</Label>
-            <Input placeholder="내용을 입력해주세요" className="bg-white" />
+            <Label>메모</Label>
+            <Textarea placeholder="메모를 입력해주세요" className="bg-white" />
           </div>
         </Card>
 
