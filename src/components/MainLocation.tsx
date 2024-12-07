@@ -13,7 +13,7 @@ type MainLocationProps = {
 
 const MainLocation = ({ location, tags }: MainLocationProps) => {
   return (
-    <div className="rounded-2xl py-5">
+    <div className="rounded-2xl pb-5">
       <div className="rounded-2xl bg-[#f8f8f8] p-4">
         <div className="flex items-center gap-2">
           <MapPin className="h-5 w-5 text-primary" />

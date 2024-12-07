@@ -27,7 +27,7 @@ export default function ExpenseForm() {
 
   return (
     <div className="min-h-screen">
-      <div className="flex h-14 items-center justify-between border-b bg-white px-4">
+      <div className="flex h-14 items-center justify-between bg-white px-4">
         <div className="flex items-center gap-2">
           <Link href="/expenses">
             <Button variant="ghost" size="icon">
@@ -40,7 +40,7 @@ export default function ExpenseForm() {
       </div>
 
       <div className="space-y-4 p-4">
-        <div className="space-y-2">
+        <div className="space-y-2 p-4">
           <Label>카테고리</Label>
           <div className="grid grid-cols-5 gap-2">
             {categories.map(({ id, icon: Icon, label }) => (
@@ -56,66 +56,56 @@ export default function ExpenseForm() {
           </div>
         </div>
 
-        <Card className="rounded-2xl border-0 bg-[#F7F7F7] p-4">
+        <Card className="space-y-4 rounded-2xl bg-[#F7F7F7] p-4">
           <div className="space-y-4">
-            <div>
-              <Label>통화</Label>
-              <Select defaultValue="KRW">
-                <SelectTrigger>
-                  <SelectValue placeholder="Select currency" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="KRW">KRW(원)</SelectItem>
-                  <SelectItem value="USD">USD($)</SelectItem>
-                  <SelectItem value="EUR">EUR(€)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <Label>통화</Label>
+            <Select defaultValue="KRW">
+              <SelectTrigger>
+                <SelectValue placeholder="Select currency" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="KRW">KRW(원)</SelectItem>
+                <SelectItem value="USD">USD($)</SelectItem>
+                <SelectItem value="EUR">EUR(€)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-            <div>
-              <Label>금액</Label>
-              <Input type="number" placeholder="금액을 입력해주세요" className="bg-white" />
-            </div>
+          <div className="space-y-4">
+            <Label>금액</Label>
+            <Input type="number" placeholder="금액을 입력해주세요" className="bg-white" />
           </div>
         </Card>
 
-        <Card className="rounded-2xl border-0 bg-[#F7F7F7] p-4">
+        <Card className="space-y-4 rounded-2xl bg-[#F7F7F7] p-4">
           <div className="space-y-4">
-            <div>
-              <Label>날짜</Label>
-              <DatePickerSheet onSelect={date => console.log(date)} />
-            </div>
-            <div className="mt-4">
-              <Label>시간</Label>
-              <TimePickerSheet onSelect={time => console.log(time)} />
-            </div>
+            <Label>날짜</Label>
+            <DatePickerSheet onSelect={date => console.log(date)} />
+          </div>
+          <div className="space-y-4">
+            <Label>시간</Label>
+            <TimePickerSheet onSelect={time => console.log(time)} />
           </div>
         </Card>
 
-        <Card className="rounded-2xl border-0 bg-[#F7F7F7] p-4">
+        <Card className="rounded-2xl bg-[#F7F7F7] p-4">
           <div className="space-y-4">
-            <div>
-              <Label>결제수단</Label>
-              <Input placeholder="현금" className="bg-white" />
-            </div>
+            <Label>결제수단</Label>
+            <Input placeholder="현금" className="bg-white" />
           </div>
         </Card>
 
-        <Card className="rounded-2xl border-0 bg-[#F7F7F7] p-4">
+        <Card className="rounded-2xl bg-[#F7F7F7] p-4">
           <div className="space-y-4">
-            <div>
-              <Label>내용</Label>
-              <Input placeholder="내용을 입력해주세요" className="bg-white" />
-            </div>
+            <Label>내용</Label>
+            <Input placeholder="내용을 입력해주세요" className="bg-white" />
           </div>
         </Card>
 
-        <Card className="rounded-2xl border-0 bg-[#F7F7F7] p-4">
+        <Card className="rounded-2xl bg-[#F7F7F7] p-4">
           <div className="space-y-4">
-            <div>
-              <Label>장소 (선택)</Label>
-              <Input placeholder="장소를 검색하세요" className="bg-white" />
-            </div>
+            <Label>장소 (선택)</Label>
+            <Input placeholder="장소를 검색하세요" className="bg-white" />
           </div>
         </Card>
       </div>

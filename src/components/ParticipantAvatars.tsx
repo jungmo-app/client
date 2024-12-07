@@ -1,4 +1,4 @@
-import { PARTICIPANTS } from './appointment-detail';
+import { PARTICIPANTS } from '@/mocks/appointment';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 type Participant = (typeof PARTICIPANTS)[number];

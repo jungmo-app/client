@@ -81,8 +81,17 @@ module.exports = {
         '.fixed-mobile-bottom': {
           '@apply fixed-mobile bottom-0': {},
         },
+        '.fixed-mobile-right': {
+          '@apply fixed-mobile right-0': {},
+        },
         '.mobile-container': {
           '@apply w-full max-w-mobile mx-auto': {},
+        },
+        '.fixed-mobile-bottom-right': {
+          '@apply fixed-mobile-bottom fixed-mobile-right': {},
+        },
+        '.fixed-mobile-bottom-right-button': {
+          '@apply absolute bottom-6 right-6 z-10': {},
         },
       });
     },

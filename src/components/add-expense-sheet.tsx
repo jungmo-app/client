@@ -9,16 +9,18 @@ export function AddExpenseSheet() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg" size="icon">
-          <Plus className="h-6 w-6" />
-        </Button>
+        <div className="fixed-mobile-bottom-right">
+          <Button className="h-12 w-12 rounded-full shadow-lg fixed-mobile-bottom-right-button" size="icon">
+            <Plus />
+          </Button>
+        </div>
       </SheetTrigger>
       <SheetContent side="bottom" className="rounded-t-3xl">
         <SheetHeader className="pb-6">
-          <SheetTitle>등록을 어떻게 할건가요?</SheetTitle>
+          <SheetTitle>지출 내역을 등록해볼까요?</SheetTitle>
           <SheetDescription>카드 내역에서 손쉽게 추가할 수 있어요</SheetDescription>
         </SheetHeader>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <Link href="/expenses/card">
             <Button variant="outline" className="w-full justify-start gap-2 rounded-2xl p-6 text-center">
               <CreditCard className="h-5 w-5" />
