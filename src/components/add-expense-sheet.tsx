@@ -1,6 +1,6 @@
 'use client';
 
-import { CreditCard, PenLine, Plus } from 'lucide-react';
+import { PenLine, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -23,7 +23,7 @@ export function AddExpenseSheet() {
         <div className="grid grid-cols-1 gap-4">
           <Link href="/expenses/card">
             <Button variant="outline" className="w-full justify-start gap-2 rounded-2xl p-6 text-center">
-              <CreditCard className="h-5 w-5" />
+              <Plus className="h-5 w-5" />
               카드 내역에서 추가하기
             </Button>
           </Link>

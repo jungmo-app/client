@@ -38,7 +38,7 @@ export default function AttendeeSelectModal({ isOpen, onClose, onSelect }: Atten
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="bottom" className="w-full sm:max-w-[425px]">
+      <SheetContent side="bottom" className="w-full">
         <SheetHeader>
           <SheetTitle>참석자 추가</SheetTitle>
         </SheetHeader>
