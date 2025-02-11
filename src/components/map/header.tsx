@@ -1,0 +1,26 @@
+'use client';
+
+import { ChevronLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+
+export default function Header() {
+  const router = useRouter();
+
+  const handleBack = () => {
+    router.back();
+  };
+
+  return (
+    <header className="z-10 bg-white">
+      <div className="flex h-14 items-center justify-between">
+        <div className="flex items-center">
+          <Button variant="ghost" size="icon" className="mr-2" onClick={handleBack}>
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="font-medium">장소 추가하기</h1>
+        </div>
+      </div>
+    </header>
+  );
+}
