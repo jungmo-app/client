@@ -3,10 +3,15 @@
 import { useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useLoadScript } from '@react-google-maps/api';
-import { MarkerType } from '@/types/map';
+import { getRadius } from '@/libs/map/calculateDistance';
+import { MarkerType, Position, SearchStatusType } from '@/types/map';
 import GoogleMapLoader from './googleMapLoader';
 import Header from './header';
 import SearchLocationBox from './searchLocationBox';
+
+interface MapProps {
+  currentLocation: Position;
+}
 
 interface IFormInput {
   inputValue: string;
@@ -14,11 +19,12 @@ interface IFormInput {
 
 const GOOGLE_MAPS_LIBRARIES: ('places' | 'geometry')[] = ['places', 'geometry'];
 
-export default function Map() {
+export default function Map({ currentLocation }: MapProps) {
   const methods = useForm<IFormInput>();
+  const mapRef = useRef<google.maps.Map | null>(null); // 부모에서 mapRef 관리
 
-  const mapRef = useRef<google.maps.Map | null>(null);
   const [markers, setMarkers] = useState<MarkerType[]>([]);
+  const [searchStatus, setSearchStatus] = useState<SearchStatusType | null>(null);
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY as string,
@@ -26,20 +32,19 @@ export default function Map() {
   });
 
   const handleSearchPlace = (value: IFormInput) => {
-    if (!mapRef.current || !google.maps) {
+    if (!mapRef.current || !google.maps || !value.inputValue) {
       return;
     }
 
-    console.log(value.inputValue);
     const service = new google.maps.places.PlacesService(mapRef.current);
-
     const center = mapRef.current.getCenter();
     const bounds = mapRef.current.getBounds();
 
-    if (!center || !bounds) return;
+    if (!center || !bounds) {
+      return;
+    }
 
-    const northEast = bounds.getNorthEast();
-    const radius = google.maps.geometry.spherical.computeDistanceBetween(center, northEast);
+    const radius = getRadius(center, bounds);
 
     const request = {
       query: value.inputValue,
@@ -57,9 +62,11 @@ export default function Map() {
           address: result.adr_address,
         }));
 
-        if (!newMarkers) return;
-        console.log(newMarkers);
-        setMarkers(newMarkers);
+        if (newMarkers) {
+          setMarkers(newMarkers);
+          mapRef.current?.panTo(newMarkers[0].position);
+          setSearchStatus({ center, bounds });
+        }
       }
     });
   };
@@ -76,7 +83,13 @@ export default function Map() {
       <FormProvider {...methods}>
         <Header />
         <SearchLocationBox onSubmit={methods.handleSubmit(handleSearchPlace)} />
-        <GoogleMapLoader ref={mapRef} markers={markers} />
+        <GoogleMapLoader
+          ref={mapRef}
+          markers={markers}
+          currentLocation={currentLocation}
+          searchStatus={searchStatus}
+          onResearch={methods.handleSubmit(handleSearchPlace)}
+        />
       </FormProvider>
     </div>
   );
