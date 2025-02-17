@@ -10,7 +10,7 @@ import Header from './header';
 import SearchLocationBox from './searchLocationBox';
 
 interface MapProps {
-  currentLocation: Position;
+  currentLocation: Position | null;
 }
 
 interface IFormInput {
@@ -21,7 +21,7 @@ const GOOGLE_MAPS_LIBRARIES: ('places' | 'geometry')[] = ['places', 'geometry'];
 
 export default function Map({ currentLocation }: MapProps) {
   const methods = useForm<IFormInput>();
-  const mapRef = useRef<google.maps.Map | null>(null); // 부모에서 mapRef 관리
+  const mapRef = useRef<google.maps.Map | null>(null);
 
   const [markers, setMarkers] = useState<MarkerType[]>([]);
   const [searchStatus, setSearchStatus] = useState<SearchStatusType | null>(null);
@@ -64,7 +64,9 @@ export default function Map({ currentLocation }: MapProps) {
 
         if (newMarkers) {
           setMarkers(newMarkers);
-          mapRef.current?.panTo(newMarkers[0].position);
+          if (newMarkers.length === 1) {
+            mapRef.current?.panTo(newMarkers[0].position);
+          }
           setSearchStatus({ center, bounds });
         }
       }

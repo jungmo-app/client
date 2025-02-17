@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["kakao.maps.d.ts"],
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -21,12 +22,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": [
-    "custom.d.ts",
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
+  "include": ["custom.d.ts", "next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }

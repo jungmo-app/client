@@ -13,13 +13,15 @@ interface GoogleMapLoaderProps {
   markers: MarkerType[];
   searchStatus?: SearchStatusType | null;
   onResearch?: () => void;
-  currentLocation: Position;
+  currentLocation: Position | null;
 }
+
+const DEFAULT_POSITION = { lat: 37.498095, lng: 127.02761 };
 
 const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderProps>(
   ({ markers, searchStatus, currentLocation, onResearch }, ref) => {
     const mapRef = useRef<google.maps.Map | null>(null);
-    const [location, setLocation] = useState<Position>(currentLocation);
+    const [location, setLocation] = useState<Position>(currentLocation ?? DEFAULT_POSITION);
     const [isButtonVisible, setIsButtonVisible] = useState<boolean>(false);
     const [isUpdateVisible, setIsUpdateButtonVisible] = useState<boolean>(false);
     const [clickedId, setClickedId] = useState<string | null>(null);
@@ -34,10 +36,19 @@ const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderP
     }, [isMapLoad]);
 
     const handleClickUpdateCenterButton = async () => {
-      const position = await getCurrentLocation();
-      if (!mapRef.current || !position) return;
-      setLocation(position);
-      mapRef.current.panTo(position);
+      if (!mapRef.current) {
+        return;
+      }
+
+      try {
+        const position = await getCurrentLocation();
+        if (position) {
+          setLocation(position);
+          mapRef.current.panTo(position);
+        }
+      } catch {
+        alert('위치를 불러올 수 없습니다');
+      }
     };
 
     const handleIdleMap = async () => {
@@ -46,7 +57,7 @@ const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderP
       const mapCenter = mapRef.current.getCenter();
       const mapBounds = mapRef.current.getBounds();
 
-      if (!mapCenter) return;
+      if (!mapCenter || !location) return;
 
       if (isEqualPositionToCenter(mapCenter, new google.maps.LatLng(location))) {
         setIsButtonVisible(false);
@@ -72,10 +83,18 @@ const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderP
       setClickedId(null);
     };
 
+    const handleClickUpdateButton = () => {
+      if (!onResearch) {
+        return;
+      }
+      setIsUpdateButtonVisible(false);
+      onResearch();
+    };
+
     return (
       <div className="relative flex-grow">
         <GoogleMap
-          center={currentLocation}
+          center={currentLocation ?? DEFAULT_POSITION}
           zoom={14}
           mapContainerStyle={{ width: '100%', height: '100%' }}
           options={{
@@ -110,7 +129,11 @@ const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderP
           </Button>
         )}
         {isUpdateVisible && (
-          <Button variant="ghost" className="absolute bottom-5 left-1/2 -translate-x-1/2 bg-white" onClick={onResearch}>
+          <Button
+            variant="ghost"
+            className="absolute bottom-5 left-1/2 -translate-x-1/2 bg-white"
+            onClick={handleClickUpdateButton}
+          >
             현재 위치에서 검색
           </Button>
         )}

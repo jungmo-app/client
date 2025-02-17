@@ -7,14 +7,22 @@ import { getCurrentLocation } from '@/libs/map/getCurrentLocation';
 import { Position } from '@/types/map';
 
 export default function Page() {
+  const [isClicked, setIsClicked] = useState<boolean>(false);
   const [currentLocation, setCurrentLocation] = useState<Position | null>(null);
   const handleClickButton = async () => {
-    const location = await getCurrentLocation();
-    setCurrentLocation(location ?? null);
+    try {
+      const location = await getCurrentLocation();
+      console.log(location);
+      setCurrentLocation(location);
+    } catch {
+      setCurrentLocation(null);
+    } finally {
+      setIsClicked(true);
+    }
   };
   return (
     <div className="mx-auto max-w-mobile">
-      {currentLocation ? <Map currentLocation={currentLocation} /> : <Button onClick={handleClickButton}>지도</Button>}
+      {isClicked ? <Map currentLocation={currentLocation} /> : <Button onClick={handleClickButton}>지도</Button>}
     </div>
   );
 }
