@@ -4,9 +4,14 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
-export function TimePickerSheet({ onSelect }: { onSelect: (time: { hours: number; minutes: number }) => void }) {
-  const [selectedHour, setSelectedHour] = useState(12);
-  const [selectedMinute, setSelectedMinute] = useState(0);
+interface TimePickerSheetProps {
+  value?: string;
+  onSelect: (time: { hours: number; minutes: number }) => void;
+}
+
+export function TimePickerSheet({ value, onSelect }: TimePickerSheetProps) {
+  const [selectedHour, setSelectedHour] = useState(value ? Number(value.split(':')[0]) : new Date().getHours());
+  const [selectedMinute, setSelectedMinute] = useState(value ? Number(value.split(':')[1]) : new Date().getMinutes());
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
   const minutes = Array.from({ length: 12 }, (_, i) => i * 5);

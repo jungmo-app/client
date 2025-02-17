@@ -10,7 +10,10 @@ import Header from './header';
 import SearchLocationBox from './searchLocationBox';
 
 interface MapProps {
+  isOpen: boolean;
+  onClose: () => void;
   currentLocation: Position | null;
+  onSelect: (address: { id: string; address: string }) => void;
 }
 
 interface IFormInput {
@@ -19,7 +22,7 @@ interface IFormInput {
 
 const GOOGLE_MAPS_LIBRARIES: ('places' | 'geometry')[] = ['places', 'geometry'];
 
-export default function Map({ currentLocation }: MapProps) {
+export default function Map({ isOpen, onClose, currentLocation, onSelect }: MapProps) {
   const methods = useForm<IFormInput>();
   const mapRef = useRef<google.maps.Map | null>(null);
 
@@ -81,18 +84,24 @@ export default function Map({ currentLocation }: MapProps) {
   }
 
   return (
-    <div className="flex h-screen w-full flex-col">
-      <FormProvider {...methods}>
-        <Header />
-        <SearchLocationBox onSubmit={methods.handleSubmit(handleSearchPlace)} />
-        <GoogleMapLoader
-          ref={mapRef}
-          markers={markers}
-          currentLocation={currentLocation}
-          searchStatus={searchStatus}
-          onResearch={methods.handleSubmit(handleSearchPlace)}
-        />
-      </FormProvider>
-    </div>
+    <>
+      {isOpen && (
+        <div className="z-[100] flex h-screen flex-col bg-white fixed-mobile-top">
+          <FormProvider {...methods}>
+            <Header onClose={onClose} />
+            <SearchLocationBox onSubmit={methods.handleSubmit(handleSearchPlace)} />
+            <GoogleMapLoader
+              ref={mapRef}
+              markers={markers}
+              currentLocation={currentLocation}
+              searchStatus={searchStatus}
+              onResearch={methods.handleSubmit(handleSearchPlace)}
+              onSelect={onSelect}
+              onClose={onClose}
+            />
+          </FormProvider>
+        </div>
+      )}
+    </>
   );
 }

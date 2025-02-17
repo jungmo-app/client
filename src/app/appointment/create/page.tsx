@@ -1,8 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { Calendar, MapPin } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { gatheringApis } from '@/apis/gathering';
 import AttendeeInput from '@/components/AttendeeInput';
 import { DatePickerSheet } from '@/components/date-picker-sheet';
 import LocationInput from '@/components/LocationInput';
@@ -12,32 +15,54 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { formattedDate } from '@/libs/date';
 import { PARTICIPANTS } from '@/mocks/appointment';
 
 type AppointmentFormData = {
   title: string;
-  datetime: string;
-  description: string;
-  location: {
-    name: string;
+  startDate: string;
+  startTime: string;
+  meetingLocation: {
+    id: string;
     address: string;
   };
+  memo: string;
+  userIds: string[];
 };
 
 export default function CreateAppointment() {
+  const router = useRouter();
   const [attendees, setAttendees] = useState<typeof PARTICIPANTS>([]);
-  const [formData, setFormData] = useState<AppointmentFormData>({
-    title: '',
-    datetime: '',
-    description: '',
-    location: {
-      name: '',
-      address: '',
+
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    getValues,
+    formState: { errors, isValid },
+  } = useForm<AppointmentFormData>({
+    defaultValues: {
+      title: '',
+      startDate: formattedDate(new Date()),
+      startTime: `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')}`,
+      meetingLocation: { id: '', address: '' },
+      memo: '',
+      userIds: [],
     },
+    mode: 'onChange',
   });
 
-  const handleSubmit = () => {
-    console.log('Form submitted:', formData);
+  const handleSubmitAppointment = async (data: AppointmentFormData) => {
+    try {
+      await gatheringApis.create({
+        ...data,
+        endDate: data.startDate,
+        meetingLocation: { placeId: data.meetingLocation.id },
+      });
+      router.push('/');
+    } catch {
+      alert('약속 등록에 실패하였습니다.');
+    }
   };
 
   return (
@@ -57,11 +82,10 @@ export default function CreateAppointment() {
         <Card className="space-y-4 rounded-2xl bg-[#F7F7F7] p-4">
           <div className="space-y-4">
             <Label>제목</Label>
-            <Input
-              placeholder="일정 제목을 입력해주세요"
-              className="bg-white"
-              value={formData.title}
-              onChange={e => setFormData({ ...formData, title: e.target.value })}
+            <Controller
+              name="title"
+              control={control}
+              render={({ field }) => <Input placeholder="일정 제목을 입력해주세요" className="bg-white" {...field} />}
             />
           </div>
         </Card>
@@ -73,8 +97,19 @@ export default function CreateAppointment() {
               <Label>날짜 및 시간</Label>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <DatePickerSheet onSelect={date => console.log(date)} />
-              <TimePickerSheet onSelect={time => console.log(time)} />
+              <DatePickerSheet
+                value={new Date(getValues('startDate'))}
+                onSelect={date => setValue('startDate', formattedDate(date))}
+              />
+              <TimePickerSheet
+                value={getValues('startTime')}
+                onSelect={time =>
+                  setValue(
+                    'startTime',
+                    `${time.hours.toString().padStart(2, '0')}:${time.minutes.toString().padStart(2, '0')}`
+                  )
+                }
+              />
             </div>
           </div>
         </Card>
@@ -84,26 +119,34 @@ export default function CreateAppointment() {
               <MapPin className="h-4 w-4" />
               <Label>장소</Label>
             </div>
-            <LocationInput
-              value={formData.location.name}
-              onChange={location =>
-                setFormData({
-                  ...formData,
-                  location,
-                })
-              }
+            <Controller
+              name="meetingLocation"
+              control={control}
+              rules={{
+                validate: {
+                  id: value => (value.id && value.address ? true : '장소 정보를 입력해주세요'),
+                },
+              }}
+              render={({ field }) => (
+                <LocationInput
+                  value={field.value.address}
+                  onChange={location => field.onChange({ id: location.id, address: location.address })}
+                />
+              )}
             />
+            {errors.meetingLocation && <span className="text-red-500">{errors.meetingLocation.id?.message}</span>}
           </div>
         </Card>
 
         <Card className="space-y-4 rounded-2xl bg-[#F7F7F7] p-4">
           <div className="space-y-4">
             <Label>설명</Label>
-            <Textarea
-              placeholder="일정에 대한 설명을 입력해주세요"
-              className="bg-white"
-              value={formData.description}
-              onChange={e => setFormData({ ...formData, description: e.target.value })}
+            <Controller
+              name="memo"
+              control={control}
+              render={({ field }) => (
+                <Textarea placeholder="일정에 대한 설명을 입력해주세요" className="bg-white" {...field} />
+              )}
             />
           </div>
         </Card>
@@ -111,7 +154,12 @@ export default function CreateAppointment() {
 
         <div className="z-10 border-t bg-white fixed-mobile-bottom">
           <div className="p-4">
-            <Button className="w-full rounded-xl" size="lg" onClick={handleSubmit}>
+            <Button
+              className="w-full rounded-xl"
+              size="lg"
+              disabled={!isValid}
+              onClick={handleSubmit(handleSubmitAppointment)}
+            >
               일정 추가
             </Button>
           </div>

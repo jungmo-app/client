@@ -3,21 +3,23 @@
 import { cookies } from 'next/headers';
 import { verifyToken } from './jwt';
 
-const cookieName = 'authorization';
+const cookieName = 'accessToken';
 
 export const deleteSession = () => {
   cookies().delete(cookieName);
 };
 
 export const getSession = async () => {
-  return cookies().get(cookieName)?.value;
+  const cookie = cookies().get(cookieName)?.value;
+  console.log(cookie);
+  return cookie;
 };
 
 /**
  * JWT 검증하고 유효한 경우 페이로드를 반환
  */
 export const verifySession = async () => {
-  const cookie = cookies().get(cookieName)?.value;
+  const cookie = await getSession();
   const session = await verifyToken(cookie);
 
   if (!session) {

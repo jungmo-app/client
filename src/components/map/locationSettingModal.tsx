@@ -13,7 +13,8 @@ import { getCacheAtom, setCacheAtom } from '@/stores/place';
 interface LocationSettingModalProps {
   placeId: null | string;
   mapRef: ForwardedRef<google.maps.Map | undefined>;
-  onClose: () => void;
+  onClose: (entireClose?: boolean) => void;
+  onSelect: (address: { id: string; address: string }) => void;
 }
 
 interface PlaceDataType {
@@ -22,7 +23,7 @@ interface PlaceDataType {
   name: string;
 }
 
-export default function LocationSettingModal({ mapRef, placeId, onClose }: LocationSettingModalProps) {
+export default function LocationSettingModal({ mapRef, placeId, onClose, onSelect }: LocationSettingModalProps) {
   const getCache = useAtom(getCacheAtom)[0];
   const setCache = useSetAtom(setCacheAtom);
 
@@ -33,6 +34,14 @@ export default function LocationSettingModal({ mapRef, placeId, onClose }: Locat
   });
 
   const [isLoaded, setIsLoaded] = useState(false);
+
+  const handleClickButton = () => {
+    if (!placeId) {
+      return;
+    }
+    onSelect({ id: placeId, address: data.address });
+    onClose(true);
+  };
 
   useEffect(() => {
     if (!mapRef || !placeId || !('current' in mapRef && mapRef.current)) {
@@ -133,7 +142,7 @@ export default function LocationSettingModal({ mapRef, placeId, onClose }: Locat
               </div>
             </ScrollArea>
             <div className="absolute bottom-0 left-0 z-[60] flex w-full border-t border-solid border-neutral-300 p-4">
-              <Button className="h-12 w-full" style={{ fontSize: '16px' }}>
+              <Button className="h-12 w-full" style={{ fontSize: '16px' }} onClick={handleClickButton}>
                 저장하기
               </Button>
             </div>

@@ -14,12 +14,14 @@ interface GoogleMapLoaderProps {
   searchStatus?: SearchStatusType | null;
   onResearch?: () => void;
   currentLocation: Position | null;
+  onSelect: (address: { id: string; address: string }) => void;
+  onClose?: () => void;
 }
 
 const DEFAULT_POSITION = { lat: 37.498095, lng: 127.02761 };
 
 const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderProps>(
-  ({ markers, searchStatus, currentLocation, onResearch }, ref) => {
+  ({ markers, searchStatus, currentLocation, onResearch, onSelect, onClose }, ref) => {
     const mapRef = useRef<google.maps.Map | null>(null);
     const [location, setLocation] = useState<Position>(currentLocation ?? DEFAULT_POSITION);
     const [isButtonVisible, setIsButtonVisible] = useState<boolean>(false);
@@ -79,8 +81,11 @@ const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderP
       setClickedId(id);
     };
 
-    const handleClosePlaceModal = () => {
+    const handleClosePlaceModal = (entireClose?: boolean) => {
       setClickedId(null);
+      if (entireClose && onClose) {
+        onClose();
+      }
     };
 
     const handleClickUpdateButton = () => {
@@ -137,7 +142,7 @@ const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderP
             현재 위치에서 검색
           </Button>
         )}
-        <LocationSettingModal mapRef={ref} placeId={clickedId} onClose={handleClosePlaceModal} />
+        <LocationSettingModal mapRef={ref} placeId={clickedId} onClose={handleClosePlaceModal} onSelect={onSelect} />
       </div>
     );
   }

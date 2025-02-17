@@ -4,10 +4,18 @@ import { ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 
-export default function Header() {
+interface HeaderProps {
+  onClose?: () => void;
+}
+
+export default function Header({ onClose }: HeaderProps) {
   const router = useRouter();
 
   const handleBack = () => {
+    if (onClose) {
+      onClose();
+      return;
+    }
     router.back();
   };
 

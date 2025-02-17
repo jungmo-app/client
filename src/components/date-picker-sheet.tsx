@@ -5,7 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/utils/styles';
 
-export function DatePickerSheet({ onSelect }: { onSelect: (date: Date) => void }) {
+interface DatePickerSheetProps {
+  value?: Date;
+  onSelect: (date: Date) => void;
+}
+
+export function DatePickerSheet({ value, onSelect }: DatePickerSheetProps) {
   const generateMonths = (startDate: Date, count: number) => {
     return Array.from({ length: count }, (_, i) => {
       const date = new Date(startDate);
@@ -22,10 +27,9 @@ export function DatePickerSheet({ onSelect }: { onSelect: (date: Date) => void }
     });
   };
 
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date>(value ?? new Date());
   const [months, setMonths] = useState(() => {
-    const currentDate = new Date();
+    const currentDate = value ?? new Date();
     return generateMonths(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1), 3);
   });
 

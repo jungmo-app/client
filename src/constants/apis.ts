@@ -5,4 +5,7 @@ export const apiPaths = {
     changePassword: '/member/password',
     deleteAccount: '/member',
   },
+  gathering: {
+    create: '/gatherings',
+  },
 } as const;
