@@ -3,11 +3,13 @@
 import { ForwardedRef, useEffect, useState } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import Image from 'next/image';
+import { gatheringApis } from '@/apis/gathering';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { placeTypeTranslations } from '@/constants/place';
 import { getCacheAtom, setCacheAtom } from '@/stores/place';
 
 interface LocationSettingModalProps {
@@ -21,6 +23,7 @@ interface PlaceDataType {
   images: string[];
   address: string;
   name: string;
+  tags: string[];
 }
 
 export default function LocationSettingModal({ mapRef, placeId, onClose, onSelect }: LocationSettingModalProps) {
@@ -31,6 +34,7 @@ export default function LocationSettingModal({ mapRef, placeId, onClose, onSelec
     images: [],
     address: '',
     name: '',
+    tags: [],
   });
 
   const [isLoaded, setIsLoaded] = useState(false);
@@ -62,12 +66,25 @@ export default function LocationSettingModal({ mapRef, placeId, onClose, onSelec
       fields: ['name', 'formatted_address', 'photos', 'types'],
     };
 
-    service.getDetails(request, (result, status) => {
+    service.getDetails(request, async (result, status) => {
       if (status === google.maps.places.PlacesServiceStatus.OK) {
+        const tags = result?.types
+          ? await Promise.all(
+              result.types.map(async item => {
+                if (placeTypeTranslations[item]) {
+                  return placeTypeTranslations[item];
+                }
+                const translatedText = (await gatheringApis.translatePlaceType(item)) ?? '';
+                return translatedText;
+              })
+            )
+          : [];
+        console.log(tags);
         const placeData = {
           images: result?.photos ? result.photos.map(photo => photo.getUrl({ maxWidth: 100, maxHeight: 100 })) : [],
           address: result?.formatted_address ?? '',
           name: result?.name ?? '',
+          tags,
         };
         setData(placeData);
         setIsLoaded(true);
@@ -110,8 +127,12 @@ export default function LocationSettingModal({ mapRef, placeId, onClose, onSelec
                 </div>
                 <div>
                   <Label className="text-neutral-400">카테고리 태그</Label>
-                  <div className="mt-1 p-1">
-                    <Input readOnly value="test" className="border-none bg-neutral-100" />
+                  <div className="mt-1 flex flex-wrap items-center gap-2 p-1">
+                    {data.tags.map((item, index) => (
+                      <Button key={index} className="cursor-default" variant={index !== 0 ? 'outline' : 'default'}>
+                        #{item}
+                      </Button>
+                    ))}
                   </div>
                 </div>
                 <div>

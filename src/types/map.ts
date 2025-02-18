@@ -14,6 +14,7 @@ export interface PlaceDataType {
   name: string;
   address: string;
   images: string[];
+  tags: string[];
 }
 
 export interface SearchStatusType {
