@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { id } from 'date-fns/locale';
 import { MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,9 +16,14 @@ export default function LocationInput({ value, onChange }: LocationInputProps) {
   const [currentLocation, setCurrentLocation] = useState<Position | null>(null);
 
   const handleButtonClick = async () => {
-    const location = await getCurrentLocation();
-    setCurrentLocation(location);
-    setIsModalOpen(true);
+    try {
+      const location = await getCurrentLocation();
+      setCurrentLocation(location);
+    } catch {
+      setCurrentLocation(null);
+    } finally {
+      setIsModalOpen(true);
+    }
   };
 
   return (
