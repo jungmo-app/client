@@ -18,6 +18,9 @@ export default async function AppointmentDetail({ id }: AppointmentDetailProps) 
   if (!appointment) {
     return <div className="flex h-screen items-center justify-center">존재하지 않는 약속입니다.</div>;
   }
+
+  const isEditable = appointment.authority === 'WRITE';
+
   const locationData = await apis.serverPlace.getDetail(appointment.meetingLocation.placeId, [
     'name',
     'formatted_address',
@@ -33,8 +36,7 @@ export default async function AppointmentDetail({ id }: AppointmentDetailProps) 
             <TotalAmountSummary totalAmount={0} size="sm" />
           </Link> */}
         </div>
-        <MainLocation appointment={appointment} location={locationData} tags={LOCATION_TAGS} />
-
+        <MainLocation appointment={appointment} location={locationData} tags={LOCATION_TAGS} isEditable={isEditable} />
         <PlacesToVisit places={PLACES} />
       </div>
       <Footer />

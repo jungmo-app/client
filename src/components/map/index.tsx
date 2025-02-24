@@ -94,20 +94,22 @@ export default function Map({ isOpen, onClose, currentLocation, onSelect }: MapP
   return (
     <>
       {isOpen && (
-        <div className="z-[100] flex h-screen flex-col bg-white fixed-mobile-top">
-          <FormProvider {...methods}>
-            <Header onClose={onClose} />
-            <SearchLocationBox onSubmit={methods.handleSubmit(handleSearchPlace)} />
-            <GoogleMapLoader
-              ref={mapRef}
-              markers={markers}
-              currentLocation={currentLocation}
-              searchStatus={searchStatus}
-              onResearch={methods.handleSubmit(handleSearchPlace)}
-              onSelect={onSelect}
-              onClose={onClose}
-            />
-          </FormProvider>
+        <div className="fixed top-0 z-[100] h-screen w-screen bg-white">
+          <div className="flex h-screen flex-col fixed-mobile-top">
+            <FormProvider {...methods}>
+              <Header onClose={onClose} />
+              <SearchLocationBox onSubmit={methods.handleSubmit(handleSearchPlace)} />
+              <GoogleMapLoader
+                ref={mapRef}
+                markers={markers}
+                currentLocation={currentLocation}
+                searchStatus={searchStatus}
+                onResearch={methods.handleSubmit(handleSearchPlace)}
+                onSelect={onSelect}
+                onClose={onClose}
+              />
+            </FormProvider>
+          </div>
         </div>
       )}
     </>

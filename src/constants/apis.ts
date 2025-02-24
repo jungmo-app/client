@@ -8,5 +8,6 @@ export const apiPaths = {
   gathering: {
     create: '/gatherings',
     getDetail: '/gatherings',
+    edit: '/gatherings',
   },
 } as const;

@@ -23,4 +23,14 @@ export const gatheringApis = {
     );
     return data;
   },
+  edit: async (id: number, payload: CreateGatheringRequest) => {
+    const response = await extractAxiosData<ApiResponse<DetailGatheringRespose>>(
+      privateAxios.put(`${apiPaths.gathering.edit}/${id}`, payload)
+    );
+    console.log(response);
+    if (response.status === 200) {
+      return true;
+    }
+    return false;
+  },
 };

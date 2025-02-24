@@ -8,7 +8,7 @@ export interface ApiResponse<T = undefined> {
   /** HTTP 상태코드 (example: 200) */
   code: number;
   /** HTTP 상태 (example: OK) */
-  status: string;
+  status: number;
 }
 
 export interface ApiErrorResponse extends Error {
