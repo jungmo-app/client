@@ -3,7 +3,7 @@
 import { ForwardedRef, useEffect, useState } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import Image from 'next/image';
-import { gatheringApis } from '@/apis/gathering';
+import { apis } from '@/apis';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -74,7 +74,7 @@ export default function LocationSettingModal({ mapRef, placeId, onClose, onSelec
                 if (placeTypeTranslations[item]) {
                   return placeTypeTranslations[item];
                 }
-                const translatedText = (await gatheringApis.translatePlaceType(item)) ?? '';
+                const translatedText = (await apis.place.translatePlaceType(item)) ?? '';
                 return translatedText;
               })
             )

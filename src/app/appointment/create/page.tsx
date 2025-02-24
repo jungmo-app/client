@@ -5,7 +5,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { Calendar, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { gatheringApis } from '@/apis/gathering';
+import { apis } from '@/apis';
 import AttendeeInput from '@/components/AttendeeInput';
 import { DatePickerSheet } from '@/components/date-picker-sheet';
 import LocationInput from '@/components/LocationInput';
@@ -54,7 +54,7 @@ export default function CreateAppointment() {
 
   const handleSubmitAppointment = async (data: AppointmentFormData) => {
     try {
-      await gatheringApis.create({
+      await apis.gathering.create({
         ...data,
         endDate: data.startDate,
         meetingLocation: { placeId: data.meetingLocation.id },
