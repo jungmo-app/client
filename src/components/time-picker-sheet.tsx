@@ -3,13 +3,15 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { cn } from '@/utils/styles';
 
 interface TimePickerSheetProps {
   value?: string;
   onSelect: (time: { hours: number; minutes: number }) => void;
+  classNames?: string;
 }
 
-export function TimePickerSheet({ value, onSelect }: TimePickerSheetProps) {
+export function TimePickerSheet({ value, onSelect, classNames }: TimePickerSheetProps) {
   const [selectedHour, setSelectedHour] = useState(value ? Number(value.split(':')[0]) : new Date().getHours());
   const [selectedMinute, setSelectedMinute] = useState(value ? Number(value.split(':')[1]) : new Date().getMinutes());
 
@@ -23,7 +25,7 @@ export function TimePickerSheet({ value, onSelect }: TimePickerSheetProps) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" className="w-full justify-start text-left font-normal">
+        <Button variant="outline" className={cn('w-full justify-start text-left font-normal', classNames)}>
           {formatTime(selectedHour, selectedMinute)}
         </Button>
       </SheetTrigger>

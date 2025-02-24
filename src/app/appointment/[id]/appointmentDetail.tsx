@@ -30,7 +30,7 @@ export default async function AppointmentDetail({ id }: AppointmentDetailProps) 
     <main className="px-4 pb-20 pt-14">
       <div className="space-y-6 py-4">
         <div>
-          <MainInfoSection appointment={appointment} />
+          <MainInfoSection appointment={appointment} isEditable={isEditable} />
           <ParticipantAvatars participants={appointment.gatheringUsers} />
           {/* <Link href="/expenses" className="mt-6 block">
             <TotalAmountSummary totalAmount={0} size="sm" />

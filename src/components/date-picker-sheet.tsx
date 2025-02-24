@@ -8,9 +8,10 @@ import { cn } from '@/utils/styles';
 interface DatePickerSheetProps {
   value?: Date;
   onSelect: (date: Date) => void;
+  classNames?: string;
 }
 
-export function DatePickerSheet({ value, onSelect }: DatePickerSheetProps) {
+export function DatePickerSheet({ value, onSelect, classNames }: DatePickerSheetProps) {
   const generateMonths = (startDate: Date, count: number) => {
     return Array.from({ length: count }, (_, i) => {
       const date = new Date(startDate);
@@ -56,7 +57,7 @@ export function DatePickerSheet({ value, onSelect }: DatePickerSheetProps) {
   };
 
   const formatDate = (date: Date) => {
-    return `${date.getMonth() + 1}월 ${date.getDate()}일 ${weekDays[date.getDay()]}요일`;
+    return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일 ${weekDays[date.getDay()]}요일`;
   };
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -81,7 +82,7 @@ export function DatePickerSheet({ value, onSelect }: DatePickerSheetProps) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" className="w-full justify-start text-left font-normal">
+        <Button variant="outline" className={cn('w-full justify-start text-left font-normal', classNames)}>
           {formatDate(selectedDate)}
         </Button>
       </SheetTrigger>
