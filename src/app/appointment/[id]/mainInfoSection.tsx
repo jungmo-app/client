@@ -1,5 +1,5 @@
 import { Calendar, PenLine } from 'lucide-react';
-import { Badge } from './ui/badge';
+import { Badge } from '@/components/ui/badge';
 
 type MainInfoSectionProps = {
   title: string;
@@ -7,7 +7,7 @@ type MainInfoSectionProps = {
   description: string;
 };
 
-const MainInfoSection = ({ title, datetime, description }: MainInfoSectionProps) => {
+export default function MainInfoSection({ title, datetime, description }: MainInfoSectionProps) {
   return (
     <div className="space-y-4 rounded-2xl p-4">
       <div className="space-y-2">
@@ -28,6 +28,4 @@ const MainInfoSection = ({ title, datetime, description }: MainInfoSectionProps)
       </div>
     </div>
   );
-};
-
-export default MainInfoSection;
+}

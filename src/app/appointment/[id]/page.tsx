@@ -1,7 +1,17 @@
-import AppointmentDetail from '@/components/appointment-detail';
+import Header from '@/components/Header';
+import AppointmentDetail from './appointmentDetail';
 
-const Appointment = () => {
-  return <AppointmentDetail />;
-};
+interface AppointmentProps {
+  params: Record<string, string>;
+}
 
-export default Appointment;
+export default function Appointment({ params }: AppointmentProps) {
+  const { id } = params;
+
+  return (
+    <div className="min-h-screen bg-white">
+      <Header />
+      <AppointmentDetail id={id} />
+    </div>
+  );
+}

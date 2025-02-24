@@ -1,7 +1,7 @@
 import { MapPin, MoreVertical } from 'lucide-react';
 import Image from 'next/image';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Badge } from './ui/badge';
 
 type Place = {
   name: string;
@@ -15,7 +15,7 @@ type PlacesToVisitProps = {
   places: Place[];
 };
 
-export function PlacesToVisit({ places }: PlacesToVisitProps) {
+export default function PlacesToVisit({ places }: PlacesToVisitProps) {
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">방문할 장소</h3>
