@@ -2,7 +2,7 @@
 
 import { apis } from '@/apis';
 import Footer from '@/components/Footer';
-import { LOCATION_TAGS, PLACES } from '@/mocks/appointment';
+import { LOCATION_TAGS } from '@/mocks/appointment';
 import MainInfoSection from './mainInfoSection';
 import MainLocation from './mainLocation';
 import ParticipantAvatars from './participantAvatars';
@@ -24,7 +24,16 @@ export default async function AppointmentDetail({ id }: AppointmentDetailProps) 
   const locationData = await apis.serverPlace.getDetail(appointment.meetingLocation.placeId, [
     'name',
     'formatted_address',
+    'geometry',
   ]);
+
+  const point =
+    locationData?.geometry?.location?.lat && locationData.geometry.location.lng
+      ? [
+          locationData.geometry.location.lat as unknown as number,
+          locationData.geometry.location.lng as unknown as number,
+        ]
+      : null;
 
   return (
     <main className="px-4 pb-20 pt-14">
@@ -37,7 +46,7 @@ export default async function AppointmentDetail({ id }: AppointmentDetailProps) 
           </Link> */}
         </div>
         <MainLocation appointment={appointment} location={locationData} tags={LOCATION_TAGS} isEditable={isEditable} />
-        <PlacesToVisit places={PLACES} />
+        <PlacesToVisit places={appointment.locations} point={point} isEditable={isEditable} />
       </div>
       <Footer />
     </main>

@@ -100,3 +100,48 @@ export const placeTypeTranslations: Record<string, string> = {
   political: '정치적',
   room: '방',
 };
+
+export const GOOGLE_MAP_FIELD = [
+  'address_component',
+  'adr_address',
+  'business_status',
+  'formatted_address',
+  'geometry',
+  'icon',
+  'icon_mask_base_uri',
+  'icon_background_color',
+  'name',
+  'permanently_closed',
+  'photo',
+  'place_id',
+  'plus_code',
+  'type',
+  'url',
+  'utc_offset',
+  'vicinity',
+
+  'formatted_phone_number',
+  'international_phone_number',
+  'website',
+
+  'opening_hours',
+  'current_opening_hours',
+  'secondary_opening_hours',
+  'special_days',
+  'temporarily_closed',
+  'reservable',
+
+  'rating',
+  'user_ratings_total',
+  'reviews',
+  'price_level',
+
+  'serves_beer',
+  'serves_wine',
+  'serves_breakfast',
+  'serves_lunch',
+  'serves_dinner',
+  'wheelchair_accessible_entrance',
+  'delivery',
+  'takeout',
+] as const;

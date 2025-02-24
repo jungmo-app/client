@@ -1,11 +1,9 @@
 import axios from 'axios';
-import { LocationDataType } from '@/types/gathering';
+import { GOOGLE_MAP_FIELD } from '@/constants/place';
 import { snakeToSpace } from '@/utils/formatText';
 
-const DETAIL_FIELD = ['name', 'formatted_address', 'location', 'photos', 'place_id', 'types'] as const;
-
 export const placeApis = {
-  getDetail: async (placeId: string, fields: (typeof DETAIL_FIELD)[number][]) => {
+  getDetail: async (placeId: string, fields: (typeof GOOGLE_MAP_FIELD)[number][]) => {
     const fieldString = fields.join(',');
     const response = await axios.post<google.maps.places.PlaceResult>(`/api/places`, {
       placeId,
@@ -31,7 +29,10 @@ export const placeApis = {
 };
 
 export const serverPlaceApis = {
-  getDetail: async (placeId: string, fields: (typeof DETAIL_FIELD)[number][]): Promise<LocationDataType | null> => {
+  getDetail: async (
+    placeId: string,
+    fields: (typeof GOOGLE_MAP_FIELD)[number][]
+  ): Promise<google.maps.places.PlaceResult | null> => {
     try {
       const fieldString = fields.join(',');
       const {
@@ -39,7 +40,7 @@ export const serverPlaceApis = {
       } = await axios.get<{ result: google.maps.places.PlaceResult }>(
         `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&fields=${fieldString}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY}&language=ko`
       );
-      return { name: result.name ?? '', address: result.formatted_address ?? '' };
+      return result;
     } catch {
       return null;
     }

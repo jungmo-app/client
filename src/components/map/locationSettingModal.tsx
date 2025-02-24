@@ -68,7 +68,7 @@ export default function LocationSettingModal({ mapRef, placeId, onClose, onSelec
     const service = new google.maps.places.PlacesService(mapRef.current);
     const request = {
       placeId,
-      fields: ['name', 'formatted_address', 'photos', 'types'],
+      fields: ['name', 'formatted_address', 'photo', 'type'],
     };
 
     service.getDetails(request, async (result, status) => {

@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 'use client';
 
 import { useState } from 'react';
@@ -6,25 +5,23 @@ import { MapPin } from 'lucide-react';
 import Link from 'next/link';
 import { gatheringApis } from '@/apis/gathering';
 import { badgeVariants } from '@/components/ui/badge';
-import { DetailGatheringRespose } from '@/types/gathering';
+import { DetailGatheringRespose, LocationDataType } from '@/types/gathering';
 import { PlaceDataType } from '@/types/map';
 import { cn } from '@/utils/styles';
 import EditLocation from './editLocation';
 
-interface LocationDataType {
-  name: string;
-  address: string;
-}
-
 type MainLocationProps = {
   appointment: DetailGatheringRespose;
-  location: LocationDataType | null;
+  location: google.maps.places.PlaceResult | null;
   tags: string[];
   isEditable?: boolean;
 };
 
 export default function MainLocation({ appointment, location, tags, isEditable }: MainLocationProps) {
-  const [locationData, setLocationData] = useState<LocationDataType | null>(location);
+  const [locationData, setLocationData] = useState<LocationDataType | null>({
+    name: location?.name ?? '',
+    address: location?.formatted_address ?? '',
+  });
 
   const handleChangeLocation = async (value: PlaceDataType) => {
     const payload = {
