@@ -5,7 +5,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { Calendar, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { apis } from '@/apis';
+import { gatheringApis } from '@/apis/gathering';
 import AttendeeInput from '@/components/AttendeeInput';
 import { DatePickerSheet } from '@/components/date-picker-sheet';
 import LocationInput from '@/components/LocationInput';
@@ -27,7 +27,7 @@ type AppointmentFormData = {
     address: string;
   };
   memo: string;
-  userIds: string[];
+  userIds: number[];
 };
 
 export default function CreateAppointment() {
@@ -54,7 +54,7 @@ export default function CreateAppointment() {
 
   const handleSubmitAppointment = async (data: AppointmentFormData) => {
     try {
-      await apis.gathering.create({
+      await gatheringApis.create({
         ...data,
         endDate: data.startDate,
         meetingLocation: { placeId: data.meetingLocation.id },
@@ -124,7 +124,7 @@ export default function CreateAppointment() {
               control={control}
               rules={{
                 validate: {
-                  id: value => (value.id && value.address ? true : '장소 정보를 입력해주세요'),
+                  id: value => (value.id ? true : '장소 정보를 입력해주세요'),
                 },
               }}
               render={({ field }) => (

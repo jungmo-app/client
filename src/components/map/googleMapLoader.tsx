@@ -6,7 +6,7 @@ import { LocateFixed } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { isEqualPositionToCenter, isInRange } from '@/libs/map/calculateDistance';
 import { getCurrentLocation } from '@/libs/map/getCurrentLocation';
-import { MarkerType, Position, SearchStatusType } from '@/types/map';
+import { MarkerType, PlaceDataType, Position, SearchStatusType } from '@/types/map';
 import LocationSettingModal from './locationSettingModal';
 
 interface GoogleMapLoaderProps {
@@ -14,7 +14,7 @@ interface GoogleMapLoaderProps {
   searchStatus?: SearchStatusType | null;
   onResearch?: () => void;
   currentLocation: Position | null;
-  onSelect: (address: { id: string; address: string }) => void;
+  onSelect: (value: PlaceDataType) => Promise<void> | void;
   onClose?: () => void;
 }
 
@@ -107,6 +107,7 @@ const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderP
             mapTypeControl: false,
             streetViewControl: false,
             zoomControl: false,
+            scrollwheel: true,
           }}
           onIdle={handleIdleMap}
           onLoad={map => {

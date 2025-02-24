@@ -7,11 +7,12 @@ export interface CreateGatheringRequest {
   title: string;
   startDate: string;
   endDate: string;
+  startTime: string;
   meetingLocation: {
     placeId: string;
   };
   memo: string;
-  userIds: string[];
+  userIds: number[];
 }
 
 export interface GatheringUsers {
@@ -32,4 +33,9 @@ export interface DetailGatheringRespose {
   gatheringUsers: GatheringUsers[];
   meetingLocation: Location;
   locations: Location[];
+}
+
+export interface LocationDataType {
+  name: string;
+  address: string;
 }

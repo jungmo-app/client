@@ -1,36 +1,29 @@
 'use client';
 
 import { ForwardedRef, useEffect, useState } from 'react';
-import { useAtom, useSetAtom } from 'jotai';
 import Image from 'next/image';
-import { apis } from '@/apis';
+import { placeApis } from '@/apis/place';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { placeTypeTranslations } from '@/constants/place';
-import { getCacheAtom, setCacheAtom } from '@/stores/place';
+import { PlaceDataType } from '@/types/map';
 
 interface LocationSettingModalProps {
   placeId: null | string;
   mapRef: ForwardedRef<google.maps.Map | undefined>;
   onClose: (entireClose?: boolean) => void;
-  onSelect: (address: { id: string; address: string }) => void;
-}
-
-interface PlaceDataType {
-  images: string[];
-  address: string;
-  name: string;
-  tags: string[];
+  onSelect: (value: PlaceDataType) => Promise<void> | void;
 }
 
 export default function LocationSettingModal({ mapRef, placeId, onClose, onSelect }: LocationSettingModalProps) {
-  const getCache = useAtom(getCacheAtom)[0];
-  const setCache = useSetAtom(setCacheAtom);
+  /* const getCache = useAtom(getCacheAtom)[0];
+  const setCache = useSetAtom(setCacheAtom); */
 
   const [data, setData] = useState<PlaceDataType>({
+    placeId: '',
     images: [],
     address: '',
     name: '',
@@ -39,12 +32,24 @@ export default function LocationSettingModal({ mapRef, placeId, onClose, onSelec
 
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const handleClickButton = () => {
+  const handleClose = (value?: boolean) => {
+    onClose(value);
+    setIsLoaded(false);
+    setData({
+      placeId: '',
+      images: [],
+      address: '',
+      name: '',
+      tags: [],
+    });
+  };
+
+  const handleClickButton = async () => {
     if (!placeId) {
       return;
     }
-    onSelect({ id: placeId, address: data.address });
-    onClose(true);
+    await onSelect(data);
+    handleClose(true);
   };
 
   useEffect(() => {
@@ -52,13 +57,13 @@ export default function LocationSettingModal({ mapRef, placeId, onClose, onSelec
       return;
     }
 
-    const cachedData = getCache(placeId);
+    /* const cachedData = getCache(placeId);
 
     if (cachedData) {
       setData(cachedData);
       setIsLoaded(true);
       return;
-    }
+    } */
 
     const service = new google.maps.places.PlacesService(mapRef.current);
     const request = {
@@ -74,24 +79,25 @@ export default function LocationSettingModal({ mapRef, placeId, onClose, onSelec
                 if (placeTypeTranslations[item]) {
                   return placeTypeTranslations[item];
                 }
-                const translatedText = (await apis.place.translatePlaceType(item)) ?? '';
+                const translatedText = (await placeApis.translatePlaceType(item)) ?? '';
                 return translatedText;
               })
             )
           : [];
-        console.log(tags);
-        const placeData = {
+        const placeData: PlaceDataType = {
+          placeId: placeId,
           images: result?.photos ? result.photos.map(photo => photo.getUrl({ maxWidth: 100, maxHeight: 100 })) : [],
           address: result?.formatted_address ?? '',
           name: result?.name ?? '',
           tags,
         };
+
         setData(placeData);
         setIsLoaded(true);
-        setCache({ placeId, data: placeData });
+        /* setCache({ placeId, data: placeData }); */
       }
     });
-  }, [placeId, mapRef, getCache, setCache]);
+  }, [placeId, mapRef /*  getCache, setCache */]);
 
   useEffect(() => {
     if (!placeId) {
@@ -100,7 +106,7 @@ export default function LocationSettingModal({ mapRef, placeId, onClose, onSelec
   }, [placeId]);
 
   return (
-    <Sheet open={Boolean(placeId)} onOpenChange={onClose}>
+    <Sheet open={Boolean(placeId)} onOpenChange={handleClose}>
       <SheetContent side="bottom" className="flex h-[60vh] flex-col pb-20">
         <SheetHeader>
           <SheetTitle>장소 정보</SheetTitle>
@@ -137,7 +143,7 @@ export default function LocationSettingModal({ mapRef, placeId, onClose, onSelec
                 </div>
                 <div>
                   <Label className="text-neutral-400">이미지</Label>
-                  <div className="mt-1 flex flex-wrap justify-between gap-2 p-1">
+                  <div className="mt-1 flex flex-wrap gap-2 p-1">
                     {data.images.length === 0 ? (
                       <div className="mt-2">이미지가 없습니다</div>
                     ) : (

@@ -11,9 +11,10 @@ export interface MarkerType {
 }
 
 export interface PlaceDataType {
-  name: string;
-  address: string;
+  placeId: string;
   images: string[];
+  address: string;
+  name: string;
   tags: string[];
 }
 

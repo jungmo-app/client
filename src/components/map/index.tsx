@@ -1,10 +1,10 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useLoadScript } from '@react-google-maps/api';
 import { getRadius } from '@/libs/map/calculateDistance';
-import { MarkerType, Position, SearchStatusType } from '@/types/map';
+import { MarkerType, PlaceDataType, Position, SearchStatusType } from '@/types/map';
 import GoogleMapLoader from './googleMapLoader';
 import Header from './header';
 import SearchLocationBox from './searchLocationBox';
@@ -13,7 +13,7 @@ interface MapProps {
   isOpen: boolean;
   onClose: () => void;
   currentLocation: Position | null;
-  onSelect: (address: { id: string; address: string }) => void;
+  onSelect: (value: PlaceDataType) => Promise<void> | void;
 }
 
 interface IFormInput {
@@ -76,10 +76,18 @@ export default function Map({ isOpen, onClose, currentLocation, onSelect }: MapP
     });
   };
 
-  if (loadError) {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      return;
+    }
+    document.body.style.overflow = 'auto';
+  }, [isOpen]);
+
+  if (loadError && isOpen) {
     return <div className="flex h-screen w-full items-center justify-center">Google Maps 로드 중 오류 발생</div>;
   }
-  if (!isLoaded) {
+  if (!isLoaded && isOpen) {
     return <div className="flex h-screen w-full items-center justify-center">지도 로드 중...</div>;
   }
 
