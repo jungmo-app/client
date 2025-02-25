@@ -39,3 +39,8 @@ export interface LocationDataType {
   name: string;
   address: string;
 }
+
+export interface VisitLocationDataType {
+  id: number;
+  place: google.maps.places.PlaceResult;
+}

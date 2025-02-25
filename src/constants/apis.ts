@@ -9,5 +9,6 @@ export const apiPaths = {
     create: '/gatherings',
     getDetail: '/gatherings',
     edit: '/gatherings',
+    delete: '/gatherings',
   },
 } as const;

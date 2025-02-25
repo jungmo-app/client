@@ -71,13 +71,9 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
     };
 
     try {
-      const result = await gatheringApis.edit(appointment.id, payload);
-
-      if (result) {
-        setData(getValues());
-        setIsEditMode(false);
-        return;
-      }
+      await gatheringApis.edit(appointment.id, payload);
+      setData(getValues());
+      setIsEditMode(false);
     } catch {
       alert('수정에 실패하였습니다');
       router.refresh();

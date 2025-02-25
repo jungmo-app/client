@@ -19,7 +19,7 @@ export default async function AppointmentDetail({ id }: AppointmentDetailProps) 
     return <div className="flex h-screen items-center justify-center">존재하지 않는 약속입니다.</div>;
   }
 
-  const isEditable = /* appointment.authority === 'WRITE' */ true;
+  const isEditable = appointment.authority === 'WRITE';
 
   const locationData = await apis.serverPlace.getDetail(appointment.meetingLocation.placeId, [
     'name',
@@ -47,7 +47,7 @@ export default async function AppointmentDetail({ id }: AppointmentDetailProps) 
         'place_id',
       ]);
       if (data) {
-        return data;
+        return { id: position.id, place: data };
       }
       return null;
     })
@@ -63,7 +63,8 @@ export default async function AppointmentDetail({ id }: AppointmentDetailProps) 
           </Link> */}
         <MainLocation appointment={appointment} location={locationData} tags={LOCATION_TAGS} isEditable={isEditable} />
         <PlacesToVisit
-          places={visitLocationData.filter(location => location !== null)}
+          locationId={Number(id)}
+          visitPlaces={visitLocationData.filter(location => location !== null)}
           point={point}
           isEditable={isEditable}
         />

@@ -12,6 +12,7 @@ export const gatheringApis = {
     const response = await extractAxiosData<CreateGatheringType>(privateAxios.post(apiPaths.gathering.create, payload));
     return response;
   },
+
   getDetail: async (id: string) => {
     const { data } = await extractAxiosData<ApiResponse<DetailGatheringRespose>>(
       privateAxios.get(
@@ -23,13 +24,14 @@ export const gatheringApis = {
     );
     return data;
   },
+
   edit: async (id: number, payload: CreateGatheringRequest) => {
-    const response = await extractAxiosData<ApiResponse<DetailGatheringRespose>>(
-      privateAxios.put(`${apiPaths.gathering.edit}/${id}`, payload)
+    await extractAxiosData<ApiResponse>(privateAxios.put(`${apiPaths.gathering.edit}/${id}`, payload));
+  },
+
+  deleteLocation: async (gatheringId: number, locationId: number) => {
+    await extractAxiosData<ApiResponse>(
+      privateAxios.delete(`${apiPaths.gathering.delete}/${gatheringId}/locations/${locationId}`)
     );
-    if (response.status === 200) {
-      return true;
-    }
-    return false;
   },
 };
