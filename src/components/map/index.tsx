@@ -14,6 +14,7 @@ interface MapProps {
   onClose: () => void;
   currentLocation: Position | null;
   onSelect: (value: PlaceDataType) => Promise<void> | void;
+  title?: string;
 }
 
 interface IFormInput {
@@ -22,7 +23,7 @@ interface IFormInput {
 
 const GOOGLE_MAPS_LIBRARIES: ('places' | 'geometry')[] = ['places', 'geometry'];
 
-export default function Map({ isOpen, onClose, currentLocation, onSelect }: MapProps) {
+export default function Map({ isOpen, currentLocation, title, onSelect, onClose }: MapProps) {
   const methods = useForm<IFormInput>();
   const mapRef = useRef<google.maps.Map | null>(null);
 
@@ -97,7 +98,7 @@ export default function Map({ isOpen, onClose, currentLocation, onSelect }: MapP
         <div className="fixed top-0 z-[100] h-screen w-screen bg-white">
           <div className="flex h-screen flex-col fixed-mobile-top">
             <FormProvider {...methods}>
-              <Header onClose={onClose} />
+              <Header title={title} onClose={onClose} />
               <SearchLocationBox onSubmit={methods.handleSubmit(handleSearchPlace)} />
               <GoogleMapLoader
                 ref={mapRef}

@@ -33,7 +33,13 @@ export default function EditLocation({ onChange }: EditLocationProps) {
       <button onClick={handleClickEditButton}>
         <Badge>편집</Badge>
       </button>
-      <Map isOpen={isOpen} currentLocation={currentLocation} onClose={handleCloseMap} onSelect={handleSelectLocation} />
+      <Map
+        isOpen={isOpen}
+        currentLocation={currentLocation}
+        title="장소 변경하기"
+        onClose={handleCloseMap}
+        onSelect={handleSelectLocation}
+      />
     </>
   );
 }

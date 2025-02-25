@@ -9,7 +9,7 @@ export default function Appointment({ params }: AppointmentProps) {
   const { id } = params;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex min-h-screen flex-col bg-white">
       <Header />
       <AppointmentDetail id={id} />
     </div>

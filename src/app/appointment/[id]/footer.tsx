@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 
-const Footer = () => {
+export default function Footer() {
   return (
     <div className="z-10 border-t bg-white fixed-mobile-bottom">
       <div className="p-4">
@@ -10,6 +10,4 @@ const Footer = () => {
       </div>
     </div>
   );
-};
-
-export default Footer;
+}

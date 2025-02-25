@@ -27,7 +27,6 @@ export const gatheringApis = {
     const response = await extractAxiosData<ApiResponse<DetailGatheringRespose>>(
       privateAxios.put(`${apiPaths.gathering.edit}/${id}`, payload)
     );
-    console.log(response);
     if (response.status === 200) {
       return true;
     }

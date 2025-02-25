@@ -18,10 +18,14 @@ type MainLocationProps = {
 };
 
 export default function MainLocation({ appointment, location, tags, isEditable }: MainLocationProps) {
-  const [locationData, setLocationData] = useState<LocationDataType | null>({
-    name: location?.name ?? '',
-    address: location?.formatted_address ?? '',
-  });
+  const [locationData, setLocationData] = useState<LocationDataType | null>(
+    location
+      ? {
+          name: location?.name ?? '',
+          address: location?.formatted_address ?? '',
+        }
+      : null
+  );
 
   const handleChangeLocation = async (value: PlaceDataType) => {
     const payload = {
@@ -35,7 +39,7 @@ export default function MainLocation({ appointment, location, tags, isEditable }
       memo: appointment.memo,
       userIds: appointment.gatheringUsers.map(user => user.userId),
     };
-    console.log(payload);
+
     const result = await gatheringApis.edit(appointment.id, payload);
     if (result) {
       setLocationData({ name: value.name, address: value.address });
@@ -49,7 +53,7 @@ export default function MainLocation({ appointment, location, tags, isEditable }
       <div className="rounded-2xl bg-[#f8f8f8] p-4">
         <div className="flex items-center gap-2">
           <MapPin className="h-5 w-5 text-primary" />
-          <h3 className="flex-1 font-medium">{locationData ? locationData.name : '위치를 불러올 수 없습니다'}</h3>
+          <h3 className="flex-1 font-medium">{locationData?.name ?? '위치를 불러올 수 없습니다'}</h3>
           {isEditable && <EditLocation onChange={handleChangeLocation} />}
         </div>
         <p className="mt-1 text-sm text-gray-500">{locationData?.address}</p>
