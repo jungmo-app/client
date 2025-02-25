@@ -11,6 +11,7 @@ export const placeApis = {
     });
     return response;
   },
+
   translatePlaceType: async (payload: string) => {
     const spaceWord = snakeToSpace(payload);
     const url = 'https://libretranslate.de/translate';

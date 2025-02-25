@@ -35,6 +35,21 @@ export default async function AppointmentDetail({ id }: AppointmentDetailProps) 
         ]
       : null;
 
+  const visitLocationData = await Promise.all(
+    appointment.locations.map(
+      async position =>
+        await apis.serverPlace.getDetail(position.placeId, [
+          'name',
+          'formatted_address',
+          'icon_background_color',
+          'geometry',
+          'photo',
+          'type',
+          'place_id',
+        ])
+    )
+  );
+
   return (
     <main className="px-4 pb-20 pt-14">
       <div className="space-y-6 py-4">
@@ -46,7 +61,11 @@ export default async function AppointmentDetail({ id }: AppointmentDetailProps) 
           </Link> */}
         </div>
         <MainLocation appointment={appointment} location={locationData} tags={LOCATION_TAGS} isEditable={isEditable} />
-        <PlacesToVisit places={appointment.locations} point={point} isEditable={isEditable} />
+        <PlacesToVisit
+          places={visitLocationData.filter(location => location !== null)}
+          point={point}
+          isEditable={isEditable}
+        />
       </div>
       <Footer />
     </main>

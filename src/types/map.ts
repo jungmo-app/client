@@ -22,3 +22,7 @@ export interface SearchStatusType {
   center: google.maps.LatLng;
   bounds: google.maps.LatLngBounds;
 }
+
+export interface Photos extends google.maps.places.PlacePhoto {
+  photo_reference: string;
+}
