@@ -5,7 +5,7 @@ import { PopoverTrigger } from '@radix-ui/react-popover';
 import { MapPin, MoreVertical } from 'lucide-react';
 import Image from 'next/image';
 import { apis } from '@/apis';
-import LocationSettingModal from '@/components/map/locationSettingModal';
+import LocationSettingModal from '@/components/modals/locationSettingModal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent } from '@/components/ui/popover';

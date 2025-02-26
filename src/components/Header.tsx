@@ -33,17 +33,6 @@ const Header = ({ title, className, children, onClose, ...props }: HeaderProps) 
           <h1 className="font-medium">{title}</h1>
         </div>
         {children}
-        {/* <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon">
-            <Share2 className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="icon">
-            <Map className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="icon">
-            <MoreVertical className="h-5 w-5" />
-          </Button>
-        </div> */}
       </div>
     </header>
   );

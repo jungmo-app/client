@@ -3,10 +3,10 @@
 import * as React from 'react';
 import dayjs from 'dayjs';
 import { Calendar as CalendarIcon } from 'lucide-react';
+import Calendar from '@/components/calendar';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/utils/styles';
-import Calendar from './calendar';
 
 type DatePickerProps = {
   date?: Date;
@@ -34,7 +34,6 @@ export function DatePicker({ date, onSelect, className }: DatePickerProps) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
-        {/* <Calendar initialFocus locale={ko} mode="single" selected={date} onSelect={handleSelect} /> */}
         <Calendar date={date ?? new Date()} onSelect={handleSelect} />
       </PopoverContent>
     </Popover>

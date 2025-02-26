@@ -3,12 +3,12 @@
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
 import { GoogleMap, MarkerF } from '@react-google-maps/api';
 import { LocateFixed } from 'lucide-react';
+import LocationSettingModal from '@/components/modals/locationSettingModal';
 import { Button } from '@/components/ui/button';
 import { GOOGLE_MAP_FIELD } from '@/constants/place';
 import { isEqualPositionToCenter, isInRange } from '@/libs/map/calculateDistance';
 import { getCurrentLocation } from '@/libs/map/getCurrentLocation';
 import { MarkerType, Position, SearchStatusType } from '@/types/map';
-import LocationSettingModal from './locationSettingModal';
 
 interface GoogleMapLoaderProps {
   markers: MarkerType[];

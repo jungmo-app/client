@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useLoadScript } from '@react-google-maps/api';
-import Header from '@/components/Header';
+import Header from '@/components/header';
 import { GOOGLE_MAP_FIELD } from '@/constants/place';
 import { getRadius } from '@/libs/map/calculateDistance';
 import { MarkerType, Position, SearchStatusType } from '@/types/map';

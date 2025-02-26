@@ -28,9 +28,6 @@ export default function LocationSettingModal({
   onClose,
   onSelect,
 }: LocationSettingModalProps) {
-  /* const getCache = useAtom(getCacheAtom)[0];
-  const setCache = useSetAtom(setCacheAtom); */
-
   const [data, setData] = useState<google.maps.places.PlaceResult | null>(null);
   const [tags, setTags] = useState<string[]>([]);
 
@@ -48,14 +45,6 @@ export default function LocationSettingModal({
   };
 
   useEffect(() => {
-    /* const cachedData = getCache(placeId);
-
-    if (cachedData) {
-      setData(cachedData);
-      setIsLoaded(true);
-      return;
-    } */
-
     if (locationData) {
       setData(locationData);
       return;

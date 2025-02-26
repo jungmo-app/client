@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Users } from 'lucide-react';
+import AttendeeSelectModal from '@/components/modals/attendeeSelectModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PARTICIPANTS } from '@/mocks/appointment';
-import AttendeeSelectModal from './modals/AttendeeSelectModal';
 
 type AttendeeInputProps = {
   selectedAttendees: typeof PARTICIPANTS;
