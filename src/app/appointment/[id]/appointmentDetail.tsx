@@ -1,8 +1,5 @@
-/* eslint-disable max-len */
-
 import { apis } from '@/apis';
 import { LOCATION_TAGS } from '@/mocks/appointment';
-import Footer from './footer';
 import MainInfoSection from './mainInfoSection';
 import MainLocation from './mainLocation';
 import ParticipantAvatars from './participantAvatars';
@@ -63,13 +60,12 @@ export default async function AppointmentDetail({ id }: AppointmentDetailProps) 
           </Link> */}
         <MainLocation appointment={appointment} location={locationData} tags={LOCATION_TAGS} isEditable={isEditable} />
         <PlacesToVisit
-          locationId={id}
+          appointmentId={id}
           visitPlaces={visitLocationData.filter(location => location !== null)}
           point={point}
           isEditable={isEditable}
         />
       </div>
-      {isEditable && <Footer />}
     </main>
   );
 }

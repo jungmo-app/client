@@ -10,5 +10,6 @@ export const apiPaths = {
     getDetail: '/gatherings',
     edit: '/gatherings',
     delete: '/gatherings',
+    addLocation: '/gatherings',
   },
 } as const;

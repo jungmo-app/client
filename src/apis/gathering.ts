@@ -34,4 +34,13 @@ export const gatheringApis = {
       privateAxios.delete(`${apiPaths.gathering.delete}/${gatheringId}/locations/${locationId}`)
     );
   },
+
+  addLocation: async (gatheringId: number, placeId: string) => {
+    const response = await extractAxiosData<ApiResponse<number>>(
+      privateAxios.post(`${apiPaths.gathering.addLocation}/${gatheringId}/locations`, {
+        placeId,
+      })
+    );
+    return response;
+  },
 };

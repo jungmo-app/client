@@ -4,24 +4,26 @@ import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from '
 import { GoogleMap, MarkerF } from '@react-google-maps/api';
 import { LocateFixed } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { GOOGLE_MAP_FIELD } from '@/constants/place';
 import { isEqualPositionToCenter, isInRange } from '@/libs/map/calculateDistance';
 import { getCurrentLocation } from '@/libs/map/getCurrentLocation';
-import { MarkerType, PlaceDataType, Position, SearchStatusType } from '@/types/map';
+import { MarkerType, Position, SearchStatusType } from '@/types/map';
 import LocationSettingModal from './locationSettingModal';
 
 interface GoogleMapLoaderProps {
   markers: MarkerType[];
+  target?: (typeof GOOGLE_MAP_FIELD)[number][];
   searchStatus?: SearchStatusType | null;
   onResearch?: () => void;
   currentLocation: Position | null;
-  onSelect: (value: PlaceDataType) => Promise<void> | void;
+  onSelect: (value: google.maps.places.PlaceResult) => Promise<void> | void;
   onClose?: () => void;
 }
 
 const DEFAULT_POSITION = { lat: 37.498095, lng: 127.02761 };
 
 const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderProps>(
-  ({ markers, searchStatus, currentLocation, onResearch, onSelect, onClose }, ref) => {
+  ({ markers, target, searchStatus, currentLocation, onResearch, onSelect, onClose }, ref) => {
     const mapRef = useRef<google.maps.Map | null>(null);
     const [location, setLocation] = useState<Position>(currentLocation ?? DEFAULT_POSITION);
     const [isButtonVisible, setIsButtonVisible] = useState<boolean>(false);
@@ -148,6 +150,7 @@ const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderP
         )}
         <LocationSettingModal
           isOpen={Boolean(clickedId)}
+          target={target}
           placeId={clickedId}
           onClose={handleClosePlaceModal}
           onSelect={onSelect}

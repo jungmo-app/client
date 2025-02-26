@@ -8,7 +8,7 @@ import Map from './map';
 
 type LocationInputProps = {
   value: string;
-  onChange: (address: { id: string; address: string }) => void;
+  onChange: (value: { id: string; address: string }) => Promise<void> | void;
 };
 
 export default function LocationInput({ value, onChange }: LocationInputProps) {
@@ -24,6 +24,13 @@ export default function LocationInput({ value, onChange }: LocationInputProps) {
     } finally {
       setIsModalOpen(true);
     }
+  };
+
+  const handleSelectLocation = async (value: google.maps.places.PlaceResult) => {
+    if (!value.place_id || !value.formatted_address) {
+      return;
+    }
+    await onChange({ id: value.place_id, address: value.formatted_address });
   };
 
   return (
@@ -48,7 +55,7 @@ export default function LocationInput({ value, onChange }: LocationInputProps) {
         isOpen={isModalOpen}
         currentLocation={currentLocation}
         onClose={() => setIsModalOpen(false)}
-        onSelect={onChange}
+        onSelect={handleSelectLocation}
       />
     </div>
   );

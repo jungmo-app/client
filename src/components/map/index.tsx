@@ -1,19 +1,21 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useLoadScript } from '@react-google-maps/api';
+import { GOOGLE_MAP_FIELD } from '@/constants/place';
 import { getRadius } from '@/libs/map/calculateDistance';
-import { MarkerType, PlaceDataType, Position, SearchStatusType } from '@/types/map';
+import { MarkerType, Position, SearchStatusType } from '@/types/map';
 import GoogleMapLoader from './googleMapLoader';
 import Header from './header';
 import SearchLocationBox from './searchLocationBox';
 
 interface MapProps {
   isOpen: boolean;
+  target?: (typeof GOOGLE_MAP_FIELD)[number][];
   onClose: () => void;
   currentLocation: Position | null;
-  onSelect: (value: PlaceDataType) => Promise<void> | void;
+  onSelect: (value: google.maps.places.PlaceResult) => Promise<void> | void;
   title?: string;
 }
 
@@ -23,7 +25,7 @@ interface IFormInput {
 
 const GOOGLE_MAPS_LIBRARIES: ('places' | 'geometry')[] = ['places', 'geometry'];
 
-export default function Map({ isOpen, currentLocation, title, onSelect, onClose }: MapProps) {
+export default function Map({ isOpen, currentLocation, title, target, onSelect, onClose }: MapProps) {
   const methods = useForm<IFormInput>();
   const mapRef = useRef<google.maps.Map | null>(null);
 
@@ -34,6 +36,21 @@ export default function Map({ isOpen, currentLocation, title, onSelect, onClose 
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY as string,
     libraries: GOOGLE_MAPS_LIBRARIES,
   });
+
+  const handleClose = useCallback(() => {
+    setMarkers([]);
+    methods.setValue('inputValue', '');
+    onClose();
+  }, [methods, onClose]);
+
+  const handleSelect = useCallback(
+    async (value: google.maps.places.PlaceResult) => {
+      setMarkers([]);
+      methods.setValue('inputValue', '');
+      await onSelect(value);
+    },
+    [methods, onSelect]
+  );
 
   const handleSearchPlace = (value: IFormInput) => {
     if (!mapRef.current || !google.maps || !value.inputValue) {
@@ -98,16 +115,17 @@ export default function Map({ isOpen, currentLocation, title, onSelect, onClose 
         <div className="fixed top-0 z-[100] h-screen w-screen bg-white">
           <div className="flex h-screen flex-col fixed-mobile-top">
             <FormProvider {...methods}>
-              <Header title={title} onClose={onClose} />
+              <Header title={title} onClose={handleClose} />
               <SearchLocationBox onSubmit={methods.handleSubmit(handleSearchPlace)} />
               <GoogleMapLoader
                 ref={mapRef}
                 markers={markers}
+                target={target}
                 currentLocation={currentLocation}
                 searchStatus={searchStatus}
                 onResearch={methods.handleSubmit(handleSearchPlace)}
-                onSelect={onSelect}
-                onClose={onClose}
+                onSelect={handleSelect}
+                onClose={handleClose}
               />
             </FormProvider>
           </div>

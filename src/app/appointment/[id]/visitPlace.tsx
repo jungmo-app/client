@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { PopoverTrigger } from '@radix-ui/react-popover';
 import { MapPin, MoreVertical } from 'lucide-react';
 import Image from 'next/image';
@@ -23,33 +23,22 @@ interface VisitPlaceProps {
 
 export default function VisitPlace({ visitPlace, point, onDeleteLoation, isEditable }: VisitPlaceProps) {
   const popOverRef = useRef<HTMLDivElement>(null);
-  const [tag, setTag] = useState<string[] | null>(
-    visitPlace.place.types ? visitPlace.place.types.map(item => placeTypeTranslations[item] ?? '') : null
+  const locationData = visitPlace.place;
+  const [tag, setTag] = useState<string>(
+    placeTypeTranslations[locationData.types ? locationData.types[0] : 'none'] ?? ''
   );
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [isOpenSetting, setIsOpenSetting] = useState<boolean>(false);
 
   const distance =
-    point && visitPlace.place?.geometry?.location
+    point && locationData?.geometry?.location
       ? getDistance(
           point[0],
           point[1],
-          visitPlace.place.geometry.location.lat as unknown as number,
-          visitPlace.place.geometry.location.lng as unknown as number
+          locationData.geometry.location.lat as unknown as number,
+          locationData.geometry.location.lng as unknown as number
         )
       : null;
-
-  const detailData = {
-    placeId: visitPlace.place.place_id ?? '',
-    images:
-      visitPlace.place.photos?.map(photo => {
-        const typedPhoto = photo as Photos;
-        return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${typedPhoto.photo_reference}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY}`;
-      }) ?? [],
-    address: visitPlace.place.formatted_address ?? '',
-    name: visitPlace.place.name ?? '',
-    tags: tag ?? [],
-  };
 
   const handleClickWrapper = (e: React.MouseEvent) => {
     if (popOverRef.current?.contains(e.target as Node)) {
@@ -66,26 +55,23 @@ export default function VisitPlace({ visitPlace, point, onDeleteLoation, isEdita
     setIsOpenSetting(value);
   };
 
-  const handleDeleteLocation = async () => {
+  const handleDeleteLocation = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     setIsOpenSetting(false);
     await onDeleteLoation(visitPlace.id);
   };
 
   useEffect(() => {
     const getTag = async () => {
-      if (!visitPlace.place.types) {
+      if (!locationData.types || placeTypeTranslations[locationData.types[0]]) {
         return;
       }
 
-      const tagData = await Promise.all(
-        visitPlace.place.types.map(
-          async item => placeTypeTranslations[item] ?? (await apis.place.translatePlaceType(item))
-        )
-      );
+      const tagData = (await apis.place.translatePlaceType(locationData.types[0])) ?? '';
       setTag(tagData);
     };
     getTag();
-  }, [visitPlace]);
+  }, [locationData]);
 
   return (
     <>
@@ -93,18 +79,18 @@ export default function VisitPlace({ visitPlace, point, onDeleteLoation, isEdita
         <div className="flex items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
             <div
-              className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${visitPlace.place?.icon_background_color}`}
+              className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${locationData?.icon_background_color}`}
             >
               <MapPin className="h-5 w-5" />
             </div>
             <div className="min-w-0">
               <div className="mb-1 flex items-center gap-2">
-                <div className="truncate font-medium">{visitPlace.place?.name ?? ''}</div>
-                {tag && <Badge variant="secondary">{tag[0]}</Badge>}
+                <div className="truncate font-medium">{locationData?.name ?? ''}</div>
+                {tag && <Badge variant="secondary">{tag}</Badge>}
               </div>
               <div className="text-sm text-gray-500">
                 <span className="block truncate">
-                  {distance && `${distance[0]} ${distance[1]} • `} {visitPlace.place?.formatted_address ?? ''}
+                  {distance && `${distance[0]} ${distance[1]} • `} {locationData?.formatted_address ?? ''}
                 </span>
               </div>
             </div>
@@ -130,7 +116,7 @@ export default function VisitPlace({ visitPlace, point, onDeleteLoation, isEdita
           )}
         </div>
         <div className="mt-3 grid grid-cols-3 gap-2">
-          {visitPlace.place.photos?.slice(0, 3).map(photo => {
+          {locationData.photos?.slice(0, 3).map(photo => {
             const typedPhoto = photo as Photos;
 
             return (
@@ -150,8 +136,8 @@ export default function VisitPlace({ visitPlace, point, onDeleteLoation, isEdita
       </div>
       <LocationSettingModal
         isOpen={isOpenModal}
-        placeId={visitPlace.place.place_id ?? null}
-        locationData={detailData}
+        placeId={locationData.place_id ?? null}
+        locationData={locationData}
         onClose={handleClosePlaceModal}
       />
     </>

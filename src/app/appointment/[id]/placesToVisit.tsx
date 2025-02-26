@@ -5,22 +5,23 @@ import { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
 import { VisitLocationDataType } from '@/types/gathering';
+import Footer from './footer';
 import VisitPlace from './visitPlace';
 
 type PlacesToVisitProps = {
-  locationId: number;
+  appointmentId: number;
   point: number[] | null;
   visitPlaces: VisitLocationDataType[];
   isEditable: boolean;
 };
 
-export default function PlacesToVisit({ locationId, point, visitPlaces, isEditable }: PlacesToVisitProps) {
+export default function PlacesToVisit({ appointmentId, point, visitPlaces, isEditable }: PlacesToVisitProps) {
   const router = useRouter();
   const [locations, setLocations] = useState<VisitLocationDataType[]>(visitPlaces);
 
   const handleDeleteLocation = async (placeId: number) => {
     try {
-      await apis.gathering.deleteLocation(locationId, placeId);
+      await apis.gathering.deleteLocation(appointmentId, placeId);
       setLocations(prev => prev.filter(place => place.id !== placeId));
     } catch (error) {
       const e = error as AxiosError;
@@ -28,6 +29,10 @@ export default function PlacesToVisit({ locationId, point, visitPlaces, isEditab
       alert('삭제할 수 없습니다.');
       router.refresh();
     }
+  };
+
+  const handleAddLocation = (id: number, value: google.maps.places.PlaceResult) => {
+    setLocations(prev => [...prev, { id, place: value }]);
   };
 
   return (
@@ -51,6 +56,7 @@ export default function PlacesToVisit({ locationId, point, visitPlaces, isEditab
           </div>
         )}
       </div>
+      {isEditable && <Footer id={appointmentId} onAddLocation={handleAddLocation} />}
     </div>
   );
 }
