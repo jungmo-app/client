@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { PopoverTrigger } from '@radix-ui/react-popover';
 import { MapPin, MoreVertical } from 'lucide-react';
 import Image from 'next/image';
 import { apis } from '@/apis';
+import LocationSettingModal from '@/components/map/locationSettingModal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent } from '@/components/ui/popover';
@@ -21,12 +22,12 @@ interface VisitPlaceProps {
 }
 
 export default function VisitPlace({ visitPlace, point, onDeleteLoation, isEditable }: VisitPlaceProps) {
-  const [tag, setTag] = useState(
-    visitPlace.place.types && placeTypeTranslations[visitPlace.place.types[0]]
-      ? placeTypeTranslations[visitPlace.place.types[0]]
-      : ''
+  const popOverRef = useRef<HTMLDivElement>(null);
+  const [tag, setTag] = useState<string[] | null>(
+    visitPlace.place.types ? visitPlace.place.types.map(item => placeTypeTranslations[item] ?? '') : null
   );
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+  const [isOpenSetting, setIsOpenSetting] = useState<boolean>(false);
 
   const distance =
     point && visitPlace.place?.geometry?.location
@@ -38,31 +39,57 @@ export default function VisitPlace({ visitPlace, point, onDeleteLoation, isEdita
         )
       : null;
 
+  const detailData = {
+    placeId: visitPlace.place.place_id ?? '',
+    images:
+      visitPlace.place.photos?.map(photo => {
+        const typedPhoto = photo as Photos;
+        return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${typedPhoto.photo_reference}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY}`;
+      }) ?? [],
+    address: visitPlace.place.formatted_address ?? '',
+    name: visitPlace.place.name ?? '',
+    tags: tag ?? [],
+  };
+
+  const handleClickWrapper = (e: React.MouseEvent) => {
+    if (popOverRef.current?.contains(e.target as Node)) {
+      return;
+    }
+    setIsOpenModal(true);
+  };
+
+  const handleClosePlaceModal = useCallback(() => {
+    setIsOpenModal(false);
+  }, []);
+
   const handleOpenPopover = (value: boolean) => {
-    setIsOpen(value);
+    setIsOpenSetting(value);
   };
 
   const handleDeleteLocation = async () => {
-    setIsOpen(false);
+    setIsOpenSetting(false);
     await onDeleteLoation(visitPlace.id);
   };
 
   useEffect(() => {
     const getTag = async () => {
-      if (!visitPlace.place.types || (visitPlace.place.types && placeTypeTranslations[visitPlace.place.types[0]])) {
+      if (!visitPlace.place.types) {
         return;
       }
-      const tagName = await apis.place.translatePlaceType(visitPlace.place.types[0]);
-      if (tagName) {
-        setTag(tagName);
-      }
+
+      const tagData = await Promise.all(
+        visitPlace.place.types.map(
+          async item => placeTypeTranslations[item] ?? (await apis.place.translatePlaceType(item))
+        )
+      );
+      setTag(tagData);
     };
     getTag();
   }, [visitPlace]);
 
   return (
     <>
-      <div className="rounded-2xl bg-[#f8f8f8] p-4">
+      <div className="cursor-pointer rounded-2xl bg-[#f8f8f8] p-4" onClick={handleClickWrapper}>
         <div className="flex items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
             <div
@@ -73,7 +100,7 @@ export default function VisitPlace({ visitPlace, point, onDeleteLoation, isEdita
             <div className="min-w-0">
               <div className="mb-1 flex items-center gap-2">
                 <div className="truncate font-medium">{visitPlace.place?.name ?? ''}</div>
-                <Badge variant="secondary">{tag}</Badge>
+                {tag && <Badge variant="secondary">{tag[0]}</Badge>}
               </div>
               <div className="text-sm text-gray-500">
                 <span className="block truncate">
@@ -83,21 +110,23 @@ export default function VisitPlace({ visitPlace, point, onDeleteLoation, isEdita
             </div>
           </div>
           {isEditable && (
-            <Popover open={isOpen} onOpenChange={handleOpenPopover}>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="flex-shrink-0 self-start">
-                  <MoreVertical className="h-5 w-5" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                className="flex -translate-x-8 items-center justify-center p-0 text-sm"
-                style={{ width: '88px', height: '48px' }}
-              >
-                <Button variant="ghost" onClick={handleDeleteLocation}>
-                  삭제하기
-                </Button>
-              </PopoverContent>
-            </Popover>
+            <div ref={popOverRef}>
+              <Popover open={isOpenSetting} onOpenChange={handleOpenPopover}>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon" className="flex-shrink-0 self-start">
+                    <MoreVertical className="h-5 w-5" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="flex -translate-x-8 items-center justify-center p-0 text-sm"
+                  style={{ width: '88px', height: '48px' }}
+                >
+                  <Button variant="ghost" onClick={handleDeleteLocation}>
+                    삭제하기
+                  </Button>
+                </PopoverContent>
+              </Popover>
+            </div>
           )}
         </div>
         <div className="mt-3 grid grid-cols-3 gap-2">
@@ -119,6 +148,12 @@ export default function VisitPlace({ visitPlace, point, onDeleteLoation, isEdita
           })}
         </div>
       </div>
+      <LocationSettingModal
+        isOpen={isOpenModal}
+        placeId={visitPlace.place.place_id ?? null}
+        locationData={detailData}
+        onClose={handleClosePlaceModal}
+      />
     </>
   );
 }

@@ -19,7 +19,6 @@ export default function PlacesToVisit({ locationId, point, visitPlaces, isEditab
   const [locations, setLocations] = useState<VisitLocationDataType[]>(visitPlaces);
 
   const handleDeleteLocation = async (placeId: number) => {
-    /* api 요청 */
     try {
       await apis.gathering.deleteLocation(locationId, placeId);
       setLocations(prev => prev.filter(place => place.id !== placeId));

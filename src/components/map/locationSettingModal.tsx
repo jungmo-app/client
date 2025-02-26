@@ -1,24 +1,31 @@
 'use client';
 
-import { ForwardedRef, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { placeApis } from '@/apis/place';
+import { apis } from '@/apis';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { placeTypeTranslations } from '@/constants/place';
-import { PlaceDataType } from '@/types/map';
+import { Photos, PlaceDataType } from '@/types/map';
 
 interface LocationSettingModalProps {
+  isOpen: boolean;
   placeId: null | string;
-  mapRef: ForwardedRef<google.maps.Map | undefined>;
+  locationData?: PlaceDataType;
   onClose: (entireClose?: boolean) => void;
-  onSelect: (value: PlaceDataType) => Promise<void> | void;
+  onSelect?: (value: PlaceDataType) => Promise<void> | void;
 }
 
-export default function LocationSettingModal({ mapRef, placeId, onClose, onSelect }: LocationSettingModalProps) {
+export default function LocationSettingModal({
+  isOpen,
+  locationData,
+  placeId,
+  onClose,
+  onSelect,
+}: LocationSettingModalProps) {
   /* const getCache = useAtom(getCacheAtom)[0];
   const setCache = useSetAtom(setCacheAtom); */
 
@@ -30,33 +37,20 @@ export default function LocationSettingModal({ mapRef, placeId, onClose, onSelec
     tags: [],
   });
 
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  const handleClose = (value?: boolean) => {
-    onClose(value);
-    setIsLoaded(false);
-    setData({
-      placeId: '',
-      images: [],
-      address: '',
-      name: '',
-      tags: [],
-    });
-  };
+  const [isLoaded, setIsLoaded] = useState(Boolean(locationData));
 
   const handleClickButton = async () => {
     if (!placeId) {
       return;
     }
-    await onSelect(data);
-    handleClose(true);
+    if (onSelect) {
+      await onSelect(data);
+    }
+
+    onClose(true);
   };
 
   useEffect(() => {
-    if (!mapRef || !placeId || !('current' in mapRef && mapRef.current)) {
-      return;
-    }
-
     /* const cachedData = getCache(placeId);
 
     if (cachedData) {
@@ -65,49 +59,55 @@ export default function LocationSettingModal({ mapRef, placeId, onClose, onSelec
       return;
     } */
 
-    const service = new google.maps.places.PlacesService(mapRef.current);
-    const request = {
-      placeId,
-      fields: ['name', 'formatted_address', 'photo', 'type'],
-    };
+    if (locationData) {
+      setData(locationData);
+      return;
+    }
 
-    service.getDetails(request, async (result, status) => {
-      if (status === google.maps.places.PlacesServiceStatus.OK) {
-        const tags = result?.types
+    if (!placeId) {
+      return;
+    }
+
+    const getData = async () => {
+      setIsLoaded(false);
+      try {
+        const { data: detailData } = await apis.place.getDetail(placeId, [
+          'name',
+          'formatted_address',
+          'photo',
+          'type',
+        ]);
+        const tags = detailData.types
           ? await Promise.all(
-              result.types.map(async item => {
-                if (placeTypeTranslations[item]) {
-                  return placeTypeTranslations[item];
-                }
-                const translatedText = (await placeApis.translatePlaceType(item)) ?? '';
-                return translatedText;
-              })
+              detailData.types.map(
+                async item => placeTypeTranslations[item] ?? (await apis.place.translatePlaceType(item))
+              )
             )
           : [];
-        const placeData: PlaceDataType = {
-          placeId: placeId,
-          images: result?.photos ? result.photos.map(photo => photo.getUrl({ maxWidth: 100, maxHeight: 100 })) : [],
-          address: result?.formatted_address ?? '',
-          name: result?.name ?? '',
+        setData({
+          placeId,
+          images: detailData.photos
+            ? detailData.photos.map(photo => {
+                const typedPhoto = photo as Photos;
+                return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${typedPhoto.photo_reference}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY}`;
+              })
+            : [],
+          address: detailData.formatted_address ?? '',
+          name: detailData.name ?? '',
           tags,
-        };
-
-        setData(placeData);
+        });
         setIsLoaded(true);
-        /* setCache({ placeId, data: placeData }); */
+      } catch {
+        alert('장소 정보를 가져올 수 없습니다');
+        onClose();
       }
-    });
-  }, [placeId, mapRef /*  getCache, setCache */]);
-
-  useEffect(() => {
-    if (!placeId) {
-      setIsLoaded(false);
-    }
-  }, [placeId]);
+    };
+    getData();
+  }, [placeId, onClose, locationData /*  getCache, setCache */]);
 
   return (
-    <Sheet open={Boolean(placeId)} onOpenChange={handleClose}>
-      <SheetContent side="bottom" className="flex h-[60vh] flex-col pb-20">
+    <Sheet open={isOpen} onOpenChange={() => onClose(false)}>
+      <SheetContent side="bottom" className={`flex h-[60vh] flex-col ${onSelect && 'pb-20'}`}>
         <SheetHeader>
           <SheetTitle>장소 정보</SheetTitle>
         </SheetHeader>
@@ -168,11 +168,13 @@ export default function LocationSettingModal({ mapRef, placeId, onClose, onSelec
                 </div>
               </div>
             </ScrollArea>
-            <div className="absolute bottom-0 left-0 z-[60] flex w-full border-t border-solid border-neutral-300 p-4">
-              <Button className="h-12 w-full" style={{ fontSize: '16px' }} onClick={handleClickButton}>
-                저장하기
-              </Button>
-            </div>
+            {onSelect && (
+              <div className="absolute bottom-0 left-0 z-[60] flex w-full border-t border-solid border-neutral-300 p-4">
+                <Button className="h-12 w-full" style={{ fontSize: '16px' }} onClick={handleClickButton}>
+                  저장하기
+                </Button>
+              </div>
+            )}
           </>
         )}
       </SheetContent>

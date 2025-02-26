@@ -11,7 +11,7 @@ export default function Appointment({ params }: AppointmentProps) {
   return (
     <div className="flex min-h-screen flex-col bg-white">
       <Header />
-      <AppointmentDetail id={id} />
+      <AppointmentDetail id={Number(id)} />
     </div>
   );
 }

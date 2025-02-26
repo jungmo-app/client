@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
 import { GoogleMap, MarkerF } from '@react-google-maps/api';
 import { LocateFixed } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -81,12 +81,15 @@ const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderP
       setClickedId(id);
     };
 
-    const handleClosePlaceModal = (entireClose?: boolean) => {
-      setClickedId(null);
-      if (entireClose && onClose) {
-        onClose();
-      }
-    };
+    const handleClosePlaceModal = useCallback(
+      (entireClose?: boolean) => {
+        setClickedId(null);
+        if (entireClose && onClose) {
+          onClose();
+        }
+      },
+      [onClose]
+    );
 
     const handleClickUpdateButton = () => {
       if (!onResearch) {
@@ -143,7 +146,12 @@ const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderP
             현재 위치에서 검색
           </Button>
         )}
-        <LocationSettingModal mapRef={ref} placeId={clickedId} onClose={handleClosePlaceModal} onSelect={onSelect} />
+        <LocationSettingModal
+          isOpen={Boolean(clickedId)}
+          placeId={clickedId}
+          onClose={handleClosePlaceModal}
+          onSelect={onSelect}
+        />
       </div>
     );
   }

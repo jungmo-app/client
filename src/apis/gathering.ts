@@ -13,7 +13,7 @@ export const gatheringApis = {
     return response;
   },
 
-  getDetail: async (id: string) => {
+  getDetail: async (id: number) => {
     const { data } = await extractAxiosData<ApiResponse<DetailGatheringRespose>>(
       privateAxios.get(
         `${apiPaths.gathering.getDetail}/${id}` /* , {
