@@ -1,24 +1,23 @@
 'use client';
 
 import * as React from 'react';
-import { ko } from 'date-fns/locale';
 import dayjs from 'dayjs';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/utils/styles';
+import Calendar from './calendar';
 
 type DatePickerProps = {
   date?: Date;
-  onSelect: (date: Date | undefined) => void;
+  onSelect: (date: Date) => void;
   className?: string;
 };
 
 export function DatePicker({ date, onSelect, className }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
 
-  const handleSelect = (date: Date | undefined) => {
+  const handleSelect = (date: Date) => {
     onSelect(date);
     setOpen(false);
   };
@@ -35,7 +34,8 @@ export function DatePicker({ date, onSelect, className }: DatePickerProps) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
-        <Calendar initialFocus locale={ko} mode="single" selected={date} onSelect={handleSelect} />
+        {/* <Calendar initialFocus locale={ko} mode="single" selected={date} onSelect={handleSelect} /> */}
+        <Calendar date={date ?? new Date()} onSelect={handleSelect} />
       </PopoverContent>
     </Popover>
   );

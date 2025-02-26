@@ -1,8 +1,8 @@
 module.exports = {
   env: { browser: true, es2020: true, node: true },
-  globals: { window: true },
   extends: [
     'eslint:recommended',
+    'next/core-web-vitals',
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
     'plugin:storybook/recommended',

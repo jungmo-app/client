@@ -25,7 +25,7 @@ export default function EditAccountPage() {
     handleImageChange,
   } = useImageUpload({
     initialImage: user.image,
-    onImageChange: (file, preview) => {
+    onImageChange: file => {
       form.setValue('profileImage', file);
     },
   });

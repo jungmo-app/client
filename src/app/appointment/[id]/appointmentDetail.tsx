@@ -1,5 +1,6 @@
 import { apis } from '@/apis';
 import { LOCATION_TAGS } from '@/mocks/appointment';
+import { VisitLocationDataType } from '@/types/gathering';
 import MainInfoSection from './mainInfoSection';
 import MainLocation from './mainLocation';
 import ParticipantAvatars from './participantAvatars';
@@ -65,7 +66,7 @@ export default async function AppointmentDetail({ id }: AppointmentDetailProps) 
         <MainLocation appointment={appointment} location={locationData} tags={LOCATION_TAGS} isEditable={isEditable} />
         <PlacesToVisit
           appointmentId={id}
-          visitPlaces={visitLocationData.filter(location => location !== null)}
+          visitPlaces={visitLocationData.filter(location => location !== null) as VisitLocationDataType[]}
           point={point}
           isEditable={isEditable}
         />

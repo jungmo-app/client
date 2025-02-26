@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeftIcon } from '@radix-ui/react-icons';
@@ -13,14 +12,19 @@ import { Input } from '@/components/ui/input';
 const signupSchema = z.object({
   name: z.string().min(1, '이름을 입력해주세요'),
   email: z.string().min(1, '이메일을 입력해주세요'),
-  password: z.string().min(8, '비밀번호는 8자 이상이어야 합니다'),
+  password: z
+    .string()
+    .min(8, '비밀번호는 8자 이상이어야 합니다')
+    .regex(/[A-Z]/, { message: '비밀번호에는 최소 하나의 대문자가 포함되어야 합니다.' })
+    .regex(/[a-z]/, { message: '비밀번호에는 최소 하나의 소문자가 포함되어야 합니다.' })
+    .regex(/[\W_]/, { message: '비밀번호에는 최소 하나의 특수문자가 포함되어야 합니다.' }),
   profilePicture: z.instanceof(File).optional(),
 });
 
 type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
-  const [profilePreview, setProfilePreview] = useState<string | null>(null);
+  /* const [profilePreview, setProfilePreview] = useState<string | null>(null); */
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -36,7 +40,7 @@ export default function SignupPage() {
     console.log(data);
   };
 
-  const handleProfilePictureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  /* const handleProfilePictureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -46,7 +50,7 @@ export default function SignupPage() {
       reader.readAsDataURL(file);
       form.setValue('profilePicture', file);
     }
-  };
+  }; */
 
   return (
     <div className="flex min-h-screen flex-col bg-white p-4">
