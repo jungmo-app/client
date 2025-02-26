@@ -2,6 +2,7 @@ import nextConfigs from './nextConfigs/index.mjs';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: false,
   images: {
     remotePatterns: [
       {

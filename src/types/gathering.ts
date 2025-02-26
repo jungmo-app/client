@@ -22,6 +22,15 @@ export interface GatheringUsers {
   profileImagE: string;
 }
 
+export interface GatheringListResponse {
+  id: number;
+  title: string;
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  meetingLocation: string;
+}
+
 export interface DetailGatheringRespose {
   authority: string;
   id: number;

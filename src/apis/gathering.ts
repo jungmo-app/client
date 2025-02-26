@@ -2,7 +2,7 @@ import { AxiosError } from 'axios';
 import { apiPaths } from '@/constants/apis';
 import { extractAxiosData, privateAxios } from '@/libs/baseAxios';
 import type { ApiResponse } from '@/types/apis';
-import type { CreateGatheringRequest, DetailGatheringRespose } from '@/types/gathering';
+import type { CreateGatheringRequest, DetailGatheringRespose, GatheringListResponse } from '@/types/gathering';
 
 export const gatheringApis = {
   create: async (payload: CreateGatheringRequest) => {
@@ -13,6 +13,21 @@ export const gatheringApis = {
       return response;
     } catch {
       return false;
+    }
+  },
+
+  getList: async (date: Date) => {
+    const currentDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+    try {
+      const { data } = await extractAxiosData<ApiResponse<GatheringListResponse[]>>(
+        privateAxios.get(`${apiPaths.gathering.getList}?currentDate=${currentDate}`)
+      );
+      if (data) {
+        return data;
+      }
+      return null;
+    } catch {
+      return null;
     }
   },
 
