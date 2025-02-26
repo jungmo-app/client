@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Button, Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui';
 import { cn } from '@/utils/styles';
 
 interface DatePickerSheetProps {
@@ -11,7 +10,7 @@ interface DatePickerSheetProps {
   classNames?: string;
 }
 
-export function DatePickerSheet({ value, onSelect, classNames }: DatePickerSheetProps) {
+export default function DatePickerSheet({ value, onSelect, classNames }: DatePickerSheetProps) {
   const generateMonths = (startDate: Date, count: number) => {
     return Array.from({ length: count }, (_, i) => {
       const date = new Date(startDate);

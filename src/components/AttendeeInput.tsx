@@ -1,8 +1,9 @@
+'use client';
+
 import { useState } from 'react';
 import { Users } from 'lucide-react';
 import AttendeeSelectModal from '@/components/modals/attendeeSelectModal';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button, Input } from '@/components/ui';
 import { PARTICIPANTS } from '@/mocks/appointment';
 
 type AttendeeInputProps = {

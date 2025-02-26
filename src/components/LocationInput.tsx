@@ -1,7 +1,8 @@
+'use client';
+
 import { useState } from 'react';
 import { MapPin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button, Input } from '@/components/ui';
 import { getCurrentLocation } from '@/libs/map/getCurrentLocation';
 import { Position } from '@/types/map';
 import Map from './map';

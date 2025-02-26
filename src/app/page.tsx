@@ -4,9 +4,8 @@ import { useState } from 'react';
 import { PopoverTrigger } from '@radix-ui/react-popover';
 import { CalendarRange, ChevronLeft, ChevronRight, Menu, PlusCircle, Search, User } from 'lucide-react';
 import Link from 'next/link';
-import Calendar from '@/components/calendar';
-import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent } from '@/components/ui/popover';
+import { Calendar } from '@/components';
+import { Button, Popover, PopoverContent } from '@/components/ui';
 import AppointmentList from './appointmetList';
 
 export default function Main() {

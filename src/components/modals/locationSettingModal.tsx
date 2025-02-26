@@ -3,11 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { apis } from '@/apis';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Button, Input, Label, ScrollArea, Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui';
 import { GOOGLE_MAP_FIELD, placeTypeTranslations } from '@/constants/place';
 import { Photos } from '@/types/map';
 

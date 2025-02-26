@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { Map, MoreVertical, Share2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
 import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface HeaderToolProps {
   id: number;

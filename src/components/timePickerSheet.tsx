@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Button, Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui';
 import { cn } from '@/utils/styles';
 
 interface TimePickerSheetProps {
@@ -11,7 +10,7 @@ interface TimePickerSheetProps {
   classNames?: string;
 }
 
-export function TimePickerSheet({ value, onSelect, classNames }: TimePickerSheetProps) {
+export default function TimePickerSheet({ value, onSelect, classNames }: TimePickerSheetProps) {
   const [selectedHour, setSelectedHour] = useState(value ? Number(value.split(':')[0]) : new Date().getHours());
   const [selectedMinute, setSelectedMinute] = useState(value ? Number(value.split(':')[1]) : new Date().getMinutes());
 

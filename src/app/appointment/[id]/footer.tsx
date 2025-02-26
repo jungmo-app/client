@@ -3,7 +3,7 @@
 import { useCallback, useState } from 'react';
 import { apis } from '@/apis';
 import Map from '@/components/map';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui';
 import { getCurrentLocation } from '@/libs/map/getCurrentLocation';
 import { Position } from '@/types/map';
 

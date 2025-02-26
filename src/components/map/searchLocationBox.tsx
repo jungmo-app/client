@@ -2,7 +2,7 @@ import { FormEvent, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import debounce from 'lodash.debounce';
 import { Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui';
 import useOutsideClick from '@/hooks/useOutsideClick';
 
 interface SearchLocationBoxProps {

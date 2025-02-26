@@ -1,4 +1,4 @@
-import Header from '@/components/header';
+import { Header } from '@/components';
 import AppointmentDetail from './appointmentDetail';
 import HeaderTool from './headerTool';
 

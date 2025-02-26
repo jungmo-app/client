@@ -5,7 +5,7 @@ import { MapPin } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { gatheringApis } from '@/apis/gathering';
-import { badgeVariants } from '@/components/ui/badge';
+import { badgeVariants } from '@/components/ui';
 import { DetailGatheringRespose, LocationDataType } from '@/types/gathering';
 import { PlaceDataType } from '@/types/map';
 import { cn } from '@/utils/styles';

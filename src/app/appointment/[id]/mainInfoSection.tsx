@@ -5,10 +5,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { Calendar, LucideFileTerminal, PenLine } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { gatheringApis } from '@/apis/gathering';
-import { DatePickerSheet } from '@/components/date-picker-sheet';
-import { TimePickerSheet } from '@/components/time-picker-sheet';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
+import { DatePickerSheet, TimePickerSheet } from '@/components';
+import { Badge, Textarea } from '@/components/ui';
 import { DetailGatheringRespose } from '@/types/gathering';
 
 type MainInfoSectionProps = {

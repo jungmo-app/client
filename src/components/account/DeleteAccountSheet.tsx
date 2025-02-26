@@ -1,6 +1,6 @@
 import { ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import {
+  Button,
   Sheet,
   SheetClose,
   SheetContent,
@@ -9,7 +9,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '@/components/ui/sheet';
+} from '@/components/ui';
 
 type DeleteAccountSheetProps = {
   onDelete: () => void;

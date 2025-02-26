@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import { Loader2 } from 'lucide-react';
-import { Button, ButtonProps } from '@/components/ui/button';
+import { Button, ButtonProps } from '@/components/ui';
 import { cn } from '@/utils/styles';
 
 export type LoadingButtonProps = ButtonProps & {

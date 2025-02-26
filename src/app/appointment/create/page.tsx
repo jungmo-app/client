@@ -5,16 +5,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { Calendar, MapPin } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { gatheringApis } from '@/apis/gathering';
-import AttendeeInput from '@/components/attendeeInput';
-import { DatePickerSheet } from '@/components/datePickerSheet';
-import Header from '@/components/header';
-import LocationInput from '@/components/LocationInput';
-import { TimePickerSheet } from '@/components/time-picker-sheet';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { AttendeeInput, DatePickerSheet, Header, LocaitionInput, TimePickerSheet } from '@/components';
+import { Button, Card, Input, Label, Textarea } from '@/components/ui';
 import { formattedDate } from '@/libs/date';
 import { PARTICIPANTS } from '@/mocks/appointment';
 
@@ -118,7 +110,7 @@ export default function CreateAppointment() {
                 },
               }}
               render={({ field }) => (
-                <LocationInput
+                <LocaitionInput
                   value={field.value.address}
                   onChange={location => field.onChange({ id: location.id, address: location.address })}
                 />

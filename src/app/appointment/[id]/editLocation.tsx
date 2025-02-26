@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { apis } from '@/apis';
-import Map from '@/components/map';
-import { Badge } from '@/components/ui/badge';
+import { Map } from '@/components';
+import { Badge } from '@/components/ui';
 import { placeTypeTranslations } from '@/constants/place';
 import { getCurrentLocation } from '@/libs/map/getCurrentLocation';
 import { Photos, PlaceDataType, Position } from '@/types/map';

@@ -1,11 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui';
 
-export function DateTimePicker({ onSelect }: { onSelect: (date: Date) => void }) {
+export default function DateTimePicker({ onSelect }: { onSelect: (date: Date) => void }) {
   const [date, setDate] = useState(new Date());
 
   const years = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i);

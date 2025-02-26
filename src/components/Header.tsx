@@ -3,7 +3,7 @@
 import { HTMLAttributes } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui';
 import { cn } from '@/utils/styles';
 
 interface HeaderProps extends Omit<HTMLAttributes<HTMLElement>, 'title' | 'className'> {
@@ -12,7 +12,7 @@ interface HeaderProps extends Omit<HTMLAttributes<HTMLElement>, 'title' | 'class
   className?: string;
 }
 
-const Header = ({ title, className, children, onClose, ...props }: HeaderProps) => {
+export default function Header({ title, className, children, onClose, ...props }: HeaderProps) {
   const router = useRouter();
 
   const handleBack = () => {
@@ -36,6 +36,4 @@ const Header = ({ title, className, children, onClose, ...props }: HeaderProps) 
       </div>
     </header>
   );
-};
-
-export default Header;
+}

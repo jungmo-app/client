@@ -6,11 +6,20 @@ import { ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ChangePasswordSheet } from '@/components/account/ChangePasswordSheet';
 import { DeleteAccountSheet } from '@/components/account/DeleteAccountSheet';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Button,
+  Card,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
+} from '@/components/ui';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { PARTICIPANTS } from '@/mocks/appointment';
 import { ChangePasswordFormValues, EditProfileFormValues, editProfileSchema } from '@/schemas/account';

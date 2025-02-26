@@ -4,7 +4,7 @@ import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from '
 import { GoogleMap, MarkerF } from '@react-google-maps/api';
 import { LocateFixed } from 'lucide-react';
 import LocationSettingModal from '@/components/modals/locationSettingModal';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui';
 import { GOOGLE_MAP_FIELD } from '@/constants/place';
 import { isEqualPositionToCenter, isInRange } from '@/libs/map/calculateDistance';
 import { getCurrentLocation } from '@/libs/map/getCurrentLocation';

@@ -3,9 +3,8 @@
 import * as React from 'react';
 import dayjs from 'dayjs';
 import { Calendar as CalendarIcon } from 'lucide-react';
-import Calendar from '@/components/calendar';
-import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components';
+import { Button, Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
 import { cn } from '@/utils/styles';
 
 type DatePickerProps = {
@@ -14,7 +13,7 @@ type DatePickerProps = {
   className?: string;
 };
 
-export function DatePicker({ date, onSelect, className }: DatePickerProps) {
+export default function DatePicker({ date, onSelect, className }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
 
   const handleSelect = (date: Date) => {
