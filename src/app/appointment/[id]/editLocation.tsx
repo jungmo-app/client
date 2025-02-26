@@ -1,13 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import { apis } from '@/apis';
 import Map from '@/components/map';
 import { Badge } from '@/components/ui/badge';
+import { placeTypeTranslations } from '@/constants/place';
 import { getCurrentLocation } from '@/libs/map/getCurrentLocation';
-import { PlaceDataType, Position } from '@/types/map';
+import { Photos, PlaceDataType, Position } from '@/types/map';
 
 interface EditLocationProps {
-  onChange: (value: PlaceDataType) => void;
+  onChange: (value: PlaceDataType) => Promise<void>;
 }
 
 export default function EditLocation({ onChange }: EditLocationProps) {
@@ -24,9 +26,25 @@ export default function EditLocation({ onChange }: EditLocationProps) {
     setIsOpen(false);
   };
 
-  const handleSelectLocation = (value: PlaceDataType) => {
+  const handleSelectLocation = async (value: google.maps.places.PlaceResult) => {
     setIsOpen(false);
-    onChange(value);
+    const tags = await Promise.all(
+      value.types
+        ? value.types.map(async item => placeTypeTranslations[item] ?? (await apis.place.translatePlaceType(item)))
+        : []
+    );
+    onChange({
+      placeId: value.place_id ?? '',
+      images: value.photos
+        ? value.photos.map(photo => {
+            const typedPhoto = photo as Photos;
+            return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${typedPhoto.photo_reference}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY}`;
+          })
+        : [],
+      address: value.formatted_address ?? '',
+      name: value.name ?? '',
+      tags: tags,
+    });
   };
   return (
     <>
@@ -36,6 +54,7 @@ export default function EditLocation({ onChange }: EditLocationProps) {
       <Map
         isOpen={isOpen}
         currentLocation={currentLocation}
+        target={['place_id', 'photo', 'formatted_address', 'name', 'type']}
         title="장소 변경하기"
         onClose={handleCloseMap}
         onSelect={handleSelectLocation}

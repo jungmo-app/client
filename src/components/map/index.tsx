@@ -3,11 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useLoadScript } from '@react-google-maps/api';
+import Header from '@/components/Header';
 import { GOOGLE_MAP_FIELD } from '@/constants/place';
 import { getRadius } from '@/libs/map/calculateDistance';
 import { MarkerType, Position, SearchStatusType } from '@/types/map';
 import GoogleMapLoader from './googleMapLoader';
-import Header from './header';
 import SearchLocationBox from './searchLocationBox';
 
 interface MapProps {
@@ -115,7 +115,7 @@ export default function Map({ isOpen, currentLocation, title, target, onSelect, 
         <div className="fixed top-0 z-[100] h-screen w-screen bg-white">
           <div className="flex h-screen flex-col fixed-mobile-top">
             <FormProvider {...methods}>
-              <Header title={title} onClose={handleClose} />
+              <Header title={title ?? '장소 추가하기'} style={{ position: 'relative' }} onClose={handleClose} />
               <SearchLocationBox onSubmit={methods.handleSubmit(handleSearchPlace)} />
               <GoogleMapLoader
                 ref={mapRef}

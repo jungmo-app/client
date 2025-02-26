@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Calendar, MapPin } from 'lucide-react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { gatheringApis } from '@/apis/gathering';
 import AttendeeInput from '@/components/AttendeeInput';
 import { DatePickerSheet } from '@/components/date-picker-sheet';
+import Header from '@/components/Header';
 import LocationInput from '@/components/LocationInput';
 import { TimePickerSheet } from '@/components/time-picker-sheet';
 import { Button } from '@/components/ui/button';
@@ -67,17 +67,7 @@ export default function CreateAppointment() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="flex h-14 items-center justify-between bg-white px-4">
-        <div className="flex items-center gap-2">
-          <Link href="/">
-            <Button variant="ghost" size="icon">
-              ✕
-            </Button>
-          </Link>
-          <h1 className="text-lg font-medium">일정 추가</h1>
-        </div>
-      </div>
-
+      <Header title="일정 추가" style={{ position: 'relative' }} />
       <div className="space-y-4 p-4">
         <Card className="space-y-4 rounded-2xl bg-[#F7F7F7] p-4">
           <div className="space-y-4">

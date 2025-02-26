@@ -12,8 +12,12 @@ interface AppointmentDetailProps {
 export default async function AppointmentDetail({ id }: AppointmentDetailProps) {
   const appointment = await apis.gathering.getDetail(id);
 
-  if (!appointment) {
+  if (appointment === null) {
     return <div className="flex h-screen items-center justify-center">존재하지 않는 약속입니다.</div>;
+  }
+
+  if (appointment === undefined) {
+    return <div className="flex h-screen items-center justify-center">해당 약속을 불러올 수 없습니다.</div>;
   }
 
   const isEditable = appointment.authority === 'WRITE';

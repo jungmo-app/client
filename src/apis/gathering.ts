@@ -1,46 +1,80 @@
+import { AxiosError } from 'axios';
 import { apiPaths } from '@/constants/apis';
 import { extractAxiosData, privateAxios } from '@/libs/baseAxios';
 import type { ApiResponse } from '@/types/apis';
 import type { CreateGatheringRequest, DetailGatheringRespose } from '@/types/gathering';
 
-interface CreateGatheringType {
-  data: string;
-}
-
 export const gatheringApis = {
   create: async (payload: CreateGatheringRequest) => {
-    const response = await extractAxiosData<CreateGatheringType>(privateAxios.post(apiPaths.gathering.create, payload));
-    return response;
-  },
-
-  getDetail: async (id: number) => {
-    const { data } = await extractAxiosData<ApiResponse<DetailGatheringRespose>>(
-      privateAxios.get(
-        `${apiPaths.gathering.getDetail}/${id}` /* , {
-        adapter: 'fetch',
-        fetchOptions: { cache: 'force-cache' },
-      } */
-      )
-    );
-    return data;
+    try {
+      const response = await extractAxiosData<ApiResponse<string>>(
+        privateAxios.post(apiPaths.gathering.create, payload)
+      );
+      return response;
+    } catch {
+      return false;
+    }
   },
 
   edit: async (id: number, payload: CreateGatheringRequest) => {
-    await extractAxiosData<ApiResponse>(privateAxios.put(`${apiPaths.gathering.edit}/${id}`, payload));
+    try {
+      await extractAxiosData<ApiResponse>(privateAxios.put(`${apiPaths.gathering.edit}/${id}`, payload));
+      return true;
+    } catch {
+      return false;
+    }
+  },
+
+  delete: async (id: number) => {
+    try {
+      await extractAxiosData<ApiResponse>(privateAxios.delete(`${apiPaths.gathering.delete}/${id}`));
+      return true;
+    } catch {
+      return false;
+    }
+  },
+
+  getDetail: async (id: number) => {
+    try {
+      const { data } = await extractAxiosData<ApiResponse<DetailGatheringRespose>>(
+        privateAxios.get(
+          `${apiPaths.gathering.getDetail}/${id}` /* , {
+          adapter: 'fetch',
+          fetchOptions: { cache: 'force-cache' },
+        } */
+        )
+      );
+      return data;
+    } catch (error) {
+      const e = error as AxiosError;
+      if (e.status === 404) {
+        return null;
+      }
+      return undefined;
+    }
   },
 
   deleteLocation: async (gatheringId: number, locationId: number) => {
-    await extractAxiosData<ApiResponse>(
-      privateAxios.delete(`${apiPaths.gathering.delete}/${gatheringId}/locations/${locationId}`)
-    );
+    try {
+      await extractAxiosData<ApiResponse>(
+        privateAxios.delete(`${apiPaths.gathering.deleteLocation}/${gatheringId}/locations/${locationId}`)
+      );
+      return true;
+    } catch {
+      return false;
+    }
   },
 
   addLocation: async (gatheringId: number, placeId: string) => {
-    const response = await extractAxiosData<ApiResponse<number>>(
-      privateAxios.post(`${apiPaths.gathering.addLocation}/${gatheringId}/locations`, {
-        placeId,
-      })
-    );
-    return response;
+    try {
+      const response = await extractAxiosData<ApiResponse<number>>(
+        privateAxios.post(`${apiPaths.gathering.addLocation}/${gatheringId}/locations`, {
+          placeId,
+        })
+      );
+      return response;
+    } catch {
+      return false;
+    }
   },
 };

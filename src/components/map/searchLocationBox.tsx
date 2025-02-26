@@ -2,7 +2,6 @@ import { FormEvent, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import debounce from 'lodash.debounce';
 import { Search } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import useOutsideClick from '@/hooks/useOutsideClick';
 
@@ -101,7 +100,6 @@ export default function SearchLocationBox({ onSubmit }: SearchLocationBoxProps) 
             ))}
           </div>
         )}
-        <Button variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2" />
       </form>
     </div>
   );

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { MapPin } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { gatheringApis } from '@/apis/gathering';
 import { badgeVariants } from '@/components/ui/badge';
 import { DetailGatheringRespose, LocationDataType } from '@/types/gathering';
@@ -18,6 +19,7 @@ type MainLocationProps = {
 };
 
 export default function MainLocation({ appointment, location, tags, isEditable }: MainLocationProps) {
+  const router = useRouter();
   const [locationData, setLocationData] = useState<LocationDataType | null>(
     location
       ? {
@@ -40,12 +42,13 @@ export default function MainLocation({ appointment, location, tags, isEditable }
       userIds: appointment.gatheringUsers.map(user => user.userId),
     };
 
-    const result = await gatheringApis.edit(appointment.id, payload);
-    if (result) {
-      setLocationData({ name: value.name, address: value.address });
+    const response = await gatheringApis.edit(appointment.id, payload);
+    if (!response) {
+      alert('수정에 실패하였습니다');
+      router.refresh();
       return;
     }
-    alert('수정에 실패하였습니다');
+    setLocationData({ name: value.name, address: value.address });
   };
 
   return (
