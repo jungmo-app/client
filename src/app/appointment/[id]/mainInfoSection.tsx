@@ -83,8 +83,8 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
     <div className="space-y-4 rounded-2xl p-4">
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <LucideFileTerminal className="mr-2 h-4 w-4" color="#6B7280" />
+          <div className="flex items-center overflow-hidden">
+            <LucideFileTerminal className="mr-2 h-4 w-4 flex-shrink-0" color="#6B7280" />
             {isEditMode ? (
               <Controller
                 name="title"
@@ -97,12 +97,12 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
                 )}
               />
             ) : (
-              <h2 className="font-semibold">{data.title}</h2>
+              <h2 className="truncate font-semibold">{data.title}</h2>
             )}
           </div>
 
           {isEditable && (
-            <div className="flex items-center gap-2">
+            <div className="flex flex-shrink-0 items-center gap-2">
               {isEditMode ? (
                 <>
                   <button className="flex h-[22px] w-[44px] items-center justify-center">

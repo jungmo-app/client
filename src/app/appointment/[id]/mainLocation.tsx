@@ -53,13 +53,15 @@ export default function MainLocation({ appointment, location, tags, isEditable }
 
   return (
     <div className="rounded-2xl pb-5">
-      <div className="rounded-2xl bg-[#f8f8f8] p-4">
-        <div className="flex items-center gap-2">
-          <MapPin className="h-5 w-5 text-primary" />
-          <h3 className="flex-1 font-medium">{locationData?.name ?? '위치를 불러올 수 없습니다'}</h3>
-          {isEditable && <EditLocation onChange={handleChangeLocation} />}
+      <div className="flex items-center gap-2 rounded-2xl bg-[#f8f8f8] p-4">
+        <MapPin className="h-5 w-5 flex-shrink-0 text-primary" />
+        <div className="flex-1 overflow-hidden">
+          <div className="flex flex-1 items-center gap-2 overflow-hidden">
+            <h3 className="flex-1 truncate font-medium">{locationData?.name ?? '위치를 불러올 수 없습니다'}</h3>
+            {isEditable && <EditLocation onChange={handleChangeLocation} />}
+          </div>
+          <p className="mt-1 truncate text-sm text-gray-500">{locationData?.address}</p>
         </div>
-        <p className="mt-1 text-sm text-gray-500">{locationData?.address}</p>
       </div>
 
       <div className="mt-4 flex gap-2 px-4">
