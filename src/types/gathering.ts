@@ -19,7 +19,7 @@ export interface GatheringUsers {
   userId: number;
   userCode: string;
   userName: string;
-  profileImagE: string;
+  profileImagE: string | null;
 }
 
 export interface GatheringListResponse {

@@ -60,9 +60,6 @@ export default async function AppointmentDetail({ id }: AppointmentDetailProps) 
       <div className="flex w-full flex-col space-y-6 py-4">
         <MainInfoSection appointment={appointment} isEditable={isEditable} />
         <ParticipantAvatars participants={appointment.gatheringUsers} />
-        {/* <Link href="/expenses" className="mt-6 block">
-            <TotalAmountSummary totalAmount={0} size="sm" />
-          </Link> */}
         <MainLocation appointment={appointment} location={locationData} tags={LOCATION_TAGS} isEditable={isEditable} />
         <PlacesToVisit
           appointmentId={id}

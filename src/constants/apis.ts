@@ -14,4 +14,7 @@ export const apiPaths = {
     deleteLocation: '/gatherings',
     addLocation: '/gatherings',
   },
+  user: {
+    search: '/users/search',
+  },
 } as const;

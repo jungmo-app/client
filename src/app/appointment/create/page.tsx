@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { Calendar, MapPin } from 'lucide-react';
+import { FormProvider, useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { gatheringApis } from '@/apis/gathering';
-import { AttendeeInput, DatePickerSheet, Header, LocaitionInput, TimePickerSheet } from '@/components';
-import { Button, Card, Input, Label, Textarea } from '@/components/ui';
+import { DateInput, DescriptionInput, PlaceInput, TitleInput } from '@/app/appointment/create';
+import { AttendeeInput, Header } from '@/components';
+import { Button } from '@/components/ui';
 import { formattedDate } from '@/libs/date';
-import { PARTICIPANTS } from '@/mocks/appointment';
+import { UserDataResponse } from '@/types/user';
 
 type AppointmentFormData = {
   title: string;
@@ -24,15 +24,9 @@ type AppointmentFormData = {
 
 export default function CreateAppointment() {
   const router = useRouter();
-  const [attendees, setAttendees] = useState<typeof PARTICIPANTS>([]);
+  const [attendees, setAttendees] = useState<UserDataResponse[]>([]);
 
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    getValues,
-    formState: { errors, isValid },
-  } = useForm<AppointmentFormData>({
+  const methods = useForm<AppointmentFormData>({
     defaultValues: {
       title: '',
       startDate: formattedDate(new Date()),
@@ -50,6 +44,7 @@ export default function CreateAppointment() {
         ...data,
         endDate: data.startDate,
         meetingLocation: { placeId: data.meetingLocation.id },
+        userIds: attendees.map(user => user.userId),
       });
       router.push('/');
     } catch {
@@ -59,94 +54,29 @@ export default function CreateAppointment() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Header title="일정 추가" style={{ position: 'relative' }} />
-      <div className="space-y-4 p-4">
-        <Card className="space-y-4 rounded-2xl bg-[#F7F7F7] p-4">
-          <div className="space-y-4">
-            <Label>제목</Label>
-            <Controller
-              name="title"
-              control={control}
-              render={({ field }) => <Input placeholder="일정 제목을 입력해주세요" className="bg-white" {...field} />}
-            />
-          </div>
-        </Card>
+      <FormProvider {...methods}>
+        <Header title="일정 추가" style={{ position: 'relative' }} />
+        <div className="space-y-4 p-4">
+          <TitleInput />
+          <DateInput />
+          <PlaceInput />
+          <DescriptionInput />
+          <AttendeeInput selectedAttendees={attendees} onAttendeesChange={setAttendees} />
 
-        <Card className="space-y-4 rounded-2xl bg-[#F7F7F7] p-4">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              <Label>날짜 및 시간</Label>
+          <div className="z-10 border-t bg-white fixed-mobile-bottom">
+            <div className="p-4">
+              <Button
+                className="w-full rounded-xl"
+                size="lg"
+                disabled={!methods.formState.isValid}
+                onClick={methods.handleSubmit(handleSubmitAppointment)}
+              >
+                일정 추가
+              </Button>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <DatePickerSheet
-                value={new Date(getValues('startDate'))}
-                onSelect={date => setValue('startDate', formattedDate(date))}
-              />
-              <TimePickerSheet
-                value={getValues('startTime')}
-                onSelect={time =>
-                  setValue(
-                    'startTime',
-                    `${time.hours.toString().padStart(2, '0')}:${time.minutes.toString().padStart(2, '0')}`
-                  )
-                }
-              />
-            </div>
-          </div>
-        </Card>
-        <Card className="space-y-4 rounded-2xl bg-[#F7F7F7] p-4">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              <Label>장소</Label>
-            </div>
-            <Controller
-              name="meetingLocation"
-              control={control}
-              rules={{
-                validate: {
-                  id: value => (value.id ? true : '장소 정보를 입력해주세요'),
-                },
-              }}
-              render={({ field }) => (
-                <LocaitionInput
-                  value={field.value.address}
-                  onChange={location => field.onChange({ id: location.id, address: location.address })}
-                />
-              )}
-            />
-            {errors.meetingLocation && <span className="text-red-500">{errors.meetingLocation.id?.message}</span>}
-          </div>
-        </Card>
-
-        <Card className="space-y-4 rounded-2xl bg-[#F7F7F7] p-4">
-          <div className="space-y-4">
-            <Label>설명</Label>
-            <Controller
-              name="memo"
-              control={control}
-              render={({ field }) => (
-                <Textarea placeholder="일정에 대한 설명을 입력해주세요" className="bg-white" {...field} />
-              )}
-            />
-          </div>
-        </Card>
-        <AttendeeInput selectedAttendees={attendees} onAttendeesChange={setAttendees} />
-
-        <div className="z-10 border-t bg-white fixed-mobile-bottom">
-          <div className="p-4">
-            <Button
-              className="w-full rounded-xl"
-              size="lg"
-              disabled={!isValid}
-              onClick={handleSubmit(handleSubmitAppointment)}
-            >
-              일정 추가
-            </Button>
           </div>
         </div>
-      </div>
+      </FormProvider>
     </div>
   );
 }

@@ -4,11 +4,11 @@ import { useState } from 'react';
 import { Users } from 'lucide-react';
 import AttendeeSelectModal from '@/components/modals/attendeeSelectModal';
 import { Button, Input } from '@/components/ui';
-import { PARTICIPANTS } from '@/mocks/appointment';
+import { UserDataResponse } from '@/types/user';
 
 type AttendeeInputProps = {
-  selectedAttendees: typeof PARTICIPANTS;
-  onAttendeesChange: (attendees: typeof PARTICIPANTS) => void;
+  selectedAttendees: UserDataResponse[];
+  onAttendeesChange: (attendees: UserDataResponse[]) => void;
 };
 
 export default function AttendeeInput({ selectedAttendees, onAttendeesChange }: AttendeeInputProps) {
@@ -19,7 +19,7 @@ export default function AttendeeInput({ selectedAttendees, onAttendeesChange }: 
       <Input
         readOnly
         placeholder="참석자를 선택해주세요"
-        value={selectedAttendees.map(user => user.name).join(', ')}
+        value={selectedAttendees.map(user => user.userName).join(', ')}
         className="cursor-pointer"
         onClick={() => setIsModalOpen(true)}
       />
