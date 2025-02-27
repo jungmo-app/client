@@ -5,10 +5,6 @@ import { verifyToken } from './jwt';
 
 const cookieName = 'accessToken';
 
-export const deleteSession = () => {
-  cookies().delete(cookieName);
-};
-
 export const getSession = async () => {
   const cookie = cookies().get(cookieName)?.value;
   console.log(cookie);

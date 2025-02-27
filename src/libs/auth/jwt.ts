@@ -1,9 +1,8 @@
 'use server';
 
 import { jwtVerify } from 'jose';
-import { JWSSignatureVerificationFailed, JWTExpired } from 'jose/errors';
+import { JWTExpired } from 'jose/errors';
 import { SessionType } from '@/stores/user';
-import { deleteSession } from './session';
 
 const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
 
@@ -18,17 +17,10 @@ export const verifyToken = async (session: string | undefined = '') => {
     return payload;
   } catch (error) {
     if (error instanceof JWTExpired) {
-      deleteSession();
-      console.log('* 만료');
-      return null;
+      /* console.log('* 만료'); */
+      return 'expired';
     }
-
-    if (error instanceof JWSSignatureVerificationFailed) {
-      console.log('* 서명 검증 실패');
-      return null;
-    }
-
-    console.log('* 검증 실패');
+    /* console.log('* 검증 실패'); */
     return null;
   }
 };

@@ -24,4 +24,7 @@ export const authApis = {
 
     return response;
   },
+  refreshToken: async (refreshToken: string) => {
+    await extractAxiosData<ApiResponse>(privateAxios.post(apiPaths.auth.refreshToken, { refreshToken }));
+  },
 } as const;

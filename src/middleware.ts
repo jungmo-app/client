@@ -1,19 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { apis } from './apis';
+import { verifyToken } from './libs/auth/jwt';
 
-// eslint-disable-next-line unused-imports/no-unused-vars
 export const middleware = async (request: NextRequest) => {
-  // const { pathname } = request.nextUrl;
-  // const isPublicRoute = BASE_URL === pathname || PUBLIC_ROUTES.includes(pathname);
+  const accessToken = request.cookies.get('accessToken')?.value;
+  const refreshToken = request.cookies.get('refreshToken')?.value;
+  const response = NextResponse.next();
 
-  // const cookie = await getSession();
-  // const session = await verifyToken(cookie);
+  if (!accessToken) {
+    if (refreshToken) {
+      response.cookies.delete('refreshToken');
+    }
+    return response;
+  }
 
-  // // 퍼블릭 경로가 아닌데 세션이 없는 경우
-  // if (!isPublicRoute && !session) {
-  //   return NextResponse.redirect(new URL(BASE_URL, request.url));
-  // }
+  if (!refreshToken) {
+    response.cookies.delete('accessToken');
+    return response;
+  }
 
-  return NextResponse.next();
+  try {
+    const result = await verifyToken(accessToken);
+    if (result === 'expired' && refreshToken) {
+      await apis.auth.refreshToken(refreshToken);
+      return response;
+    }
+
+    if (result && result !== 'expired') {
+      return response;
+    }
+    throw new Error('failed jwt verify');
+  } catch {
+    response.cookies.delete('accessToken');
+    response.cookies.delete('refreshToken');
+    return response;
+  }
 };
 
 export const config = {

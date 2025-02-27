@@ -4,6 +4,7 @@ export const apiPaths = {
     register: '/member',
     changePassword: '/member/password',
     deleteAccount: '/member',
+    refreshToken: '/auth/refresh',
   },
   gathering: {
     create: '/gatherings',
