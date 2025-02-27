@@ -53,10 +53,10 @@ export default function CreateAppointment() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen overflow-auto bg-white">
       <FormProvider {...methods}>
         <Header title="일정 추가" style={{ position: 'relative' }} />
-        <div className="space-y-4 p-4">
+        <div className="mb-20 space-y-4 p-4">
           <TitleInput />
           <DateInput />
           <PlaceInput />

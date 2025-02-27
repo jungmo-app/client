@@ -62,7 +62,7 @@ export default function AppointmentList({ appointmentData }: AppointmentListProp
                 <Image fill src={IMAGE} alt={appointment.title} className="object-cover" />
               </div>
               <div className="flex-1 overflow-hidden">
-                <h4 className="font-medium">{appointment.title}</h4>
+                <h4 className="truncate font-medium">{appointment.title}</h4>
                 <p className="truncate text-sm text-muted-foreground">{`${appointment.startDate} ${appointment.startTime}`}</p>
                 <p className="truncate text-sm text-muted-foreground">{appointment.meetingLocation}</p>
               </div>

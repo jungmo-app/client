@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MapPin } from 'lucide-react';
-import { Button, Input } from '@/components/ui';
+import { Input } from '@/components/ui';
 import { getCurrentLocation } from '@/libs/map/getCurrentLocation';
 import { Position } from '@/types/map';
 import Map from './map';
@@ -43,15 +42,6 @@ export default function LocationInput({ value, onChange }: LocationInputProps) {
         className="cursor-pointer bg-white"
         onClick={handleButtonClick}
       />
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute right-2 top-1/2 -translate-y-1/2"
-        onClick={handleButtonClick}
-      >
-        <MapPin className="h-4 w-4" />
-      </Button>
-
       <Map
         isOpen={isModalOpen}
         currentLocation={currentLocation}
