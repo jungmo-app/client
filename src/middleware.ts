@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { apis } from './apis';
-import { verifyToken } from './libs/auth/jwt';
+import { apis } from '@/apis';
+import { verifyToken } from '@/libs/auth/jwt';
+import { parseSetCookie } from '@/utils/formatText';
+
+const resetCookie = (res: NextResponse, name: string) => {
+  res.cookies.set(name, '', {
+    maxAge: 0,
+    path: '/',
+    domain: '.jungmoserver.shop',
+    httpOnly: true,
+    secure: true,
+  });
+};
 
 export const middleware = async (request: NextRequest) => {
   const accessToken = request.cookies.get('accessToken')?.value;
@@ -9,30 +20,39 @@ export const middleware = async (request: NextRequest) => {
 
   if (!accessToken) {
     if (refreshToken) {
-      response.cookies.delete('refreshToken');
+      resetCookie(response, 'refreshToken');
     }
     return response;
   }
 
   if (!refreshToken) {
-    response.cookies.delete('accessToken');
+    resetCookie(response, 'accessToken');
     return response;
   }
 
   try {
     const result = await verifyToken(accessToken);
-    if (result === 'expired' && refreshToken) {
-      await apis.auth.refreshToken(refreshToken);
+    if (result === 'expired') {
+      try {
+        const api = await apis.auth.refreshToken(accessToken, refreshToken);
+        const cookies = api.headers.getSetCookie();
+        cookies.forEach(cookie => {
+          const { name, value, options } = parseSetCookie(cookie);
+          response.cookies.set(name, value, options);
+        });
+        return response;
+      } catch (e) {
+        throw new Error('failed refresh token');
+      }
+    }
+    if (result) {
       return response;
     }
-
-    if (result && result !== 'expired') {
-      return response;
-    }
-    throw new Error('failed jwt verify');
-  } catch {
-    response.cookies.delete('accessToken');
-    response.cookies.delete('refreshToken');
+    throw new Error('invalid token');
+  } catch (e) {
+    console.error(e);
+    resetCookie(response, 'accessToken');
+    resetCookie(response, 'refreshToken');
     return response;
   }
 };

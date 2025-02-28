@@ -112,7 +112,7 @@ export default function Map({ isOpen, currentLocation, title, target, onSelect, 
   return (
     <>
       {isOpen && (
-        <div className="fixed top-0 z-[100] h-screen w-screen bg-white">
+        <div className="fixed left-0 top-0 z-[100] h-screen w-screen bg-white">
           <div className="flex h-screen flex-col fixed-mobile-top">
             <FormProvider {...methods}>
               <Header title={title ?? '장소 추가하기'} style={{ position: 'relative' }} onClose={handleClose} />

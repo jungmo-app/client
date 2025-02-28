@@ -7,7 +7,6 @@ const cookieName = 'accessToken';
 
 export const getSession = async () => {
   const cookie = cookies().get(cookieName)?.value;
-  console.log(cookie);
   return cookie;
 };
 

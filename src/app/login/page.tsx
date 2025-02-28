@@ -2,30 +2,37 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { AxiosError } from 'axios';
 import Link from 'next/link';
-import * as z from 'zod';
+import { useRouter } from 'next/navigation';
+import { apis } from '@/apis';
 import { Button, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from '@/components/ui';
-
-const loginSchema = z.object({
-  email: z.string().min(1, '이메일을 입력해주세요'),
-  password: z.string().min(8, '비밀번호는 8자 이상이어야 합니다'),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
+import { LoginRequest, loginSchema } from '@/types/auth';
 
 export default function LoginPage() {
-  const form = useForm<LoginFormValues>({
+  const router = useRouter();
+  const form = useForm<LoginRequest>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
       password: '',
     },
-    mode: 'onChange',
+    mode: 'onSubmit',
   });
 
-  const onSubmit = (data: LoginFormValues) => {
-    console.log(data);
-    // Add login logic here
+  const onSubmit = async (data: LoginRequest) => {
+    try {
+      await apis.auth.login(data);
+      router.push('/');
+    } catch (error) {
+      const e = error as AxiosError;
+      if (e.status === 400) {
+        form.setError('email', { message: '이메일 또는 비밀번호가 잘못되었습니다.' });
+        form.setError('password', { message: '이메일 또는 비밀번호가 잘못되었습니다.' });
+        return;
+      }
+      alert('로그인을 할 수 없습니다.');
+    }
   };
 
   return (
@@ -47,7 +54,6 @@ export default function LoginPage() {
                   <FormControl>
                     <Input
                       {...field}
-                      type="email"
                       placeholder="이메일을 입력해주세요"
                       className="h-12 rounded-full border-gray-300 bg-gray-100 px-4"
                     />

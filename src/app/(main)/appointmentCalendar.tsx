@@ -12,6 +12,11 @@ export default function AppointmentCalendar() {
   };
 
   return (
-    <Calendar showAdjacentDays date={date} className="my-3 h-[240px] w-[500px] gap-5 px-3" onSelect={handleClickDay} />
+    <Calendar
+      showAdjacentDays
+      date={date}
+      className="my-3 h-[240px] w-[500px] max-w-full gap-5 px-3"
+      onSelect={handleClickDay}
+    />
   );
 }

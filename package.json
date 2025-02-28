@@ -5,7 +5,7 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "dev": "next dev -p 3100",
+    "dev": "next dev -H test.jungmoserver.shop -p 3100 --experimental-https",
     "build": "next build",
     "start": "next start -p 3100",
     "lint": "next lint",

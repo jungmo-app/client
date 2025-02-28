@@ -24,7 +24,20 @@ export const authApis = {
 
     return response;
   },
-  refreshToken: async (refreshToken: string) => {
-    await extractAxiosData<ApiResponse>(privateAxios.post(apiPaths.auth.refreshToken, { refreshToken }));
+  refreshToken: async (accessToken: string, refreshToken: string) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.refreshToken.slice(1)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        credentials: 'include',
+        body: JSON.stringify({ refreshToken }),
+      });
+      if (!response.ok) {
+        throw new Error('failed refresh token');
+      }
+      return response;
+    } catch {
+      throw new Error('refresh api error');
+    }
   },
 } as const;
