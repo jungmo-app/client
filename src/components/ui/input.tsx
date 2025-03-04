@@ -1,13 +1,13 @@
 import * as React from 'react';
-import { useFormContext } from 'react-hook-form';
 import { cn } from '@/utils/styles';
-import { useFormField } from './form';
 
-const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
-  ({ className, type, ...props }, ref) => {
-    const { error, name } = useFormField();
-    const { clearErrors } = useFormContext();
+interface InputProps {
+  error?: boolean;
+  clearError?: () => void;
+}
 
+const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'> & InputProps>(
+  ({ className, type, error, clearError, ...props }, ref) => {
     return (
       <input
         type={type}
@@ -19,7 +19,7 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
         )}
         onFocus={e => {
           props.onFocus && props.onFocus(e);
-          clearErrors(name);
+          clearError && clearError();
         }}
         {...props}
       />

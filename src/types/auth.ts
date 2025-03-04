@@ -2,6 +2,11 @@ import * as z from 'zod';
 
 export const loginSchema = z.object({
   email: z.string().email({ message: '이메일 형식이 잘못되었습니다.' }).min(1, '이메일을 입력해주세요'),
+  password: z.string(),
+});
+
+export const signUpSchema = z.object({
+  email: z.string().email({ message: '이메일 형식이 잘못되었습니다.' }).min(1, '이메일을 입력해주세요'),
   password: z
     .string()
     .regex(
