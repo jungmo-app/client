@@ -21,15 +21,16 @@ import { UserDataResponse } from '@/types/user';
 
 type AttendeeSelectModalProps = {
   isOpen: boolean;
+  value?: UserDataResponse[];
   onClose: () => void;
   onSelect: (selectedUsers: UserDataResponse[]) => void;
 };
 
-export default function AttendeeSelectModal({ isOpen, onClose, onSelect }: AttendeeSelectModalProps) {
+export default function AttendeeSelectModal({ isOpen, value, onClose, onSelect }: AttendeeSelectModalProps) {
   const { register, getValues } = useForm();
   const [isError, setIsError] = useState<boolean>(false);
   const [searchResult, setSearchResult] = useState<UserDataResponse[]>([]);
-  const [selectedUsers, setSelectedUsers] = useState<UserDataResponse[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<UserDataResponse[]>(value ?? []);
 
   const handleSearchUser = useCallback((value: string) => {
     const debouncedFetchData = debounce(async (value: string) => {
@@ -61,10 +62,15 @@ export default function AttendeeSelectModal({ isOpen, onClose, onSelect }: Atten
     onClose();
   };
 
+  const handleClose = () => {
+    setSelectedUsers(value ?? []);
+    onClose();
+  };
+
   const searchList = searchResult.filter(user => !selectedUsers.some(item => user.userId === item.userId));
 
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
+    <Sheet open={isOpen} onOpenChange={handleClose}>
       <SheetContent side="bottom" className="flex w-full flex-col">
         <SheetHeader>
           <SheetTitle>참석자 추가</SheetTitle>

@@ -1,13 +1,16 @@
+/* eslint-disable import/no-unresolved */
 'use client';
 
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Calendar, LucideFileTerminal, PenLine } from 'lucide-react';
+import { Calendar, LucideFileTerminal, PenLine, Settings } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { gatheringApis } from '@/apis/gathering';
 import { DatePickerSheet, TimePickerSheet } from '@/components';
-import { Badge, Textarea } from '@/components/ui';
+import AttendeeSelectModal from '@/components/modals/attendeeSelectModal';
+import { Avatar, AvatarImage, Badge, Textarea } from '@/components/ui';
 import { DetailGatheringRespose } from '@/types/gathering';
+import { UserDataResponse } from '@/types/user';
 
 type MainInfoSectionProps = {
   appointment: DetailGatheringRespose;
@@ -21,7 +24,7 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
     startDate: appointment.startDate,
     startTime: appointment.startTime,
     description: appointment.memo,
-    userList: [],
+    userList: appointment.gatheringUsers,
   });
   const { control, getValues, reset, setValue } = useForm({
     defaultValues: {
@@ -29,10 +32,13 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
       startDate: appointment.startDate,
       startTime: appointment.startTime,
       description: appointment.memo,
-      userList: [],
+      userList: appointment.gatheringUsers,
     },
   });
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const [isOpenSelectModal, setIsOpenSelectModal] = useState(false);
+  const visibleParticipants = getValues('userList').slice(0, 3);
+  const remainingCount = getValues('userList').length - 3;
 
   const handleClickEditButton = () => {
     setIsEditMode(true);
@@ -41,6 +47,10 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
   const handleClickCancleButton = () => {
     setIsEditMode(false);
     reset(data);
+  };
+
+  const handleChangeAttendee = (attendees: UserDataResponse[]) => {
+    setValue('userList', attendees);
   };
 
   const handleSelectDate = (value: Date) => {
@@ -55,6 +65,13 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
     setValue('startTime', `${time.hours}:${time.minutes}`);
   };
 
+  const handleClickSettingAttendeeButton = () => {
+    if (!isEditMode) {
+      return;
+    }
+    setIsOpenSelectModal(true);
+  };
+
   const handleClickSaveButton = async () => {
     const payload = {
       title: getValues('title'),
@@ -65,7 +82,7 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
         placeId: appointment.meetingLocation.placeId,
       },
       memo: getValues('description'),
-      userIds: appointment.gatheringUsers.map(user => user.userId),
+      userIds: getValues('userList').map(user => user.userId),
     };
 
     try {
@@ -168,6 +185,43 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
               <div className="flex-shrink whitespace-pre-line break-all">{data.description}</div>
             )}
           </div>
+        </div>
+        <div className="flex items-center justify-between" style={{ marginTop: '12px' }}>
+          <div className="flex">
+            {visibleParticipants.map(participant => (
+              <div key={participant.userId} className="group relative">
+                <Avatar className="relative h-8 w-8 border-2 border-white">
+                  <AvatarImage src={participant.profileImage} alt={participant.userName} />
+                </Avatar>
+                <Badge
+                  variant="outline"
+                  className="invisible absolute left-1/2 top-0 z-[99999] -translate-x-1/2 -translate-y-7 text-nowrap bg-white group-hover:visible"
+                >
+                  {participant.userName}
+                </Badge>
+              </div>
+            ))}
+            {remainingCount > 0 && (
+              <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-gray-100 text-sm text-gray-600">
+                +{remainingCount}
+              </div>
+            )}
+          </div>
+          {isEditMode && (
+            <button
+              className="flex size-[34px] items-center justify-center rounded-full border-2 border-white bg-neutral-200 hover:bg-neutral-300"
+              onClick={handleClickSettingAttendeeButton}
+            >
+              <Settings className="size-5 stroke-white" />
+            </button>
+          )}
+
+          <AttendeeSelectModal
+            isOpen={isOpenSelectModal}
+            value={getValues('userList')}
+            onClose={() => setIsOpenSelectModal(false)}
+            onSelect={handleChangeAttendee}
+          />
         </div>
       </div>
     </div>
