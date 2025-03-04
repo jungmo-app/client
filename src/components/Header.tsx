@@ -24,7 +24,7 @@ export default function Header({ title, className, children, onClose, ...props }
   };
 
   return (
-    <header className={cn('z-10 bg-white fixed-mobile-top', className)} {...props}>
+    <header className={cn('sticky top-0 z-10 bg-white', className)} {...props}>
       <div className="flex h-14 items-center justify-between">
         <div className="flex items-center">
           <Button variant="ghost" size="icon" className="mr-2" onClick={handleBack}>

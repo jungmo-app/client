@@ -55,7 +55,7 @@ export default async function AppointmentDetail({ id }: AppointmentDetailProps) 
   );
 
   return (
-    <main className={`flex w-full flex-grow px-4 pb-${isEditable ? '20' : '14'} pt-14`}>
+    <main className={`relative flex w-full flex-grow px-4 pb-${isEditable ? '20' : '14'}`}>
       <div className="flex w-full flex-col space-y-6 py-4">
         <MainInfoSection appointment={appointment} isEditable={isEditable} />
         <MainLocation appointment={appointment} location={locationData} tags={LOCATION_TAGS} isEditable={isEditable} />

@@ -53,17 +53,17 @@ export default function CreateAppointment() {
   };
 
   return (
-    <div className="min-h-screen overflow-auto bg-white">
-      <FormProvider {...methods}>
-        <Header title="일정 추가" style={{ position: 'relative' }} />
-        <div className="mb-20 space-y-4 p-4">
+    <FormProvider {...methods}>
+      <div className="relative min-h-screen bg-white">
+        <Header title="일정 추가" />
+        <div className="space-y-4 p-4">
           <TitleInput />
           <DateInput />
           <PlaceInput />
           <DescriptionInput />
           <AttendeeInput selectedAttendees={attendees} onAttendeesChange={setAttendees} />
 
-          <div className="z-10 border-t bg-white fixed-mobile-bottom">
+          <div className="sticky bottom-0 z-10 border-t bg-white">
             <div className="p-4">
               <Button
                 className="w-full rounded-xl"
@@ -76,7 +76,7 @@ export default function CreateAppointment() {
             </div>
           </div>
         </div>
-      </FormProvider>
-    </div>
+      </div>
+    </FormProvider>
   );
 }

@@ -1,9 +1,9 @@
 'use client';
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Avatar, AvatarFallback, AvatarImage, Button } from '@/components/ui';
+import { Header } from '@/components';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui';
 import { PARTICIPANTS } from '@/mocks/appointment';
 
 // 메뉴 아이템 데이터
@@ -15,18 +15,11 @@ const myActivities = [
 const mySubscriptions = [{ label: '로그아웃', href: '/logout' }];
 
 export default function AccountPage() {
-  const router = useRouter();
   const user = PARTICIPANTS[0];
 
   return (
     <div className="h-full bg-white">
-      <div className="flex h-14 items-center gap-2 p-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
-          <ChevronLeft className="h-5 w-5" />
-        </Button>
-        <div />
-        <h1 className="font-medium">메뉴</h1>
-      </div>
+      <Header title="메뉴" />
 
       {/* 프로필 섹션 */}
       <div className="mb-6 mt-6 px-4">

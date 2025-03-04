@@ -18,3 +18,10 @@ export const redirectLogin = () => {
     redirect('login');
   }
 };
+
+export const redirectMain = () => {
+  const accessToken = cookies().get('accessToken')?.value;
+  if (accessToken) {
+    redirect('/');
+  }
+};
