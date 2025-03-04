@@ -19,11 +19,7 @@ import {
 } from '@/components/ui';
 import { type ChangePasswordFormValues, changePasswordSchema } from '@/schemas/account';
 
-type ChangePasswordSheetProps = {
-  onChangePassword: (data: ChangePasswordFormValues) => void;
-};
-
-export function ChangePasswordSheet({ onChangePassword }: ChangePasswordSheetProps) {
+export default function ChangePasswordSheet() {
   const form = useForm<ChangePasswordFormValues>({
     resolver: zodResolver(changePasswordSchema),
     defaultValues: {
@@ -33,6 +29,10 @@ export function ChangePasswordSheet({ onChangePassword }: ChangePasswordSheetPro
     },
     mode: 'onChange',
   });
+
+  const handleChangePassword = (value: ChangePasswordFormValues) => {
+    console.log(value);
+  };
 
   return (
     <Sheet>
@@ -47,7 +47,7 @@ export function ChangePasswordSheet({ onChangePassword }: ChangePasswordSheetPro
           <SheetTitle>비밀번호 변경</SheetTitle>
         </SheetHeader>
         <Form {...form}>
-          <form className="mt-6 space-y-6" onSubmit={form.handleSubmit(onChangePassword)}>
+          <form className="mt-6 space-y-6" onSubmit={form.handleSubmit(handleChangePassword)}>
             <FormField
               control={form.control}
               name="currentPassword"

@@ -11,11 +11,10 @@ import {
   SheetTrigger,
 } from '@/components/ui';
 
-type DeleteAccountSheetProps = {
-  onDelete: () => void;
-};
-
-export function DeleteAccountSheet({ onDelete }: DeleteAccountSheetProps) {
+export default function DeleteAccountSheet() {
+  const handleDeleteAccount = () => {
+    console.log('delete');
+  };
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -37,7 +36,7 @@ export function DeleteAccountSheet({ onDelete }: DeleteAccountSheetProps) {
               취소
             </Button>
           </SheetClose>
-          <Button variant="destructive" className="w-full" onClick={onDelete}>
+          <Button variant="destructive" className="w-full" onClick={handleDeleteAccount}>
             탈퇴하기
           </Button>
         </SheetFooter>

@@ -1,16 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ChevronLeft } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { ChangePasswordSheet } from '@/components/account/ChangePasswordSheet';
-import { DeleteAccountSheet } from '@/components/account/DeleteAccountSheet';
+import { Edit, Save, X } from 'lucide-react';
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-  Button,
   Card,
   Form,
   FormControl,
@@ -22,11 +19,12 @@ import {
 } from '@/components/ui';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { PARTICIPANTS } from '@/mocks/appointment';
-import { ChangePasswordFormValues, EditProfileFormValues, editProfileSchema } from '@/schemas/account';
+import { EditProfileFormValues, editProfileSchema } from '@/schemas/account';
 
-export default function EditAccountPage() {
-  const router = useRouter();
+export default function InfoForm() {
   const user = PARTICIPANTS[0];
+
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const {
     preview,
@@ -51,48 +49,60 @@ export default function EditAccountPage() {
 
   const onSubmit = (data: EditProfileFormValues) => {
     console.log('Form submitted:', data);
-    router.back();
   };
 
-  const handleDeleteAccount = () => {
-    console.log('Account deleted');
+  const handleClickEditButton = () => {
+    setIsEditMode(true);
   };
 
-  const handlePasswordChange = (data: ChangePasswordFormValues) => {
-    console.log('Password changed:', data);
+  const handleClickCancelButton = () => {
+    setIsEditMode(false);
   };
 
+  const handleClickSaveButton = () => {
+    setIsEditMode(false);
+  };
   return (
-    <div className="min-h-screen bg-white">
-      <div className="sticky top-0 z-10 bg-white">
-        <div className="flex h-14 items-center justify-between px-4">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => router.back()}>
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
-            <h1 className="text-lg font-medium">프로필 수정</h1>
-          </div>
+    <Card className="relative px-3 pb-4 pt-8">
+      {isEditMode ? (
+        <div className="absolute right-3 top-3 flex items-center gap-2">
+          <button className="group" onClick={handleClickSaveButton}>
+            <Save className="size-5 stroke-neutral-400 group-hover:stroke-neutral-500" />
+          </button>
+          <button className="group" onClick={handleClickCancelButton}>
+            <X className="size-5 stroke-neutral-400 group-hover:stroke-neutral-500" />
+          </button>
         </div>
-      </div>
+      ) : (
+        <button className="group absolute right-3 top-3" onClick={handleClickEditButton}>
+          <Edit className="size-5 stroke-neutral-400 group-hover:stroke-neutral-500" />
+        </button>
+      )}
 
       <Form {...form}>
         <form className="space-y-6 p-4" onSubmit={form.handleSubmit(onSubmit)}>
           <div className="flex flex-col items-center space-y-4">
             <div className="relative">
-              <Avatar className="h-24 w-24">
+              <Avatar className="h-32 w-32">
                 <AvatarImage src={preview || ''} />
                 <AvatarFallback>{form.watch('name')[0]}</AvatarFallback>
               </Avatar>
-              <Input type="file" accept="image/*" className="hidden" id="profile-image" onChange={handleImageChange} />
-              <Button
-                variant="outline"
-                size="sm"
-                className="absolute bottom-0 right-0 rounded-full"
-                type="button"
-                onClick={() => document.getElementById('profile-image')?.click()}
-              >
-                수정
-              </Button>
+              <Input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                id="profile-image"
+                autoComplete="on"
+                onChange={handleImageChange}
+              />
+              {isEditMode && (
+                <button
+                  className="absolute left-0 top-0 size-32 rounded-full bg-shadow-30 text-white hover:bg-shadow-50"
+                  onClick={() => document.getElementById('profile-image')?.click()}
+                >
+                  변경
+                </button>
+              )}
             </div>
             {imageError && <p className="text-sm text-destructive">{imageError}</p>}
           </div>
@@ -105,7 +115,13 @@ export default function EditAccountPage() {
                 <FormItem className="space-y-2">
                   <FormLabel>이름</FormLabel>
                   <FormControl>
-                    <Input {...field} className="bg-white" placeholder="이름을 입력해주세요" />
+                    <Input
+                      {...field}
+                      readOnly={!isEditMode}
+                      className={`bg-white ${!isEditMode && 'cursor-default'}`}
+                      placeholder="이름을 입력해주세요"
+                      autoComplete="on"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -121,29 +137,21 @@ export default function EditAccountPage() {
                 <FormItem className="space-y-2">
                   <FormLabel>이메일</FormLabel>
                   <FormControl>
-                    <Input {...field} type="email" className="bg-white" placeholder="이메일을 입력해주세요" />
+                    <Input
+                      {...field}
+                      readOnly={!isEditMode}
+                      className={`bg-white ${!isEditMode && 'cursor-default'}`}
+                      type="email"
+                      placeholder="이메일을 입력해주세요"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </Card>
-
-          <ChangePasswordSheet onChangePassword={handlePasswordChange} />
-          <DeleteAccountSheet onDelete={handleDeleteAccount} />
-
-          <div className="border-t p-4 fixed-mobile-bottom">
-            <Button
-              className="w-full"
-              size="lg"
-              disabled={!form.formState.isValid}
-              onClick={form.handleSubmit(onSubmit)}
-            >
-              저장
-            </Button>
-          </div>
         </form>
       </Form>
-    </div>
+    </Card>
   );
 }
