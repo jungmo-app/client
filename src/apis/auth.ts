@@ -9,6 +9,14 @@ export const authApis = {
 
     return response;
   },
+  logout: async () => {
+    /* const response = await axios.post('/api/logout');
+    return response; */
+    const response = await fetch('/api/logout', {
+      method: 'POST',
+    });
+    return response;
+  },
   register: async (payload: RegisterRequest) => {
     const response = await extractAxiosData<ApiResponse>(baseAxios.post(apiPaths.auth.register, payload));
 

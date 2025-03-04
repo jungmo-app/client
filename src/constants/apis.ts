@@ -1,6 +1,7 @@
 export const apiPaths = {
   auth: {
     login: '/auth/login',
+    logout: 'auth/logout',
     register: '/member',
     changePassword: '/member/password',
     deleteAccount: '/member',

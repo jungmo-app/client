@@ -2,16 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apis } from '@/apis';
 import { verifyToken } from '@/libs/auth/jwt';
 import { parseSetCookie } from '@/utils/formatText';
-
-const resetCookie = (res: NextResponse, name: string) => {
-  res.cookies.set(name, '', {
-    maxAge: 0,
-    path: '/',
-    domain: '.jungmoserver.shop',
-    httpOnly: true,
-    secure: true,
-  });
-};
+import { resetCookie } from './utils/cookie';
 
 export const middleware = async (request: NextRequest) => {
   const accessToken = request.cookies.get('accessToken')?.value;
