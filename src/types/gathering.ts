@@ -1,3 +1,5 @@
+import { UserDataResponse } from './user';
+
 export interface Location {
   id: number;
   placeId: string;
@@ -13,13 +15,6 @@ export interface CreateGatheringRequest {
   };
   memo: string;
   userIds: number[];
-}
-
-export interface GatheringUsers {
-  userId: number;
-  userCode: string;
-  userName: string;
-  profileImagE: string | null;
 }
 
 export interface GatheringListResponse {
@@ -39,7 +34,7 @@ export interface DetailGatheringRespose {
   endDate: string;
   startTime: string;
   memo: string;
-  gatheringUsers: GatheringUsers[];
+  gatheringUsers: UserDataResponse[];
   meetingLocation: Location;
   locations: Location[];
 }

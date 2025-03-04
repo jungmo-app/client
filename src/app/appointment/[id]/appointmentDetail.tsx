@@ -3,7 +3,6 @@ import { LOCATION_TAGS } from '@/mocks/appointment';
 import { VisitLocationDataType } from '@/types/gathering';
 import MainInfoSection from './mainInfoSection';
 import MainLocation from './mainLocation';
-import ParticipantAvatars from './participantAvatars';
 import PlacesToVisit from './placesToVisit';
 
 interface AppointmentDetailProps {
@@ -59,7 +58,6 @@ export default async function AppointmentDetail({ id }: AppointmentDetailProps) 
     <main className={`flex w-full flex-grow px-4 pb-${isEditable ? '20' : '14'} pt-14`}>
       <div className="flex w-full flex-col space-y-6 py-4">
         <MainInfoSection appointment={appointment} isEditable={isEditable} />
-        <ParticipantAvatars participants={appointment.gatheringUsers} />
         <MainLocation appointment={appointment} location={locationData} tags={LOCATION_TAGS} isEditable={isEditable} />
         <PlacesToVisit
           appointmentId={id}
