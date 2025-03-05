@@ -8,6 +8,7 @@ import { gatheringApis } from '@/apis/gathering';
 import { badgeVariants } from '@/components/ui';
 import { DetailGatheringRespose, LocationDataType } from '@/types/gathering';
 import { PlaceDataType } from '@/types/map';
+import { revalidatePage } from '@/utils/revalidate';
 import { cn } from '@/utils/styles';
 import EditLocation from './editLocation';
 
@@ -49,6 +50,7 @@ export default function MainLocation({ appointment, location, tags, isEditable }
       return;
     }
     setLocationData({ name: value.name, address: value.address });
+    revalidatePage('/appointment');
   };
 
   return (

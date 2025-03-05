@@ -8,6 +8,7 @@ export const middleware = async (request: NextRequest) => {
   const accessToken = request.cookies.get('accessToken')?.value;
   const refreshToken = request.cookies.get('refreshToken')?.value;
   const response = NextResponse.next();
+  console.log('middleware');
 
   if (!accessToken) {
     if (refreshToken) {
@@ -57,6 +58,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico, sitemap.xml, robots.txt (metadata files)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.svg$|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.gif$).*)',
+    '/((?!api|_next/static).*)',
   ],
 };
