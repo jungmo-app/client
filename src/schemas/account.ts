@@ -6,7 +6,6 @@ const hasSpecialChar = /.*[@$!%*#?&].*/;
 
 export const editProfileSchema = z.object({
   name: z.string().min(1, '이름을 입력해주세요'),
-  email: z.string().email('올바른 이메일 형식이 아니에요'),
   profileImage: z.instanceof(File).optional(),
 });
 

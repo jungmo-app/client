@@ -18,4 +18,13 @@ export const userApis = {
       return null;
     }
   },
+  getInfo: async () => {
+    try {
+      const { data } = await extractAxiosData<ApiResponse<UserDataResponse>>(privateAxios.get(apiPaths.user.userInfo));
+      return data;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  },
 };

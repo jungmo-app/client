@@ -26,7 +26,7 @@ export const middleware = async (request: NextRequest) => {
     if (result === 'expired') {
       try {
         const api = await apis.auth.refreshToken(accessToken, refreshToken);
-        const cookies = api.headers.getSetCookie();
+        const cookies = (api.headers as unknown as Headers & { getSetCookie: () => string[] }).getSetCookie();
         cookies.forEach(cookie => {
           const { name, value, options } = parseSetCookie(cookie);
           response.cookies.set(name, value, options);

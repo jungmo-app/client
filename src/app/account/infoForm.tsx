@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Edit, Save, X } from 'lucide-react';
+import { Copy, Edit, Save, X } from 'lucide-react';
 import {
   Avatar,
   AvatarFallback,
@@ -16,38 +16,47 @@ import {
   FormLabel,
   FormMessage,
   Input,
+  Label,
 } from '@/components/ui';
 import { useImageUpload } from '@/hooks/useImageUpload';
-import { PARTICIPANTS } from '@/mocks/appointment';
 import { EditProfileFormValues, editProfileSchema } from '@/schemas/account';
+import { UserDataResponse } from '@/types/user';
 
-export default function InfoForm() {
-  const user = PARTICIPANTS[0];
+interface InfoFormProps {
+  userData: UserDataResponse;
+}
 
+export default function InfoForm({ userData }: InfoFormProps) {
   const [isEditMode, setIsEditMode] = useState(false);
+  const [data, setData] = useState<EditProfileFormValues>({
+    name: userData.userName,
+    profileImage: undefined,
+  });
 
   const {
     preview,
     error: imageError,
     handleImageChange,
   } = useImageUpload({
-    initialImage: user.image,
-    onImageChange: file => {
-      form.setValue('profileImage', file);
+    initialImage: userData.profileImage,
+    onImageChange: data => {
+      form.setValue('profileImage', data);
     },
   });
 
   const form = useForm<EditProfileFormValues>({
     resolver: zodResolver(editProfileSchema),
     defaultValues: {
-      name: user.name,
-      email: user.email,
-      profileImage: undefined,
+      name: data.name,
+      profileImage: data.profileImage,
     },
     mode: 'onChange',
   });
 
-  const onSubmit = (data: EditProfileFormValues) => {
+  const onSubmit = async (data: EditProfileFormValues) => {
+    /* if (!data.profileImage) {
+      const filename;
+    } */
     console.log('Form submitted:', data);
   };
 
@@ -57,10 +66,22 @@ export default function InfoForm() {
 
   const handleClickCancelButton = () => {
     setIsEditMode(false);
+    form.reset(data);
   };
 
   const handleClickSaveButton = () => {
+    console.log(form.getValues());
+    setData(form.getValues());
     setIsEditMode(false);
+  };
+
+  const handleClickCopyButton = async () => {
+    try {
+      await navigator.clipboard.writeText(userData.userCode);
+      alert('클립보드에 복사하였습니다.');
+    } catch {
+      alert('클립보드 복사에 실패하였습니다');
+    }
   };
   return (
     <Card className="relative px-3 pb-4 pt-8">
@@ -130,25 +151,17 @@ export default function InfoForm() {
           </Card>
 
           <Card className="space-y-4 rounded-2xl bg-[#F7F7F7] p-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem className="space-y-2">
-                  <FormLabel>이메일</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      readOnly={!isEditMode}
-                      className={`bg-white ${!isEditMode && 'cursor-default'}`}
-                      type="email"
-                      placeholder="이메일을 입력해주세요"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <Label>유저 코드</Label>
+            <button
+              className="relative flex h-10 w-full rounded-md border border-black border-input bg-background bg-white px-3 py-2 text-sm outline-none ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+              style={{ marginTop: '8px' }}
+              onClick={handleClickCopyButton}
+            >
+              <span className="pl-6">{userData.userCode}</span>
+              <div className="absolute left-3 top-1/2 size-4 -translate-y-1/2">
+                <Copy className="size-4" />
+              </div>
+            </button>
           </Card>
         </form>
       </Form>

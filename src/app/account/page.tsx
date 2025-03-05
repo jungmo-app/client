@@ -1,12 +1,16 @@
-'use client';
-
+import { redirect } from 'next/navigation';
+import { apis } from '@/apis';
 import { Header } from '@/components';
 import ChangePasswordSheet from './changePasswordSheet';
 import DeleteAccountSheet from './deleteAccountSheet';
 import InfoForm from './infoForm';
 import LogoutButton from './logoutButton';
 
-export default function AccountPage() {
+export default async function AccountPage() {
+  const userData = await apis.user.getInfo();
+  if (!userData) {
+    redirect('/');
+  }
   return (
     <div className="h-full bg-white">
       <Header title="메뉴" />
@@ -21,7 +25,7 @@ export default function AccountPage() {
           <ChevronRight className="h-5 w-5 text-gray-400" />
         </div>
       </div> */}
-      <InfoForm />
+      <InfoForm userData={userData} />
       <div className="my-8 flex flex-col items-center gap-2">
         <ChangePasswordSheet />
         <DeleteAccountSheet />
