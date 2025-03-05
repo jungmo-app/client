@@ -13,12 +13,7 @@ export type EditProfileFormValues = z.infer<typeof editProfileSchema>;
 
 export const changePasswordSchema = z
   .object({
-    currentPassword: z
-      .string()
-      .min(8, '8자 이상 입력해주세요')
-      .regex(hasNumber, '숫자를 포함해주세요')
-      .regex(hasEnglish, '영문을 포함해주세요')
-      .regex(hasSpecialChar, '특수문자를 포함해주세요'),
+    currentPassword: z.string(),
     newPassword: z
       .string()
       .min(8, '8자 이상 입력해주세요')

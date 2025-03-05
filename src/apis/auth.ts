@@ -10,12 +10,17 @@ export const authApis = {
     return response;
   },
   logout: async () => {
-    /* const response = await axios.post('/api/logout');
-    return response; */
-    const response = await fetch('/api/logout', {
-      method: 'POST',
-    });
-    return response;
+    try {
+      const response = await fetch('/api/logout', {
+        method: 'POST',
+      });
+      if (!response.ok) {
+        throw new Error('로그아웃 실패');
+      }
+      return true;
+    } catch {
+      return false;
+    }
   },
   register: async (payload: RegisterRequest) => {
     const response = await extractAxiosData<ApiResponse>(baseAxios.post(apiPaths.auth.register, payload));
@@ -24,11 +29,6 @@ export const authApis = {
   },
   changePassword: async (payload: ChangePasswordRequest) => {
     const response = await extractAxiosData<ApiResponse>(privateAxios.patch(apiPaths.auth.changePassword, payload));
-
-    return response;
-  },
-  deleteAccount: async () => {
-    const response = await extractAxiosData<ApiResponse>(privateAxios.delete(apiPaths.auth.deleteAccount));
 
     return response;
   },

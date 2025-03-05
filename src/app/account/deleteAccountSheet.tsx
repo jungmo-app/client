@@ -1,6 +1,8 @@
 'use client';
 
 import { ChevronRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { apis } from '@/apis';
 import {
   Button,
   Sheet,
@@ -14,8 +16,15 @@ import {
 } from '@/components/ui';
 
 export default function DeleteAccountSheet() {
-  const handleDeleteAccount = () => {
-    console.log('delete');
+  const router = useRouter();
+  const handleDeleteAccount = async () => {
+    const deleteAccount = await apis.user.deleteAccount();
+    if (deleteAccount) {
+      alert('계정이 삭제되었습니다');
+      router.push('/login');
+      return;
+    }
+    alert('계정삭제에 실패하였습니다');
   };
   return (
     <Sheet>

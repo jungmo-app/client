@@ -1,10 +1,9 @@
 export const apiPaths = {
   auth: {
     login: '/auth/login',
-    logout: 'auth/logout',
+    logout: '/auth/logout',
     register: '/member',
     changePassword: '/member/password',
-    deleteAccount: '/member',
     refreshToken: '/auth/refresh',
   },
   gathering: {
@@ -19,5 +18,6 @@ export const apiPaths = {
   user: {
     userInfo: 'users/info',
     search: '/users/search',
+    deleteAccount: '/users/info',
   },
 } as const;
