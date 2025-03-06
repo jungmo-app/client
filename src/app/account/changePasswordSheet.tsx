@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronRight } from 'lucide-react';
+import { apis } from '@/apis';
 import {
   Button,
   Form,
@@ -22,22 +24,36 @@ import {
 import { type ChangePasswordFormValues, changePasswordSchema } from '@/schemas/account';
 
 export default function ChangePasswordSheet() {
+  const [isOpen, setIsOpen] = useState(false);
   const form = useForm<ChangePasswordFormValues>({
     resolver: zodResolver(changePasswordSchema),
     defaultValues: {
-      currentPassword: '',
+      oldPassword: '',
       newPassword: '',
       confirmPassword: '',
     },
     mode: 'onChange',
   });
 
-  const handleChangePassword = (value: ChangePasswordFormValues) => {
-    console.log(value);
+  const handleChangePassword = async (value: ChangePasswordFormValues) => {
+    const response = await apis.auth.changePassword({
+      oldPassword: value.oldPassword,
+      newPassword: value.newPassword,
+    });
+
+    if (response) {
+      alert('비밀번호를 변경하였습니다');
+      setIsOpen(false);
+      return;
+    }
+    if (response === null) {
+      form.setError('oldPassword', { message: '비밀번호가 잘못되었습니다' });
+    }
+    alert('비밀번호 변경에 실패하였습니다.');
   };
 
   return (
-    <Sheet>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" className="flex w-full justify-between px-0 text-gray-500 hover:bg-transparent">
           <span>비밀번호 변경하기</span>
@@ -52,7 +68,7 @@ export default function ChangePasswordSheet() {
           <form className="mt-6 space-y-6" onSubmit={form.handleSubmit(handleChangePassword)}>
             <FormField
               control={form.control}
-              name="currentPassword"
+              name="oldPassword"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>현재 비밀번호</FormLabel>

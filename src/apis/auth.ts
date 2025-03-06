@@ -1,7 +1,9 @@
 import { apiPaths } from '@/constants/apis';
-import { baseAxios, extractAxiosData, privateAxios } from '@/libs/baseAxios';
+import { baseAxios, extractAxiosData } from '@/libs/baseAxios';
+import { clientPrivateFetch } from '@/libs/interceptor';
+import { ChangePasswordPayload } from '@/schemas/account';
 import { ApiResponse } from '@/types/apis';
-import { ChangePasswordRequest, LoginRequest, RegisterRequest } from '@/types/auth';
+import { LoginRequest, RegisterRequest } from '@/types/auth';
 
 export const authApis = {
   login: async (payload: LoginRequest) => {
@@ -34,10 +36,26 @@ export const authApis = {
 
     return response;
   },
-  changePassword: async (payload: ChangePasswordRequest) => {
-    const response = await extractAxiosData<ApiResponse>(privateAxios.patch(apiPaths.auth.changePassword, payload));
-
-    return response;
+  changePassword: async (payload: ChangePasswordPayload) => {
+    try {
+      const response = await clientPrivateFetch(apiPaths.auth.changePassword, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      });
+      if (response?.status === 200) {
+        return true;
+      }
+      if (response?.status === 400) {
+        return null;
+      }
+      throw new Error('api error');
+    } catch {
+      return false;
+    }
   },
   refreshToken: async (accessToken: string, refreshToken: string) => {
     try {

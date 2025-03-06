@@ -13,7 +13,7 @@ export type EditProfileFormValues = z.infer<typeof editProfileSchema>;
 
 export const changePasswordSchema = z
   .object({
-    currentPassword: z.string(),
+    oldPassword: z.string(),
     newPassword: z
       .string()
       .min(8, '8자 이상 입력해주세요')
@@ -31,9 +31,11 @@ export const changePasswordSchema = z
     message: '새 비밀번호가 일치하지 않아요',
     path: ['confirmPassword'],
   })
-  .refine(data => data.currentPassword !== data.newPassword, {
+  .refine(data => data.oldPassword !== data.newPassword, {
     message: '현재 비밀번호와 동일한 비밀번호로 변경할 수 없어요',
     path: ['newPassword'],
   });
 
 export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
+
+export type ChangePasswordPayload = Omit<ChangePasswordFormValues, 'confirmPassword'>;
