@@ -10,9 +10,10 @@ interface LoginPageProps {
 
 export default function LoginPage({ searchParams }: LoginPageProps) {
   const accessToken = cookies().get('accessToken')?.value;
+  ``;
   const { refer } = searchParams;
   if (accessToken) {
-    redirect(refer ?? '/');
+    redirect(refer ? `${refer}?date=${Date.now()}` : '/');
   }
   return (
     <div className="flex min-h-screen flex-col justify-center bg-white p-4">

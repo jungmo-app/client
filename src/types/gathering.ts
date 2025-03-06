@@ -19,6 +19,7 @@ export interface CreateGatheringRequest {
 
 export interface GatheringListResponse {
   id: number;
+  profileImage: null | string;
   title: string;
   startDate: string;
   endDate: string;

@@ -39,6 +39,20 @@ export const userApis = {
       return false;
     }
   },
+  editInfo: async (payload: FormData) => {
+    try {
+      const response = await clientPrivateFetch(apiPaths.user.editInfo, {
+        method: 'PUT',
+        body: payload,
+      });
+      if (response?.status === 200) {
+        return true;
+      }
+      throw new Error('api error');
+    } catch {
+      return false;
+    }
+  },
 };
 
 export const serverUserApis = {

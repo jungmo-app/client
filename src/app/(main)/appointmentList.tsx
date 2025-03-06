@@ -59,7 +59,13 @@ export default function AppointmentList({ appointmentData }: AppointmentListProp
           {appointments.map(appointment => (
             <Link key={appointment.id} href={`/appointment/${appointment.id}`} className="flex items-center gap-4 p-2">
               <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg">
-                <Image fill src={IMAGE} alt={appointment.title} className="object-cover" />
+                <Image
+                  fill
+                  src={appointment.profileImage ?? IMAGE}
+                  alt={appointment.title}
+                  className="object-cover"
+                  priority={true}
+                />
               </div>
               <div className="flex-1 overflow-hidden">
                 <h4 className="truncate font-medium">{appointment.title}</h4>

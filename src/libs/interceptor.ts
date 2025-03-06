@@ -10,7 +10,6 @@ export const privateServerFetchFunc = async (url: string, init?: RequestInit) =>
     ...init,
     headers: {
       Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
       ...init?.headers,
     },
   });
@@ -28,7 +27,6 @@ const privateClientFetch = async (url: string, init?: RequestInit) => {
       ...init,
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
         ...init?.headers,
       },
     });
@@ -48,7 +46,6 @@ const privateClientFetch = async (url: string, init?: RequestInit) => {
             ...init,
             headers: {
               Authorization: `Bearer ${newToken}`,
-              'Content-Type': 'application/json',
               ...init?.headers,
             },
           });
@@ -105,10 +102,6 @@ export const customFetch = async <T>(url: string, init?: RequestInit) => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${url.slice(1)}`, {
       credentials: 'include',
       ...init,
-      headers: {
-        'Content-Type': 'application/json',
-        ...init?.headers,
-      },
     });
     if (!response.ok) {
       throw new Error('api error');

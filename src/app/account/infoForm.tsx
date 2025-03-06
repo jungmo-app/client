@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Copy, Edit, Save, X } from 'lucide-react';
+import { apis } from '@/apis';
 import {
   Avatar,
   AvatarFallback,
@@ -21,6 +22,7 @@ import {
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { EditProfileFormValues, editProfileSchema } from '@/schemas/account';
 import { UserDataResponse } from '@/types/user';
+import { revalidatePage } from '@/utils/revalidate';
 
 interface InfoFormProps {
   userData: UserDataResponse;
@@ -57,6 +59,20 @@ export default function InfoForm({ userData }: InfoFormProps) {
     /* if (!data.profileImage) {
       const filename;
     } */
+    const formData = new FormData();
+    formData.append('userName', data.name);
+    if (data.profileImage) {
+      formData.append('profileImage', data.profileImage);
+    }
+    const response = await apis.user.editInfo(formData);
+    if (response) {
+      alert('수정하였습니다');
+      setData(form.getValues());
+      setIsEditMode(false);
+      revalidatePage('/account');
+      return;
+    }
+    alert('수정에 실패하였습니다');
     console.log('Form submitted:', data);
   };
 
@@ -69,11 +85,6 @@ export default function InfoForm({ userData }: InfoFormProps) {
     form.reset(data);
   };
 
-  const handleClickSaveButton = () => {
-    setData(form.getValues());
-    setIsEditMode(false);
-  };
-
   const handleClickCopyButton = async () => {
     try {
       await navigator.clipboard.writeText(userData.userCode);
@@ -84,23 +95,22 @@ export default function InfoForm({ userData }: InfoFormProps) {
   };
   return (
     <Card className="relative px-3 pb-4 pt-8">
-      {isEditMode ? (
-        <div className="absolute right-3 top-3 flex items-center gap-2">
-          <button className="group" onClick={handleClickSaveButton}>
-            <Save className="size-5 stroke-neutral-400 group-hover:stroke-neutral-500" />
-          </button>
-          <button className="group" onClick={handleClickCancelButton}>
-            <X className="size-5 stroke-neutral-400 group-hover:stroke-neutral-500" />
-          </button>
-        </div>
-      ) : (
-        <button className="group absolute right-3 top-3" onClick={handleClickEditButton}>
-          <Edit className="size-5 stroke-neutral-400 group-hover:stroke-neutral-500" />
-        </button>
-      )}
-
       <Form {...form}>
         <form className="space-y-6 p-4" onSubmit={form.handleSubmit(onSubmit)}>
+          {isEditMode ? (
+            <div className="absolute right-3 top-3 flex items-center gap-2">
+              <button type="submit" className="group">
+                <Save className="size-5 stroke-neutral-400 group-hover:stroke-neutral-500" />
+              </button>
+              <button className="group" onClick={handleClickCancelButton}>
+                <X className="size-5 stroke-neutral-400 group-hover:stroke-neutral-500" />
+              </button>
+            </div>
+          ) : (
+            <button type="button" className="group absolute right-3 top-3" onClick={handleClickEditButton}>
+              <Edit className="size-5 stroke-neutral-400 group-hover:stroke-neutral-500" />
+            </button>
+          )}
           <div className="flex flex-col items-center space-y-4">
             <div className="relative">
               <Avatar className="h-32 w-32">
@@ -118,6 +128,7 @@ export default function InfoForm({ userData }: InfoFormProps) {
               {isEditMode && (
                 <button
                   className="absolute left-0 top-0 size-32 rounded-full bg-shadow-30 text-white hover:bg-shadow-50"
+                  type="button"
                   onClick={() => document.getElementById('profile-image')?.click()}
                 >
                   변경

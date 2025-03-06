@@ -4,3 +4,9 @@ export interface UserDataResponse {
   userName: string;
   profileImage: string | null;
 }
+
+export interface InfoRequest {
+  userName: string;
+  profileImage: File | null;
+  delete?: boolean;
+}

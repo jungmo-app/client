@@ -20,5 +20,6 @@ export const apiPaths = {
     userInfo: '/users/info',
     search: '/users/search',
     deleteAccount: '/users/info',
+    editInfo: '/users/info',
   },
 } as const;
