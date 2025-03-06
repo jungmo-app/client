@@ -1,63 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { apis } from '@/apis';
-import { verifyToken } from '@/libs/auth/jwt';
-import { parseSetCookie } from '@/utils/formatText';
+import { apis } from './apis';
+/* import { verifyToken } from './libs/auth/jwt'; */
 import { resetCookie } from './utils/cookie';
+import { parseSetCookie } from './utils/formatText';
 
 export const middleware = async (request: NextRequest) => {
   const accessToken = request.cookies.get('accessToken')?.value;
   const refreshToken = request.cookies.get('refreshToken')?.value;
   const response = NextResponse.next();
-  console.log('middleware');
 
-  if (!accessToken) {
-    if (refreshToken) {
-      resetCookie(response, 'refreshToken');
-    }
-    return response;
-  }
-
-  if (!refreshToken) {
-    resetCookie(response, 'accessToken');
-    return response;
-  }
-
-  try {
-    const result = await verifyToken(accessToken);
-    if (result === 'expired') {
-      try {
-        const api = await apis.auth.refreshToken(accessToken, refreshToken);
-        const cookies = (api.headers as unknown as Headers & { getSetCookie: () => string[] }).getSetCookie();
-        cookies.forEach(cookie => {
-          const { name, value, options } = parseSetCookie(cookie);
-          response.cookies.set(name, value, options);
-        });
-        return response;
-      } catch (e) {
-        throw new Error('failed refresh token');
-      }
-    }
-    if (result) {
-      return response;
-    }
-    throw new Error('invalid token');
-  } catch (e) {
-    console.error(e);
+  if (!accessToken || !refreshToken) {
     resetCookie(response, 'accessToken');
     resetCookie(response, 'refreshToken');
     return response;
   }
+  /* const isValidToken = await verifyToken(accessToken);
+
+  console.log(isValidToken);
+
+  if (!isValidToken) {
+    resetCookie(response, 'accessToken');
+    resetCookie(response, 'refreshToken');
+    return response;
+  } */
+
+  const api = await apis.auth.refreshToken(accessToken, refreshToken);
+  if (!api) {
+    resetCookie(response, 'accessToken');
+    resetCookie(response, 'refreshToken');
+    return response;
+  }
+  const cookies = (api.headers as unknown as Headers & { getSetCookie: () => string[] }).getSetCookie();
+  cookies.forEach(cookie => {
+    const { name, value, options } = parseSetCookie(cookie);
+    response.cookies.set(name, value, options);
+  });
+  return response;
 };
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico, sitemap.xml, robots.txt (metadata files)
-     */
-    '/((?!api|_next/static).*)',
-  ],
+  matcher: '/login/:path*',
 };

@@ -1,12 +1,14 @@
 import { authApis } from './auth';
-import { gatheringApis } from './gathering';
+import { gatheringApis, serverGatheringApis } from './gathering';
 import { placeApis, serverPlaceApis } from './place';
-import { userApis } from './user';
+import { serverUserApis, userApis } from './user';
 
 export const apis = {
   auth: authApis,
   gathering: gatheringApis,
+  serverGathering: serverGatheringApis,
   place: placeApis,
   serverPlace: serverPlaceApis,
   user: userApis,
+  serverUser: serverUserApis,
 } as const;

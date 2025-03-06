@@ -7,9 +7,9 @@ import InfoForm from './infoForm';
 import LogoutButton from './logoutButton';
 
 export default async function AccountPage() {
-  const userData = await apis.user.getInfo();
+  const userData = await apis.serverUser.getInfo();
   if (!userData) {
-    redirect('/');
+    redirect(`/login?refer=/account&date=${Date.now()}`);
   }
   return (
     <div className="h-full bg-white">

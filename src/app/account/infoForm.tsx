@@ -70,7 +70,6 @@ export default function InfoForm({ userData }: InfoFormProps) {
   };
 
   const handleClickSaveButton = () => {
-    console.log(form.getValues());
     setData(form.getValues());
     setIsEditMode(false);
   };

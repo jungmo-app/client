@@ -1,5 +1,5 @@
 import axios, { type AxiosPromise } from 'axios';
-import { getSession } from '@/libs/auth/session';
+import { getCookie } from '@/libs/auth/session';
 
 const axiosConfig = {
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -14,7 +14,7 @@ export const baseAxios = axios.create(axiosConfig);
 export const privateAxios = axios.create(axiosConfig);
 
 privateAxios.interceptors.request.use(async config => {
-  config.headers.Authorization = `Bearer ${await getSession()}`;
+  config.headers.Authorization = `Bearer ${await getCookie('accessToken')}`;
   return config;
 });
 

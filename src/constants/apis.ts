@@ -5,6 +5,7 @@ export const apiPaths = {
     register: '/member',
     changePassword: '/member/password',
     refreshToken: '/auth/refresh',
+    checkBlacklist: '/auth/isBlacklist',
   },
   gathering: {
     create: '/gatherings',
@@ -16,7 +17,7 @@ export const apiPaths = {
     addLocation: '/gatherings',
   },
   user: {
-    userInfo: 'users/info',
+    userInfo: '/users/info',
     search: '/users/search',
     deleteAccount: '/users/info',
   },

@@ -1,31 +1,26 @@
-import { AxiosError } from 'axios';
 import { apiPaths } from '@/constants/apis';
-import { extractAxiosData, privateAxios } from '@/libs/baseAxios';
-import type { ApiResponse } from '@/types/apis';
+import { clientPrivateFetch, privateServerFetch } from '@/libs/interceptor';
 import type { CreateGatheringRequest, DetailGatheringRespose, GatheringListResponse } from '@/types/gathering';
 
 export const gatheringApis = {
   create: async (payload: CreateGatheringRequest) => {
-    try {
-      const response = await extractAxiosData<ApiResponse<string>>(
-        privateAxios.post(apiPaths.gathering.create, payload)
-      );
-      return response;
-    } catch {
-      return false;
-    }
+    const response = await clientPrivateFetch<string>(apiPaths.gathering.create, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    return response;
   },
 
   getList: async (date: Date) => {
     const currentDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
     try {
-      const { data } = await extractAxiosData<ApiResponse<GatheringListResponse[]>>(
-        privateAxios.get(`${apiPaths.gathering.getList}?currentDate=${currentDate}`)
+      const response = await clientPrivateFetch<GatheringListResponse[]>(
+        `${apiPaths.gathering.getList}?currentDate=${currentDate}`
       );
-      if (data) {
-        return data;
+      if (response?.status === 200) {
+        return response.data;
       }
-      return null;
+      throw new Error('api error');
     } catch {
       return null;
     }
@@ -33,8 +28,14 @@ export const gatheringApis = {
 
   edit: async (id: number, payload: CreateGatheringRequest) => {
     try {
-      await extractAxiosData<ApiResponse>(privateAxios.put(`${apiPaths.gathering.edit}/${id}`, payload));
-      return true;
+      const response = await clientPrivateFetch(`${apiPaths.gathering.edit}/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+      });
+      if (response?.status === 200) {
+        return true;
+      }
+      throw new Error('api error');
     } catch {
       return false;
     }
@@ -42,8 +43,13 @@ export const gatheringApis = {
 
   delete: async (id: number) => {
     try {
-      await extractAxiosData<ApiResponse>(privateAxios.delete(`${apiPaths.gathering.delete}/${id}`));
-      return true;
+      const response = await clientPrivateFetch(`${apiPaths.gathering.delete}/${id}`, {
+        method: 'DELETE',
+      });
+      if (response?.status === 200) {
+        return true;
+      }
+      throw new Error('api error');
     } catch {
       return false;
     }
@@ -51,30 +57,31 @@ export const gatheringApis = {
 
   getDetail: async (id: number) => {
     try {
-      const { data } = await extractAxiosData<ApiResponse<DetailGatheringRespose>>(
-        privateAxios.get(
-          `${apiPaths.gathering.getDetail}/${id}` /* , {
-          adapter: 'fetch',
-          fetchOptions: { cache: 'force-cache' },
-        } */
-        )
-      );
-      return data;
-    } catch (error) {
-      const e = error as AxiosError;
-      if (e.status === 404) {
+      const response = await clientPrivateFetch<DetailGatheringRespose>(`${apiPaths.gathering.getDetail}/${id}`);
+      if (response?.status === 200) {
+        return response.data;
+      }
+      if (response?.status === 404) {
         return null;
       }
+      throw new Error('api error');
+    } catch {
       return undefined;
     }
   },
 
   deleteLocation: async (gatheringId: number, locationId: number) => {
     try {
-      await extractAxiosData<ApiResponse>(
-        privateAxios.delete(`${apiPaths.gathering.deleteLocation}/${gatheringId}/locations/${locationId}`)
+      const response = await clientPrivateFetch(
+        `${apiPaths.gathering.deleteLocation}/${gatheringId}/locations/${locationId}`,
+        {
+          method: 'DELETE',
+        }
       );
-      return true;
+      if (response?.status === 200) {
+        return true;
+      }
+      throw new Error('api error');
     } catch {
       return false;
     }
@@ -82,14 +89,38 @@ export const gatheringApis = {
 
   addLocation: async (gatheringId: number, placeId: string) => {
     try {
-      const response = await extractAxiosData<ApiResponse<number>>(
-        privateAxios.post(`${apiPaths.gathering.addLocation}/${gatheringId}/locations`, {
-          placeId,
-        })
-      );
-      return response;
+      const response = await clientPrivateFetch<number>(`${apiPaths.gathering.addLocation}/${gatheringId}/locations`, {
+        method: 'POST',
+        body: JSON.stringify({ placeId }),
+      });
+      if (response?.status === 200) {
+        return response.data;
+      }
+      throw new Error('api error');
     } catch {
       return false;
     }
+  },
+};
+
+export const serverGatheringApis = {
+  getList: async (date: Date) => {
+    const currentDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+
+    const response = await privateServerFetch<GatheringListResponse[]>(
+      `${apiPaths.gathering.getList}?currentDate=${currentDate}`,
+      {
+        method: 'GET',
+        cache: 'no-cache',
+      }
+    );
+    return response === null || response === undefined ? response : response.data;
+  },
+  getDetail: async (id: number) => {
+    const response = await privateServerFetch<DetailGatheringRespose>(`${apiPaths.gathering.getDetail}/${id}`, {
+      method: 'GET',
+      cache: 'no-cache',
+    });
+    return response === null || response === undefined ? response : response.data;
   },
 };

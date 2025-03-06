@@ -1,10 +1,19 @@
+import { cookies } from 'next/headers';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { Button } from '@/components/ui';
-import { redirectMain } from '@/utils/cookie';
 import LoginForm from './loginForm';
 
-export default function LoginPage() {
-  redirectMain();
+interface LoginPageProps {
+  searchParams: Record<string, string | undefined>;
+}
+
+export default function LoginPage({ searchParams }: LoginPageProps) {
+  const accessToken = cookies().get('accessToken')?.value;
+  const { refer } = searchParams;
+  if (accessToken) {
+    redirect(refer ?? '/');
+  }
   return (
     <div className="flex min-h-screen flex-col justify-center bg-white p-4">
       <div className="mx-auto w-full max-w-md space-y-6">

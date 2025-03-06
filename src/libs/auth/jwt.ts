@@ -2,6 +2,7 @@
 
 import { jwtVerify } from 'jose';
 import { JWTExpired } from 'jose/errors';
+import { apis } from '@/apis';
 import { SessionType } from '@/stores/user';
 
 const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
@@ -9,18 +10,19 @@ const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
 /**
  * JWT 검증하고 유효한 경우 페이로드를 반환 (만료시간도 같이 검증)
  */
-export const verifyToken = async (session: string | undefined = '') => {
+export const verifyToken = async (accessToken: string) => {
   try {
-    const { payload } = await jwtVerify<SessionType>(session, encodedKey, {
+    await jwtVerify<SessionType>(accessToken, encodedKey, {
       algorithms: ['HS256'],
     });
-    return payload;
+    const isBlacklist = await apis.auth.checkBlacklist(accessToken);
+    return !isBlacklist;
   } catch (error) {
     if (error instanceof JWTExpired) {
-      /* console.log('* 만료'); */
-      return 'expired';
+      const isBlacklist = await apis.auth.checkBlacklist(accessToken);
+      return !isBlacklist;
     }
     /* console.log('* 검증 실패'); */
-    return null;
+    return false;
   }
 };

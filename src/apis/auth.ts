@@ -5,7 +5,14 @@ import { ChangePasswordRequest, LoginRequest, RegisterRequest } from '@/types/au
 
 export const authApis = {
   login: async (payload: LoginRequest) => {
-    const response = await extractAxiosData<ApiResponse>(baseAxios.post(apiPaths.auth.login, payload));
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.login.slice(1)}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(payload),
+    });
 
     return response;
   },
@@ -45,7 +52,21 @@ export const authApis = {
       }
       return response;
     } catch {
-      throw new Error('refresh api error');
+      return undefined;
+    }
+  },
+  checkBlacklist: async (accessToken: string) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.checkBlacklist.slice(1)}?accessToken=${accessToken}`
+      );
+      if (!response.ok) {
+        throw new Error('api error');
+      }
+      const { data } = await response.json();
+      return data as boolean;
+    } catch {
+      return false;
     }
   },
 } as const;

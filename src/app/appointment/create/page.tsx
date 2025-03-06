@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
-import { gatheringApis } from '@/apis/gathering';
+import { apis } from '@/apis';
 import { DateInput, DescriptionInput, PlaceInput, TitleInput } from '@/app/appointment/create';
 import { AttendeeInput, Header } from '@/components';
 import { Button } from '@/components/ui';
@@ -40,13 +40,17 @@ export default function CreateAppointment() {
 
   const handleSubmitAppointment = async (data: AppointmentFormData) => {
     try {
-      await gatheringApis.create({
+      const response = await apis.gathering.create({
         ...data,
         endDate: data.startDate,
         meetingLocation: { placeId: data.meetingLocation.id },
         userIds: attendees.map(user => user.userId),
       });
-      router.push('/');
+      if (response?.status === 200) {
+        router.push('/');
+        return;
+      }
+      throw new Error('api error');
     } catch {
       alert('약속 등록에 실패하였습니다.');
     }

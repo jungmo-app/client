@@ -1,29 +1,28 @@
 import { apiPaths } from '@/constants/apis';
-import { extractAxiosData, privateAxios } from '@/libs/baseAxios';
-import { ApiResponse } from '@/types/apis';
+import { clientPrivateFetch, privateServerFetch } from '@/libs/interceptor';
 import { UserDataResponse } from '@/types/user';
 
 export const userApis = {
   search: async (userCode: string) => {
     try {
-      const { data } = await extractAxiosData<ApiResponse<UserDataResponse[]>>(
-        privateAxios.get(`${apiPaths.user.search}?userCode=${userCode}`)
-      );
+      const respone = await clientPrivateFetch<UserDataResponse[]>(`${apiPaths.user.search}?userCode=${userCode}`);
 
-      if (!data) {
-        throw new Error('데이터를 불러올 수 없습니다');
+      if (respone?.status === 200) {
+        return respone.data;
       }
-      return data;
+      throw new Error('api error');
     } catch {
       return null;
     }
   },
   getInfo: async () => {
     try {
-      const { data } = await extractAxiosData<ApiResponse<UserDataResponse>>(privateAxios.get(apiPaths.user.userInfo));
-      return data;
-    } catch (error) {
-      console.log(error);
+      const response = await clientPrivateFetch<UserDataResponse>(apiPaths.user.userInfo);
+      if (response?.status === 200) {
+        return response.data;
+      }
+      throw new Error('api error');
+    } catch {
       return null;
     }
   },
@@ -39,5 +38,15 @@ export const userApis = {
     } catch {
       return false;
     }
+  },
+};
+
+export const serverUserApis = {
+  getInfo: async () => {
+    const response = await privateServerFetch<UserDataResponse>(apiPaths.user.userInfo, {
+      method: 'GET',
+      cache: 'no-cache',
+    });
+    return response === null || response === undefined ? response : response.data;
   },
 };

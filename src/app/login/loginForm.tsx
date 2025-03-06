@@ -2,7 +2,6 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
 import { Button, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from '@/components/ui';
@@ -21,15 +20,18 @@ export default function LoginForm() {
 
   const onSubmit = async (data: LoginRequest) => {
     try {
-      await apis.auth.login(data);
-      router.push('/');
-    } catch (error) {
-      const e = error as AxiosError;
-      if (e.status === 400) {
+      const response = await apis.auth.login(data);
+      if (response.status === 400) {
         form.setError('email', { message: '이메일 또는 비밀번호가 잘못되었습니다.' });
         form.setError('password', { message: '이메일 또는 비밀번호가 잘못되었습니다.' });
         return;
       }
+      if (response.status === 200) {
+        router.push('/');
+        return;
+      }
+      throw new Error('api Error');
+    } catch {
       alert('로그인을 할 수 없습니다.');
     }
   };

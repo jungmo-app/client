@@ -37,11 +37,11 @@ export default function Footer({ id, onAddLocation }: FooterProps) {
     }
     try {
       const result = await apis.gathering.addLocation(id, value.place_id);
-      if (!result || !result.data) {
+      if (!result) {
         alert('장소 추가에 실패하였습니다');
         return;
       }
-      onAddLocation(result.data, value);
+      onAddLocation(result, value);
     } catch {
       alert('장소 추가에 실패하였습니다');
     }
