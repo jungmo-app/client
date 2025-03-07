@@ -1,91 +1,29 @@
-'use client';
-
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { cookies } from 'next/headers';
 import Link from 'next/link';
-import * as z from 'zod';
-import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import { redirect } from 'next/navigation';
+import { Button } from '@/components/ui';
+import LoginForm from './loginForm';
 
-const loginSchema = z.object({
-  email: z.string().min(1, '이메일을 입력해주세요'),
-  password: z.string().min(8, '비밀번호는 8자 이상이어야 합니다'),
-});
+interface LoginPageProps {
+  searchParams: Record<string, string | undefined>;
+}
 
-type LoginFormValues = z.infer<typeof loginSchema>;
-
-export default function LoginPage() {
-  const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-    mode: 'onChange',
-  });
-
-  const onSubmit = (data: LoginFormValues) => {
-    console.log(data);
-    // Add login logic here
-  };
-
+export default function LoginPage({ searchParams }: LoginPageProps) {
+  const accessToken = cookies().get('accessToken')?.value;
+  ``;
+  const { refer } = searchParams;
+  if (accessToken) {
+    redirect(refer ? `${refer}?date=${Date.now()}` : '/');
+  }
   return (
-    <div className="flex min-h-screen flex-col bg-white p-4">
-      <div className="mx-auto w-full max-w-md flex-grow space-y-6">
+    <div className="flex min-h-screen flex-col justify-center bg-white p-4">
+      <div className="mx-auto w-full max-w-md space-y-6">
         <div className="space-y-2 text-center">
           <h1 className="text-2xl font-bold">로그인</h1>
           <p className="text-gray-500">계정 정보를 입력해주세요</p>
         </div>
-
-        <Form {...form}>
-          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>이메일</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="email"
-                      placeholder="이메일을 입력해주세요"
-                      className="h-12 rounded-full border-gray-300 bg-gray-100 px-4"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>비밀번호</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="password"
-                      placeholder="비밀번호를 입력해주세요"
-                      className="h-12 rounded-full border-gray-300 bg-gray-100 px-4"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button
-              type="submit"
-              className="h-12 w-full rounded-full bg-blue-500 font-semibold text-white hover:bg-blue-600"
-            >
-              로그인
-            </Button>
-          </form>
-        </Form>
-
-        <div className="relative">
+        <LoginForm />
+        <div className="relative" style={{ marginTop: '16px', marginBottom: '12px' }}>
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />
           </div>
@@ -94,14 +32,20 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <Button
-          variant="outline"
-          className="h-12 w-full rounded-full border-2 border-yellow-400 bg-yellow-400 font-semibold text-black hover:bg-yellow-500"
-        >
-          카카오로 로그인하기
-        </Button>
+        <Link href="https://jungmoserver.shop/oauth2/authorization/kakao">
+          <Button
+            variant="outline"
+            className="h-12 w-full rounded-full border-2 border-yellow-400 bg-yellow-400 font-semibold text-black hover:bg-yellow-500"
+          >
+            카카오로 로그인하기
+          </Button>
+        </Link>
 
-        <div className="text-center">
+        <div className="flex h-fit items-center justify-center gap-2">
+          <Link href="/find" className="text-sm text-blue-500 hover:underline">
+            비밀번호 찾기
+          </Link>
+          <div className="h-3 w-1 border-l border-neutral-400" />
           <Link href="/signup" className="text-sm text-blue-500 hover:underline">
             회원가입
           </Link>

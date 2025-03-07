@@ -1,30 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { apis } from './apis';
+import { verifyToken } from './libs/auth/jwt';
+import { revalidateTagData } from './libs/revalidateTag';
+import { resetCookie } from './utils/cookie';
+import { parseSetCookie } from './utils/formatText';
 
-// eslint-disable-next-line unused-imports/no-unused-vars
 export const middleware = async (request: NextRequest) => {
-  // const { pathname } = request.nextUrl;
-  // const isPublicRoute = BASE_URL === pathname || PUBLIC_ROUTES.includes(pathname);
+  const accessToken = request.cookies.get('accessToken')?.value;
+  const refreshToken = request.cookies.get('refreshToken')?.value;
+  const response = NextResponse.next();
 
-  // const cookie = await getSession();
-  // const session = await verifyToken(cookie);
+  if (!accessToken || !refreshToken) {
+    resetCookie(response, 'accessToken');
+    resetCookie(response, 'refreshToken');
+    return response;
+  }
+  const isValidToken = await verifyToken(accessToken);
 
-  // // 퍼블릭 경로가 아닌데 세션이 없는 경우
-  // if (!isPublicRoute && !session) {
-  //   return NextResponse.redirect(new URL(BASE_URL, request.url));
-  // }
+  if (isValidToken) {
+    return response;
+  }
 
-  return NextResponse.next();
+  if (isValidToken === undefined) {
+    resetCookie(response, 'accessToken');
+    resetCookie(response, 'refreshToken');
+    revalidateTagData('*');
+    return response;
+  }
+
+  const api = await apis.auth.refreshToken(accessToken, refreshToken);
+  if (!api) {
+    resetCookie(response, 'accessToken');
+    resetCookie(response, 'refreshToken');
+    revalidateTagData('*');
+    return response;
+  }
+
+  const cookies = (api.headers as unknown as Headers & { getSetCookie: () => string[] }).getSetCookie();
+  cookies.forEach(cookie => {
+    const { name, value, options } = parseSetCookie(cookie);
+    response.cookies.set(name, value, options);
+  });
+  return response;
 };
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico, sitemap.xml, robots.txt (metadata files)
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.svg$|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.gif$).*)',
-  ],
+  matcher: '/login/:path*',
 };

@@ -1,37 +1,36 @@
+'use client';
+
 import { useState } from 'react';
 import { Users } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { PARTICIPANTS } from '@/mocks/appointment';
-import AttendeeSelectModal from './modals/AttendeeSelectModal';
+import { Card, Input, Label } from '@/components/ui';
+import { UserDataResponse } from '@/types/user';
+import AttendeeSelectModal from './modals/attendeeSelectModal';
 
 type AttendeeInputProps = {
-  selectedAttendees: typeof PARTICIPANTS;
-  onAttendeesChange: (attendees: typeof PARTICIPANTS) => void;
+  selectedAttendees: UserDataResponse[];
+  onAttendeesChange: (attendees: UserDataResponse[]) => void;
 };
 
 export default function AttendeeInput({ selectedAttendees, onAttendeesChange }: AttendeeInputProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <div className="relative">
-      <Input
-        readOnly
-        placeholder="참석자를 선택해주세요"
-        value={selectedAttendees.map(user => user.name).join(', ')}
-        className="cursor-pointer"
-        onClick={() => setIsModalOpen(true)}
-      />
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute right-2 top-1/2 -translate-y-1/2"
-        onClick={() => setIsModalOpen(true)}
-      >
-        <Users className="h-4 w-4" />
-      </Button>
+    <Card className="relative space-y-4 rounded-2xl bg-[#F7F7F7] p-4">
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Users className="size-4" />
+          <Label>참가자</Label>
+        </div>
+        <Input
+          readOnly
+          placeholder="참석자를 선택해주세요"
+          value={selectedAttendees.map(user => user.userName).join(', ')}
+          className="cursor-pointer"
+          onClick={() => setIsModalOpen(true)}
+        />
+      </div>
 
       <AttendeeSelectModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSelect={onAttendeesChange} />
-    </div>
+    </Card>
   );
 }

@@ -1,122 +1,86 @@
 'use client';
 
 import { useState } from 'react';
-import { Calendar, MapPin } from 'lucide-react';
-import Link from 'next/link';
-import AttendeeInput from '@/components/AttendeeInput';
-import { DatePickerSheet } from '@/components/date-picker-sheet';
-import LocationInput from '@/components/LocationInput';
-import { TimePickerSheet } from '@/components/time-picker-sheet';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { PARTICIPANTS } from '@/mocks/appointment';
+import { FormProvider, useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
+import { apis } from '@/apis';
+import { DateInput, DescriptionInput, PlaceInput, TitleInput } from '@/app/appointment/create';
+import { AttendeeInput, Header } from '@/components';
+import { Button } from '@/components/ui';
+import { formattedDate } from '@/libs/date';
+import { UserDataResponse } from '@/types/user';
 
 type AppointmentFormData = {
   title: string;
-  datetime: string;
-  description: string;
-  location: {
-    name: string;
+  startDate: string;
+  startTime: string;
+  meetingLocation: {
+    id: string;
     address: string;
   };
+  memo: string;
+  userIds: number[];
 };
 
 export default function CreateAppointment() {
-  const [attendees, setAttendees] = useState<typeof PARTICIPANTS>([]);
-  const [formData, setFormData] = useState<AppointmentFormData>({
-    title: '',
-    datetime: '',
-    description: '',
-    location: {
-      name: '',
-      address: '',
+  const router = useRouter();
+  const [attendees, setAttendees] = useState<UserDataResponse[]>([]);
+
+  const methods = useForm<AppointmentFormData>({
+    defaultValues: {
+      title: '',
+      startDate: formattedDate(new Date()),
+      startTime: `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')}`,
+      meetingLocation: { id: '', address: '' },
+      memo: '',
+      userIds: [],
     },
+    mode: 'onChange',
   });
 
-  const handleSubmit = () => {
-    console.log('Form submitted:', formData);
+  const handleSubmitAppointment = async (data: AppointmentFormData) => {
+    try {
+      const response = await apis.gathering.create({
+        ...data,
+        endDate: data.startDate,
+        meetingLocation: { placeId: data.meetingLocation.id },
+        userIds: attendees.map(user => user.userId),
+      });
+      if (response?.status === 200) {
+        router.push('/');
+        return;
+      }
+      throw new Error('api error');
+    } catch {
+      alert('약속 등록에 실패하였습니다.');
+    }
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="flex h-14 items-center justify-between bg-white px-4">
-        <div className="flex items-center gap-2">
-          <Link href="/">
-            <Button variant="ghost" size="icon">
-              ✕
-            </Button>
-          </Link>
-          <h1 className="text-lg font-medium">일정 추가</h1>
-        </div>
-      </div>
+    <FormProvider {...methods}>
+      <div className="relative min-h-screen bg-white">
+        <Header title="일정 추가" />
+        <div className="space-y-4 p-4">
+          <TitleInput />
+          <DateInput />
+          <PlaceInput />
+          <DescriptionInput />
+          <AttendeeInput selectedAttendees={attendees} onAttendeesChange={setAttendees} />
 
-      <div className="space-y-4 p-4">
-        <Card className="space-y-4 rounded-2xl bg-[#F7F7F7] p-4">
-          <div className="space-y-4">
-            <Label>제목</Label>
-            <Input
-              placeholder="일정 제목을 입력해주세요"
-              className="bg-white"
-              value={formData.title}
-              onChange={e => setFormData({ ...formData, title: e.target.value })}
-            />
-          </div>
-        </Card>
-
-        <Card className="space-y-4 rounded-2xl bg-[#F7F7F7] p-4">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              <Label>날짜 및 시간</Label>
+          <div className="sticky bottom-0 z-10 border-t bg-white">
+            <div className="p-4">
+              <Button
+                className="w-full rounded-xl"
+                size="lg"
+                disabled={!methods.formState.isValid}
+                onClick={methods.handleSubmit(handleSubmitAppointment)}
+              >
+                일정 추가
+              </Button>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <DatePickerSheet onSelect={date => console.log(date)} />
-              <TimePickerSheet onSelect={time => console.log(time)} />
-            </div>
-          </div>
-        </Card>
-        <Card className="space-y-4 rounded-2xl bg-[#F7F7F7] p-4">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              <Label>장소</Label>
-            </div>
-            <LocationInput
-              value={formData.location.name}
-              onChange={location =>
-                setFormData({
-                  ...formData,
-                  location,
-                })
-              }
-            />
-          </div>
-        </Card>
-
-        <Card className="space-y-4 rounded-2xl bg-[#F7F7F7] p-4">
-          <div className="space-y-4">
-            <Label>설명</Label>
-            <Textarea
-              placeholder="일정에 대한 설명을 입력해주세요"
-              className="bg-white"
-              value={formData.description}
-              onChange={e => setFormData({ ...formData, description: e.target.value })}
-            />
-          </div>
-        </Card>
-        <AttendeeInput selectedAttendees={attendees} onAttendeesChange={setAttendees} />
-
-        <div className="z-10 border-t bg-white fixed-mobile-bottom">
-          <div className="p-4">
-            <Button className="w-full rounded-xl" size="lg" onClick={handleSubmit}>
-              일정 추가
-            </Button>
           </div>
         </div>
       </div>
-    </div>
+    </FormProvider>
   );
 }

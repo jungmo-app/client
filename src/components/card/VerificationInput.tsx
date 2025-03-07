@@ -9,7 +9,7 @@ type VerificationInputProps = {
 };
 
 export default function VerificationInput({ value, onChange, maxLength = 6 }: VerificationInputProps) {
-  const inputRefs = Array.from({ length: maxLength }, () => useRef<HTMLInputElement>(null));
+  const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(maxLength).fill(null));
 
   const handleChange = (index: number, inputValue: string) => {
     if (!/^\d*$/.test(inputValue)) return;
@@ -21,14 +21,14 @@ export default function VerificationInput({ value, onChange, maxLength = 6 }: Ve
 
     // 입력 후 다음 input으로 포커스 이동
     if (inputValue && index < maxLength - 1) {
-      inputRefs[index + 1].current?.focus();
+      inputRefs.current[index + 1]?.focus();
     }
   };
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Backspace' && !value[index] && index > 0) {
       // 현재 input이 비어있고 Backspace를 누르면 이전 input으로 이동
-      inputRefs[index - 1].current?.focus();
+      inputRefs.current[index - 1]?.focus();
     }
   };
 
@@ -44,7 +44,7 @@ export default function VerificationInput({ value, onChange, maxLength = 6 }: Ve
       {Array.from({ length: maxLength }).map((_, index) => (
         <input
           key={index}
-          ref={inputRefs[index]}
+          ref={el => (inputRefs.current[index] = el)}
           type="text"
           inputMode="numeric"
           pattern="\d*"

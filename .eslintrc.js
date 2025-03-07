@@ -1,8 +1,8 @@
 module.exports = {
   env: { browser: true, es2020: true, node: true },
-  globals: { window: true },
   extends: [
     'eslint:recommended',
+    'next/core-web-vitals',
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
     'plugin:storybook/recommended',
@@ -103,8 +103,6 @@ module.exports = {
     'no-undef': 'error',
     // foo['bar'] 대신 foo.bar 사용 강제 규칙
     'dot-notation': 'error',
-    // 한 줄당 글자 제한하는 규칙, 주석 제외
-    'max-len': ['error', { code: 120, ignoreComments: true, ignoreStrings: true }],
     // dependencies인 모듈이 devDependencies에 있는 경우 에러 발생시키는 규칙
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     // import 시에 파일의 확장자를 쓰지 않도록 강제하는 규칙

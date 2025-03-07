@@ -1,12 +1,12 @@
 import { Suspense } from 'react';
-import Loading from '@/components/common/Loading';
+import LoadingIcon from '@/components/common/loadingIcon';
 import { StrictPropsWithChildren } from '@/types/common';
 import ApiErrorBoundary from './ApiErrorBoundary';
 
 const ErrorBoundary = ({ children }: StrictPropsWithChildren) => {
   return (
     <ApiErrorBoundary>
-      <Suspense fallback={<Loading />}>{children}</Suspense>
+      <Suspense fallback={<LoadingIcon />}>{children}</Suspense>
     </ApiErrorBoundary>
   );
 };

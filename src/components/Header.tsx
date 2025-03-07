@@ -1,39 +1,42 @@
 'use client';
 
-import { ChevronLeft, Map, MoreVertical, Share2 } from 'lucide-react';
+import { HTMLAttributes } from 'react';
+import { ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui';
+import { cn } from '@/utils/styles';
 
-const Header = () => {
+interface HeaderProps extends Omit<HTMLAttributes<HTMLElement>, 'title' | 'className'> {
+  title?: string;
+  onClose?: () => void;
+  className?: string;
+  routeUrl?: string;
+}
+export default function Header({ title, className, children, onClose, routeUrl, ...props }: HeaderProps) {
   const router = useRouter();
 
   const handleBack = () => {
+    if (onClose) {
+      onClose();
+    }
+    if (routeUrl) {
+      router.push(routeUrl);
+      return;
+    }
     router.back();
   };
 
   return (
-    <header className="z-10 bg-white fixed-mobile-top">
+    <header className={cn('sticky top-0 z-10 bg-white', className)} {...props}>
       <div className="flex h-14 items-center justify-between">
         <div className="flex items-center">
           <Button variant="ghost" size="icon" className="mr-2" onClick={handleBack}>
             <ChevronLeft className="h-5 w-5" />
           </Button>
-          <h1 className="font-medium">약속 상세</h1>
+          <h1 className="font-medium">{title}</h1>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon">
-            <Share2 className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="icon">
-            <Map className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="icon">
-            <MoreVertical className="h-5 w-5" />
-          </Button>
-        </div>
+        {children}
       </div>
     </header>
   );
-};
-
-export default Header;
+}

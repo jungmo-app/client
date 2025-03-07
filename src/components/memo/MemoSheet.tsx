@@ -1,8 +1,15 @@
 import { useState } from 'react';
 import { ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Textarea } from '@/components/ui/textarea';
+import {
+  Button,
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  Textarea,
+} from '@/components/ui';
 
 type MemoSheetProps = {
   initialMemo: string;
