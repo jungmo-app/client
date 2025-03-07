@@ -10,14 +10,17 @@ interface HeaderProps extends Omit<HTMLAttributes<HTMLElement>, 'title' | 'class
   title?: string;
   onClose?: () => void;
   className?: string;
+  routeUrl?: string;
 }
-
-export default function Header({ title, className, children, onClose, ...props }: HeaderProps) {
+export default function Header({ title, className, children, onClose, routeUrl, ...props }: HeaderProps) {
   const router = useRouter();
 
   const handleBack = () => {
     if (onClose) {
       onClose();
+    }
+    if (routeUrl) {
+      router.push(routeUrl);
       return;
     }
     router.back();

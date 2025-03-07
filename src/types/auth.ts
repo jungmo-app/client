@@ -15,8 +15,18 @@ export const signUpSchema = z.object({
     ),
 });
 
-export type LoginRequest = z.infer<typeof loginSchema>;
+export const signupSchema = z.object({
+  name: z.string().min(1, '이름을 입력해주세요'),
+  email: z.string().min(1, '이메일을 입력해주세요'),
+  password: z
+    .string()
+    .min(8, '비밀번호는 8자 이상이어야 합니다')
+    .regex(/[A-Z]/, { message: '비밀번호에는 최소 하나의 대문자가 포함되어야 합니다.' })
+    .regex(/[a-z]/, { message: '비밀번호에는 최소 하나의 소문자가 포함되어야 합니다.' })
+    .regex(/[\W_]/, { message: '비밀번호에는 최소 하나의 특수문자가 포함되어야 합니다.' }),
+});
 
-export interface RegisterRequest {}
+export type LoginRequest = z.infer<typeof loginSchema>;
+export type SignupFormValues = z.infer<typeof signupSchema>;
 
 export interface ChangePasswordRequest {}

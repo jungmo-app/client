@@ -32,7 +32,7 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
           </div>
         </div>
 
-        <Link href="">
+        <Link href="https://jungmoserver.shop/oauth2/authorization/kakao">
           <Button
             variant="outline"
             className="h-12 w-full rounded-full border-2 border-yellow-400 bg-yellow-400 font-semibold text-black hover:bg-yellow-500"

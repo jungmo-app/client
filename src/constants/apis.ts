@@ -2,7 +2,7 @@ export const apiPaths = {
   auth: {
     login: '/auth/login',
     logout: '/auth/logout',
-    register: '/member',
+    register: '/auth/register',
     changePassword: '/auth/password',
     refreshToken: '/auth/refresh',
     checkBlacklist: '/auth/isBlacklist',

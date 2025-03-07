@@ -15,7 +15,12 @@ export const gatheringApis = {
     const currentDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
     try {
       const response = await clientPrivateFetch<GatheringListResponse[]>(
-        `${apiPaths.gathering.getList}?currentDate=${currentDate}`
+        `${apiPaths.gathering.getList}?currentDate=${currentDate}`,
+        {
+          method: 'GET',
+          cache: 'no-cache',
+          next: { tags: [`gatheringList-${date}`] },
+        }
       );
       if (response?.status === 200) {
         return response.data;
@@ -57,7 +62,11 @@ export const gatheringApis = {
 
   getDetail: async (id: number) => {
     try {
-      const response = await clientPrivateFetch<DetailGatheringRespose>(`${apiPaths.gathering.getDetail}/${id}`);
+      const response = await clientPrivateFetch<DetailGatheringRespose>(`${apiPaths.gathering.getDetail}/${id}`, {
+        method: 'GET',
+        cache: 'no-cache',
+        next: { tags: [`gathering-${id}`] },
+      });
       if (response?.status === 200) {
         return response.data;
       }
@@ -112,6 +121,7 @@ export const serverGatheringApis = {
       {
         method: 'GET',
         cache: 'no-cache',
+        next: { tags: [`gatheringList-${currentDate}`] },
       }
     );
     return response === null || response === undefined ? response : response.data;
@@ -120,6 +130,7 @@ export const serverGatheringApis = {
     const response = await privateServerFetch<DetailGatheringRespose>(`${apiPaths.gathering.getDetail}/${id}`, {
       method: 'GET',
       cache: 'no-cache',
+      next: { tags: [`gathering-${id}`] },
     });
     return response === null || response === undefined ? response : response.data;
   },

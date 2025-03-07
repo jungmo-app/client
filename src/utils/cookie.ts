@@ -1,3 +1,4 @@
+import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { NextResponse } from 'next/server';
@@ -10,6 +11,12 @@ export const resetCookie = (res: NextResponse, name: string) => {
     httpOnly: true,
     secure: true,
   });
+};
+
+export const logout = (res: NextResponse) => {
+  resetCookie(res, 'accessToken');
+  resetCookie(res, 'refreshToken');
+  revalidateTag('*');
 };
 
 export const redirectLogin = () => {

@@ -164,6 +164,7 @@ export default function InfoForm({ userData }: InfoFormProps) {
             <Label>유저 코드</Label>
             <button
               className="relative flex h-10 w-full rounded-md border border-black border-input bg-background bg-white px-3 py-2 text-sm outline-none ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+              type="button"
               style={{ marginTop: '8px' }}
               onClick={handleClickCopyButton}
             >

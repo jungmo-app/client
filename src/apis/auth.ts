@@ -1,9 +1,7 @@
 import { apiPaths } from '@/constants/apis';
-import { baseAxios, extractAxiosData } from '@/libs/baseAxios';
 import { clientPrivateFetch } from '@/libs/interceptor';
 import { ChangePasswordPayload } from '@/schemas/account';
-import { ApiResponse } from '@/types/apis';
-import { LoginRequest, RegisterRequest } from '@/types/auth';
+import { LoginRequest, SignupFormValues } from '@/types/auth';
 
 export const authApis = {
   login: async (payload: LoginRequest) => {
@@ -31,8 +29,15 @@ export const authApis = {
       return false;
     }
   },
-  register: async (payload: RegisterRequest) => {
-    const response = await extractAxiosData<ApiResponse>(baseAxios.post(apiPaths.auth.register, payload));
+  register: async (payload: SignupFormValues) => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.register.slice(1)}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(payload),
+    });
 
     return response;
   },
@@ -48,9 +53,6 @@ export const authApis = {
       });
       if (response?.status === 200) {
         return true;
-      }
-      if (response?.status === 400) {
-        return null;
       }
       throw new Error('api error');
     } catch {

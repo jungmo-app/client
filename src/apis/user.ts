@@ -5,7 +5,11 @@ import { UserDataResponse } from '@/types/user';
 export const userApis = {
   search: async (userCode: string) => {
     try {
-      const respone = await clientPrivateFetch<UserDataResponse[]>(`${apiPaths.user.search}?userCode=${userCode}`);
+      const respone = await clientPrivateFetch<UserDataResponse[]>(`${apiPaths.user.search}?userCode=${userCode}`, {
+        method: 'GET',
+        cache: 'no-cache',
+        next: { tags: ['info'] },
+      });
 
       if (respone?.status === 200) {
         return respone.data;
@@ -17,7 +21,11 @@ export const userApis = {
   },
   getInfo: async () => {
     try {
-      const response = await clientPrivateFetch<UserDataResponse>(apiPaths.user.userInfo);
+      const response = await clientPrivateFetch<UserDataResponse>(apiPaths.user.userInfo, {
+        method: 'GET',
+        cache: 'no-cache',
+        next: { tags: ['info'] },
+      });
       if (response?.status === 200) {
         return response.data;
       }
@@ -60,6 +68,7 @@ export const serverUserApis = {
     const response = await privateServerFetch<UserDataResponse>(apiPaths.user.userInfo, {
       method: 'GET',
       cache: 'no-cache',
+      next: { tags: ['info'] },
     });
     return response === null || response === undefined ? response : response.data;
   },

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apis } from './apis';
 import { verifyToken } from './libs/auth/jwt';
+import { revalidateTagData } from './libs/revalidateTag';
 import { resetCookie } from './utils/cookie';
 import { parseSetCookie } from './utils/formatText';
 
@@ -8,7 +9,6 @@ export const middleware = async (request: NextRequest) => {
   const accessToken = request.cookies.get('accessToken')?.value;
   const refreshToken = request.cookies.get('refreshToken')?.value;
   const response = NextResponse.next();
-  console.log('middleware');
 
   if (!accessToken || !refreshToken) {
     resetCookie(response, 'accessToken');
@@ -24,6 +24,7 @@ export const middleware = async (request: NextRequest) => {
   if (isValidToken === undefined) {
     resetCookie(response, 'accessToken');
     resetCookie(response, 'refreshToken');
+    revalidateTagData('*');
     return response;
   }
 
@@ -31,6 +32,7 @@ export const middleware = async (request: NextRequest) => {
   if (!api) {
     resetCookie(response, 'accessToken');
     resetCookie(response, 'refreshToken');
+    revalidateTagData('*');
     return response;
   }
 
