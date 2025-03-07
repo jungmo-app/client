@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Button } from '@/components/ui';
+import { revalidateTagData } from '@/libs/revalidateTag';
 import LoginForm from './loginForm';
 
 interface LoginPageProps {
@@ -10,11 +11,11 @@ interface LoginPageProps {
 
 export default function LoginPage({ searchParams }: LoginPageProps) {
   const accessToken = cookies().get('accessToken')?.value;
-  ``;
   const { refer } = searchParams;
   if (accessToken) {
     redirect(refer ? `${refer}?date=${Date.now()}` : '/');
   }
+  revalidateTagData('*');
   return (
     <div className="flex min-h-screen flex-col justify-center bg-white p-4">
       <div className="mx-auto w-full max-w-md space-y-6">
