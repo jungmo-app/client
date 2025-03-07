@@ -26,7 +26,33 @@ export const signupSchema = z.object({
     .regex(/[\W_]/, { message: '비밀번호에는 최소 하나의 특수문자가 포함되어야 합니다.' }),
 });
 
+export const setPasswordSchema = z.object({
+  email: z.string().min(1, '이메일을 입력해주세요'),
+});
+
+export const resetPasswordSchema = z
+  .object({
+    newPassword: z
+      .string()
+      .min(8, '비밀번호는 8자 이상이어야 합니다')
+      .regex(/[A-Z]/, { message: '비밀번호에는 최소 하나의 대문자가 포함되어야 합니다.' })
+      .regex(/[a-z]/, { message: '비밀번호에는 최소 하나의 소문자가 포함되어야 합니다.' })
+      .regex(/[\W_]/, { message: '비밀번호에는 최소 하나의 특수문자가 포함되어야 합니다.' }),
+    confirmPassword: z
+      .string()
+      .min(8, '비밀번호는 8자 이상이어야 합니다')
+      .regex(/[A-Z]/, { message: '비밀번호에는 최소 하나의 대문자가 포함되어야 합니다.' })
+      .regex(/[a-z]/, { message: '비밀번호에는 최소 하나의 소문자가 포함되어야 합니다.' })
+      .regex(/[\W_]/, { message: '비밀번호에는 최소 하나의 특수문자가 포함되어야 합니다.' }),
+  })
+  .refine(data => data.newPassword === data.confirmPassword, {
+    message: '새 비밀번호가 일치하지 않아요',
+    path: ['confirmPassword'],
+  });
+
 export type LoginRequest = z.infer<typeof loginSchema>;
 export type SignupFormValues = z.infer<typeof signupSchema>;
+export type SetPasswordFormValues = z.infer<typeof setPasswordSchema>;
+export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 
 export interface ChangePasswordRequest {}

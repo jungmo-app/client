@@ -27,7 +27,7 @@ export default async function AccountPage() {
       </div> */}
       <InfoForm userData={userData} />
       <div className="my-8 flex flex-col items-center gap-2">
-        <ChangePasswordSheet />
+        {userData.provider === 'email' && <ChangePasswordSheet />}
         <DeleteAccountSheet />
         <LogoutButton />
       </div>

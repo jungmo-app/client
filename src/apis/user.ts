@@ -1,6 +1,6 @@
 import { apiPaths } from '@/constants/apis';
 import { clientPrivateFetch, privateServerFetch } from '@/libs/interceptor';
-import { UserDataResponse } from '@/types/user';
+import { UserDataResponse, UserInfoResponse } from '@/types/user';
 
 export const userApis = {
   search: async (userCode: string) => {
@@ -21,10 +21,10 @@ export const userApis = {
   },
   getInfo: async () => {
     try {
-      const response = await clientPrivateFetch<UserDataResponse>(apiPaths.user.userInfo, {
+      const response = await clientPrivateFetch<UserInfoResponse>(apiPaths.user.userInfo, {
         method: 'GET',
         cache: 'no-cache',
-        next: { tags: ['info'] },
+        next: { tags: ['userInfo'] },
       });
       if (response?.status === 200) {
         return response.data;
@@ -65,10 +65,10 @@ export const userApis = {
 
 export const serverUserApis = {
   getInfo: async () => {
-    const response = await privateServerFetch<UserDataResponse>(apiPaths.user.userInfo, {
+    const response = await privateServerFetch<UserInfoResponse>(apiPaths.user.userInfo, {
       method: 'GET',
       cache: 'no-cache',
-      next: { tags: ['info'] },
+      next: { tags: ['userInfo'] },
     });
     return response === null || response === undefined ? response : response.data;
   },

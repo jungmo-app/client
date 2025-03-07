@@ -2,7 +2,6 @@ import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Button } from '@/components/ui';
-import { revalidateTagData } from '@/libs/revalidateTag';
 import LoginForm from './loginForm';
 
 interface LoginPageProps {
@@ -15,7 +14,7 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
   if (accessToken) {
     redirect(refer ? `${refer}?date=${Date.now()}` : '/');
   }
-  revalidateTagData('*');
+
   return (
     <div className="flex min-h-screen flex-col justify-center bg-white p-4">
       <div className="mx-auto w-full max-w-md space-y-6">
@@ -43,7 +42,7 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
         </Link>
 
         <div className="flex h-fit items-center justify-center gap-2">
-          <Link href="/find" className="text-sm text-blue-500 hover:underline">
+          <Link href="/reset-password" className="text-sm text-blue-500 hover:underline">
             비밀번호 찾기
           </Link>
           <div className="h-3 w-1 border-l border-neutral-400" />

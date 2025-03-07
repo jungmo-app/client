@@ -6,7 +6,7 @@ export interface UserDataResponse {
 }
 
 export interface UserInfoResponse extends UserDataResponse {
-  provider: string;
+  provider: 'kakao' | 'email';
 }
 
 export interface InfoRequest {

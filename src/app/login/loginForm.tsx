@@ -28,6 +28,7 @@ export default function LoginForm() {
       }
       if (response.status === 200) {
         router.push('/');
+        router.refresh();
         return;
       }
       throw new Error('api Error');

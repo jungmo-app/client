@@ -1,4 +1,3 @@
-import { Provider as JotaiProvider } from 'jotai';
 import GlobalErrorBoundary from '@/components/ErrorBoundary/GlobalErrorBoundary';
 import { StrictPropsWithChildren } from '@/types/common';
 import { QueryClientProvider } from './QueryClientProvider';
@@ -8,9 +7,7 @@ const Providers = ({ children }: StrictPropsWithChildren) => {
   return (
     <ThemeProvider>
       <GlobalErrorBoundary>
-        <JotaiProvider>
-          <QueryClientProvider>{children}</QueryClientProvider>
-        </JotaiProvider>
+        <QueryClientProvider>{children}</QueryClientProvider>
       </GlobalErrorBoundary>
     </ThemeProvider>
   );
