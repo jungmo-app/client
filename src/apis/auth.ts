@@ -1,5 +1,5 @@
 import { apiPaths } from '@/constants/apis';
-import { clientPrivateFetch } from '@/libs/interceptor';
+import { privateClientFetch } from '@/libs/interceptor';
 import { ChangePasswordPayload } from '@/schemas/account';
 import { LoginRequest, SignupFormValues } from '@/types/auth';
 
@@ -43,7 +43,7 @@ export const authApis = {
   },
   changePassword: async (payload: ChangePasswordPayload) => {
     try {
-      const response = await clientPrivateFetch(apiPaths.auth.changePassword, {
+      const response = await privateClientFetch(apiPaths.auth.changePassword, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -1,10 +1,10 @@
 import { apiPaths } from '@/constants/apis';
-import { clientPrivateFetch, privateServerFetch } from '@/libs/interceptor';
+import { privateClientFetch, privateServerFetch } from '@/libs/interceptor';
 import type { CreateGatheringRequest, DetailGatheringRespose, GatheringListResponse } from '@/types/gathering';
 
 export const gatheringApis = {
   create: async (payload: CreateGatheringRequest) => {
-    const response = await clientPrivateFetch<string>(apiPaths.gathering.create, {
+    const response = await privateClientFetch<string>(apiPaths.gathering.create, {
       method: 'POST',
       body: JSON.stringify(payload),
     });
@@ -14,7 +14,7 @@ export const gatheringApis = {
   getList: async (date: Date) => {
     const currentDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
     try {
-      const response = await clientPrivateFetch<GatheringListResponse[]>(
+      const response = await privateClientFetch<GatheringListResponse[]>(
         `${apiPaths.gathering.getList}?currentDate=${currentDate}`,
         {
           method: 'GET',
@@ -33,7 +33,7 @@ export const gatheringApis = {
 
   edit: async (id: number, payload: CreateGatheringRequest) => {
     try {
-      const response = await clientPrivateFetch(`${apiPaths.gathering.edit}/${id}`, {
+      const response = await privateClientFetch(`${apiPaths.gathering.edit}/${id}`, {
         method: 'PUT',
         body: JSON.stringify(payload),
       });
@@ -48,7 +48,7 @@ export const gatheringApis = {
 
   delete: async (id: number) => {
     try {
-      const response = await clientPrivateFetch(`${apiPaths.gathering.delete}/${id}`, {
+      const response = await privateClientFetch(`${apiPaths.gathering.delete}/${id}`, {
         method: 'DELETE',
       });
       if (response?.status === 200) {
@@ -62,7 +62,7 @@ export const gatheringApis = {
 
   getDetail: async (id: number) => {
     try {
-      const response = await clientPrivateFetch<DetailGatheringRespose>(`${apiPaths.gathering.getDetail}/${id}`, {
+      const response = await privateClientFetch<DetailGatheringRespose>(`${apiPaths.gathering.getDetail}/${id}`, {
         method: 'GET',
         cache: 'no-cache',
         next: { tags: [`gathering-${id}`] },
@@ -81,7 +81,7 @@ export const gatheringApis = {
 
   deleteLocation: async (gatheringId: number, locationId: number) => {
     try {
-      const response = await clientPrivateFetch(
+      const response = await privateClientFetch(
         `${apiPaths.gathering.deleteLocation}/${gatheringId}/locations/${locationId}`,
         {
           method: 'DELETE',
@@ -98,7 +98,7 @@ export const gatheringApis = {
 
   addLocation: async (gatheringId: number, placeId: string) => {
     try {
-      const response = await clientPrivateFetch<number>(`${apiPaths.gathering.addLocation}/${gatheringId}/locations`, {
+      const response = await privateClientFetch<number>(`${apiPaths.gathering.addLocation}/${gatheringId}/locations`, {
         method: 'POST',
         body: JSON.stringify({ placeId }),
       });
@@ -118,20 +118,25 @@ export const serverGatheringApis = {
 
     const response = await privateServerFetch<GatheringListResponse[]>(
       `${apiPaths.gathering.getList}?currentDate=${currentDate}`,
+      '/',
       {
         method: 'GET',
         cache: 'no-cache',
         next: { tags: [`gatheringList-${currentDate}`] },
       }
     );
-    return response === null || response === undefined ? response : response.data;
+    return response?.data;
   },
   getDetail: async (id: number) => {
-    const response = await privateServerFetch<DetailGatheringRespose>(`${apiPaths.gathering.getDetail}/${id}`, {
-      method: 'GET',
-      cache: 'no-cache',
-      next: { tags: [`gathering-${id}`] },
-    });
-    return response === null || response === undefined ? response : response.data;
+    const response = await privateServerFetch<DetailGatheringRespose>(
+      `${apiPaths.gathering.getDetail}/${id}`,
+      `/appointment/${id}`,
+      {
+        method: 'GET',
+        cache: 'no-cache',
+        next: { tags: [`gathering-${id}`] },
+      }
+    );
+    return response?.data;
   },
 };

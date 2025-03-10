@@ -6,9 +6,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { gatheringApis } from '@/apis/gathering';
 import { badgeVariants } from '@/components/ui';
+import { revalidatePage } from '@/libs/serverAction';
 import { DetailGatheringRespose, LocationDataType } from '@/types/gathering';
 import { PlaceDataType } from '@/types/map';
-import { revalidatePage } from '@/utils/revalidate';
 import { cn } from '@/utils/styles';
 import EditLocation from './editLocation';
 

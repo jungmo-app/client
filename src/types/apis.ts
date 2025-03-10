@@ -2,7 +2,7 @@ import Error from 'next/error';
 import type { ERROR_MESSAGE } from '@/constants/errorMessage';
 
 export interface ApiResponse<T = undefined> {
-  data?: T;
+  data: T;
   /** 메시지 (example: SUCCESS) */
   message: string;
   /** HTTP 상태코드 (example: 200) */

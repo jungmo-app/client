@@ -3,7 +3,6 @@
 import { jwtVerify } from 'jose';
 import { JWTExpired } from 'jose/errors';
 import { apis } from '@/apis';
-import { SessionType } from '@/stores/user';
 
 const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
 
@@ -12,7 +11,7 @@ const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
  */
 export const verifyToken = async (accessToken: string) => {
   try {
-    await jwtVerify<SessionType>(accessToken, encodedKey, {
+    await jwtVerify(accessToken, encodedKey, {
       algorithms: ['HS256'],
     });
     const isBlacklist = await apis.auth.checkBlacklist(accessToken);

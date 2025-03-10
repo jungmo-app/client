@@ -1,97 +1,66 @@
 import { apis } from '@/apis';
 import { ApiResponse } from '@/types/apis';
-import { getCookie } from './auth/session';
+import { getCookie, redirectPath } from './serverAction';
 
-export const privateServerFetchFunc = async (url: string, init?: RequestInit) => {
-  const accessToken = await getCookie('accessToken');
-  const refreshToken = await getCookie('refreshToken');
+const privateFetchApi = async (url: string, token?: string, init?: RequestInit) => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${url.slice(1)}`, {
     credentials: 'include',
     ...init,
     headers: {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: token ? `Bearer ${token}` : '',
       ...init?.headers,
     },
   });
-  if (response.status === 401 && accessToken && refreshToken) {
-    return undefined;
-  }
+
   return response;
 };
 
-const privateClientFetch = async (url: string, init?: RequestInit) => {
+export const privateServerFetch = async <T>(url: string, refer: string, init?: RequestInit) => {
   const accessToken = await getCookie('accessToken');
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${url.slice(1)}`, {
-      credentials: 'include',
-      ...init,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        ...init?.headers,
-      },
-    });
+    const response = await privateFetchApi(url, accessToken, init);
+    if (!response.ok) {
+      if (response.status === 401) {
+        redirectPath(`/login?refer=${refer}&date=${Date.now()}`);
+      }
+      throw new Error('api error');
+    }
+    const res: ApiResponse<T> = await response.json();
+    return res;
+  } catch (error) {
+    const e = error as Error;
+    if (e.message.includes('NEXT_REDIRECT')) {
+      throw error;
+    }
+    return null;
+  }
+};
+
+export const privateClientFetch = async <T>(url: string, init?: RequestInit) => {
+  const accessToken = await getCookie('accessToken');
+
+  try {
+    const response = await privateFetchApi(url, accessToken, init);
+
     if (response.status === 401) {
       const refreshToken = await getCookie('refreshToken');
+
       if (accessToken && refreshToken) {
         try {
           const res = await apis.auth.refreshToken(accessToken, refreshToken);
-          if (!res) {
-            throw new Error('token refresh error');
-          }
+          if (!res || !res.ok) throw new Error('Token refresh failed');
 
           const newToken = await getCookie('accessToken');
-
-          const retryResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${url.slice(1)}`, {
-            credentials: 'include',
-            ...init,
-            headers: {
-              Authorization: `Bearer ${newToken}`,
-              ...init?.headers,
-            },
-          });
-          return retryResponse;
+          const retrypResponse = await privateFetchApi(url, newToken, init);
+          const restryRes = (await retrypResponse.json()) as ApiResponse<T>;
+          return restryRes;
         } catch {
-          return undefined;
+          // Refresh 실패 시 기존 response 반환
         }
       }
     }
-    return response;
-  } catch {
-    return null;
-  }
-};
-
-/*
- * undefined: 권한 없음(서버)/토큰 재발급 실패(클라이언트)
- * null: api 자체 error
- */
-export const privateServerFetch = async <T>(url: string, init?: RequestInit) => {
-  try {
-    const response = await privateServerFetchFunc(url, init);
-    if (response) {
-      if (!response.ok) {
-        throw new Error('api error');
-      }
-      const res: ApiResponse<T> = await response.json();
-      return res;
-    }
-    return undefined;
-  } catch (error) {
-    return null;
-  }
-};
-
-export const clientPrivateFetch = async <T>(url: string, init?: RequestInit) => {
-  try {
-    const response = await privateClientFetch(url, init);
-    if (response) {
-      if (!response.ok) {
-        throw new Error('api error');
-      }
-      const res: ApiResponse<T> = await response.json();
-      return res;
-    }
-    return undefined;
+    const res = (await response.json()) as ApiResponse<T>;
+    return res;
   } catch {
     return null;
   }

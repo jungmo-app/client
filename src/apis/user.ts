@@ -1,11 +1,11 @@
 import { apiPaths } from '@/constants/apis';
-import { clientPrivateFetch, privateServerFetch } from '@/libs/interceptor';
+import { privateClientFetch, privateServerFetch } from '@/libs/interceptor';
 import { UserDataResponse, UserInfoResponse } from '@/types/user';
 
 export const userApis = {
   search: async (userCode: string) => {
     try {
-      const respone = await clientPrivateFetch<UserDataResponse[]>(`${apiPaths.user.search}?userCode=${userCode}`, {
+      const respone = await privateClientFetch<UserDataResponse[]>(`${apiPaths.user.search}?userCode=${userCode}`, {
         method: 'GET',
         cache: 'no-cache',
         next: { tags: ['info'] },
@@ -21,7 +21,7 @@ export const userApis = {
   },
   getInfo: async () => {
     try {
-      const response = await clientPrivateFetch<UserInfoResponse>(apiPaths.user.userInfo, {
+      const response = await privateClientFetch<UserInfoResponse>(apiPaths.user.userInfo, {
         method: 'GET',
         cache: 'no-cache',
         next: { tags: ['userInfo'] },
@@ -49,7 +49,7 @@ export const userApis = {
   },
   editInfo: async (payload: FormData) => {
     try {
-      const response = await clientPrivateFetch(apiPaths.user.editInfo, {
+      const response = await privateClientFetch(apiPaths.user.editInfo, {
         method: 'PUT',
         body: payload,
       });
@@ -65,11 +65,11 @@ export const userApis = {
 
 export const serverUserApis = {
   getInfo: async () => {
-    const response = await privateServerFetch<UserInfoResponse>(apiPaths.user.userInfo, {
+    const response = await privateServerFetch<UserInfoResponse>(apiPaths.user.userInfo, '/account', {
       method: 'GET',
       cache: 'no-cache',
       next: { tags: ['userInfo'] },
     });
-    return response === null || response === undefined ? response : response.data;
+    return response?.data;
   },
 };

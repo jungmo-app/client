@@ -9,7 +9,7 @@ import LogoutButton from './logoutButton';
 export default async function AccountPage() {
   const userData = await apis.serverUser.getInfo();
   if (!userData) {
-    redirect(`/login?refer=/account&date=${Date.now()}`);
+    redirect('/');
   }
   return (
     <div className="h-full bg-white">

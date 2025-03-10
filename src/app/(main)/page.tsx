@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation';
 import { apis } from '@/apis';
 import { DateContexProvider } from '@/contexts/DateProvider';
 import { redirectLogin } from '@/utils/cookie';
@@ -9,9 +8,7 @@ import Header from './header';
 export default async function Main() {
   redirectLogin();
   const appointmentData = await apis.serverGathering.getList(new Date());
-  if (appointmentData === undefined) {
-    redirect(`/login?refer=/&date=${Date.now()}`);
-  }
+
   const appointmentList = await Promise.all(
     (appointmentData ?? []).map(async item => {
       const place = await apis.serverPlace.getDetail(item.meetingLocation, ['name']);
@@ -25,7 +22,11 @@ export default async function Main() {
         <Header />
         <main className="flex flex-1 flex-col bg-background">
           <AppointmentCalendar />
-          <AppointmentList appointmentData={appointmentList} />
+          {appointmentList ? (
+            <AppointmentList appointmentData={appointmentList} />
+          ) : (
+            <div className="flex flex-1 items-center justify-center">일정을 불러올 수 없습니다</div>
+          )}
         </main>
       </div>
     </DateContexProvider>
