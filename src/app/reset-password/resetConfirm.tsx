@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from '@/components/ui';
-import { ResetPasswordFormValues, resetPasswordSchema } from '@/types/auth';
+import { resetPasswordSchema } from '@/schemas/auth';
+import { ResetPasswordFormValues } from '@/types/auth';
 
 export default function ResetConfirm() {
   const [isClicked, setIsClicked] = useState(false);

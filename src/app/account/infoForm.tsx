@@ -21,7 +21,7 @@ import {
 } from '@/components/ui';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { revalidatePage } from '@/libs/serverAction';
-import { EditProfileFormValues, editProfileSchema } from '@/schemas/account';
+import { EditProfileFormValues, editProfileSchema } from '@/schemas/auth';
 import { UserDataResponse } from '@/types/user';
 
 interface InfoFormProps {

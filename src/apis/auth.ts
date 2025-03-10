@@ -1,7 +1,6 @@
 import { apiPaths } from '@/constants/apis';
 import { privateClientFetch } from '@/libs/interceptor';
-import { ChangePasswordPayload } from '@/schemas/account';
-import { LoginRequest, SignupFormValues } from '@/types/auth';
+import { ChangePasswordPayload, LoginRequest, SignupFormValues } from '@/types/auth';
 
 export const authApis = {
   login: async (payload: LoginRequest) => {

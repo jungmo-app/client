@@ -1,21 +1,49 @@
 import { z } from 'zod';
 import commonSchemas from './common';
 
+export const editProfileSchema = z.object({
+  name: z.string().min(1, '이름을 입력해주세요'),
+  profileImage: z.instanceof(File).optional(),
+});
+
+export type EditProfileFormValues = z.infer<typeof editProfileSchema>;
+
 export const loginSchema = z.object({
   email: commonSchemas.email,
-  password: commonSchemas.password,
+  password: z.string(),
 });
 
-export const registerSchema = z.object({
+export const signupSchema = z.object({
+  name: commonSchemas.name,
   email: commonSchemas.email,
   password: commonSchemas.password,
 });
 
-export const changePasswordSchema = z.object({
-  currentPassword: commonSchemas.password,
-  newPassword: commonSchemas.password,
-});
+export const changePasswordSchema = z
+  .object({
+    oldPassword: z.string(),
+    newPassword: commonSchemas.password,
+    confirmPassword: commonSchemas.password,
+  })
+  .refine(data => data.newPassword === data.confirmPassword, {
+    message: '새 비밀번호가 일치하지 않아요',
+    path: ['confirmPassword'],
+  })
+  .refine(data => data.oldPassword !== data.newPassword, {
+    message: '현재 비밀번호와 동일한 비밀번호로 변경할 수 없어요',
+    path: ['newPassword'],
+  });
 
-export const deleteAccountSchema = z.object({
-  password: commonSchemas.password,
+export const resetPasswordSchema = z
+  .object({
+    newPassword: commonSchemas.password,
+    confirmPassword: commonSchemas.password,
+  })
+  .refine(data => data.newPassword === data.confirmPassword, {
+    message: '새 비밀번호가 일치하지 않아요',
+    path: ['confirmPassword'],
+  });
+
+export const setPasswordSchema = z.object({
+  email: commonSchemas.email,
 });
