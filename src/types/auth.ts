@@ -14,5 +14,8 @@ export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
 
 export type ChangePasswordPayload = Omit<ChangePasswordFormValues, 'confirmPassword'>;
+export type ResetPasswordPayload = Omit<ResetPasswordFormValues, 'confirmPassword'> & {
+  token: string;
+};
 
 export interface ChangePasswordRequest {}

@@ -3,11 +3,18 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
+import { apis } from '@/apis';
 import { Button, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from '@/components/ui';
 import { resetPasswordSchema } from '@/schemas/auth';
 import { ResetPasswordFormValues } from '@/types/auth';
 
-export default function ResetConfirm() {
+interface ResetConfirmProps {
+  token: string;
+}
+
+export default function ResetConfirm({ token }: ResetConfirmProps) {
+  const router = useRouter();
   const [isClicked, setIsClicked] = useState(false);
   const form = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(resetPasswordSchema),
@@ -20,7 +27,23 @@ export default function ResetConfirm() {
 
   const handleSubmit = async (data: ResetPasswordFormValues) => {
     setIsClicked(true);
-    console.log(data);
+    const response = await apis.auth.resetPassword({
+      token,
+      newPassword: data.newPassword,
+    });
+    if (response.status === 200) {
+      alert('비밀번호가 변경되었습니다');
+      router.push('/');
+      return;
+    }
+
+    if (response.status === 401) {
+      alert('만료된 url입니다');
+      router.push('/login');
+      return;
+    }
+    alert('비밀번호 초기화에 실패하였습니다');
+
     setIsClicked(false);
   };
   return (

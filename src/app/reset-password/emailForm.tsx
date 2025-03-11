@@ -3,12 +3,13 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from '@/components/ui';
+import { LoadingButton } from '@/components/common/LoadingButton';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from '@/components/ui';
 import { setPasswordSchema } from '@/schemas/auth';
 import { SetPasswordFormValues } from '@/types/auth';
 
 interface EmailFormProps {
-  onSubmit: () => void;
+  onSubmit: (data: SetPasswordFormValues) => Promise<void>;
 }
 
 export default function EmailForm({ onSubmit }: EmailFormProps) {
@@ -23,8 +24,7 @@ export default function EmailForm({ onSubmit }: EmailFormProps) {
 
   const handleSubmit = async (data: SetPasswordFormValues) => {
     setIsClicked(true);
-    console.log(data);
-    onSubmit();
+    await onSubmit(data);
     setIsClicked(false);
   };
   return (
@@ -53,14 +53,16 @@ export default function EmailForm({ onSubmit }: EmailFormProps) {
               </FormItem>
             )}
           />
-          <Button
+          <LoadingButton
             type="submit"
+            isLoading={isClicked}
+            loadingText="링크 생성 중"
             disabled={!form.formState.isValid || isClicked}
-            className="h-12 w-full rounded-full bg-blue-500 font-semibold text-white hover:bg-blue-600"
+            className={`h-12 w-full rounded-full bg-blue-500 font-semibold text-white hover:bg-blue-600 ${isClicked && 'bg-gray-400'}`}
             style={{ marginTop: '42px' }}
           >
             링크 전송하기
-          </Button>
+          </LoadingButton>
         </form>
       </Form>
     </div>

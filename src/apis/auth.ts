@@ -1,6 +1,12 @@
 import { apiPaths } from '@/constants/apis';
 import { privateClientFetch } from '@/libs/interceptor';
-import { ChangePasswordPayload, LoginRequest, SignupFormValues } from '@/types/auth';
+import {
+  ChangePasswordPayload,
+  LoginRequest,
+  ResetPasswordPayload,
+  SetPasswordFormValues,
+  SignupFormValues,
+} from '@/types/auth';
 
 export const authApis = {
   login: async (payload: LoginRequest) => {
@@ -56,6 +62,32 @@ export const authApis = {
       throw new Error('api error');
     } catch {
       return false;
+    }
+  },
+  setPassword: async (payload: SetPasswordFormValues) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.setPassword.slice(1)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const res = await response.json();
+      return res;
+    } catch {
+      return undefined;
+    }
+  },
+  resetPassword: async (payload: ResetPasswordPayload) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.setPassword.slice(1)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const res = await response.json();
+      return res;
+    } catch {
+      return undefined;
     }
   },
   refreshToken: async (accessToken: string, refreshToken: string) => {
