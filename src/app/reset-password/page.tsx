@@ -16,7 +16,7 @@ export default function resetPasswordPage({ searchParams }: ResetPasswordProps) 
         <div className="space-y-2">
           <h1 className="text-2xl font-bold">비밀번호 초기화</h1>
         </div>
-        {token ? <ResetConfirm /> : <ResetRequest />}
+        {token ? <ResetConfirm token={token} /> : <ResetRequest />}
       </div>
     </div>
   );
