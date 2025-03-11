@@ -31,13 +31,13 @@ export default function ResetConfirm({ token }: ResetConfirmProps) {
       token,
       newPassword: data.newPassword,
     });
-    if (response.status === 200) {
+    if (response?.status === 200) {
       alert('비밀번호가 변경되었습니다');
       router.push('/');
       return;
     }
 
-    if (response.status === 401) {
+    if (response?.status === 401) {
       alert('만료된 url입니다');
       router.push('/login');
       return;

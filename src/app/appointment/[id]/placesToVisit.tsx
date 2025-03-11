@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
 import { VisitLocationDataType } from '@/types/gathering';
@@ -24,8 +23,6 @@ export default function PlacesToVisit({ appointmentId, point, visitPlaces, isEdi
       await apis.gathering.deleteLocation(appointmentId, placeId);
       setLocations(prev => prev.filter(place => place.id !== placeId));
     } catch (error) {
-      const e = error as AxiosError;
-      console.log(e.status);
       alert('삭제할 수 없습니다.');
       router.refresh();
     }

@@ -13,7 +13,6 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const placeId = url.searchParams.get('placeId');
   const fields = url.searchParams.get('fields');
-  console.log(placeId, fields);
   if (!placeId || !fields) {
     return new Response(JSON.stringify(responseData(null, 400, 'placeId와 fields는 필수입니다')), { status: 400 });
   }

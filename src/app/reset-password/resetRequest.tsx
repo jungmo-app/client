@@ -11,11 +11,11 @@ export default function ResetRequest() {
 
   const handleSubmit = async (data: SetPasswordFormValues) => {
     const response = await apis.auth.setPassword(data);
-    if (response.status === 200) {
+    if (response?.status === 200) {
       setIsSubmit(true);
       return;
     }
-    alert(response.message);
+    alert(response?.message ?? 'api 요청 오류');
   };
 
   return <>{isSubmit ? <RequestInfo /> : <EmailForm onSubmit={handleSubmit} />}</>;

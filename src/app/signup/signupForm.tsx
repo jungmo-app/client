@@ -23,7 +23,7 @@ export default function SignupForm() {
     console.log(data);
     try {
       const response = await apis.auth.register(data);
-      if (response.status === 200) {
+      if (response?.status === 200) {
         router.push('/');
         return;
       }

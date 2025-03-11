@@ -1,6 +1,6 @@
-import axios from 'axios';
 import { apiPaths } from '@/constants/apis';
 import { GOOGLE_MAP_FIELD } from '@/constants/place';
+import { customFetch } from '@/libs/interceptor';
 import { ApiResponse } from '@/types/apis';
 import { snakeToSpace } from '@/utils/formatText';
 
@@ -12,7 +12,6 @@ export const placeApis = {
         method: 'GET',
         next: { revalidate: 3600 },
       });
-      console.log(response);
       if (!response.ok) {
         throw new Error('api error');
       }
@@ -24,19 +23,13 @@ export const placeApis = {
   },
   getSearchKeyword: async (keyword: string) => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.place.autoComplete.slice(1)}?input=${keyword}`,
-        {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-          next: { revalidate: 3600 },
-        }
-      );
-      if (!response.ok) {
-        throw new Error('api error');
+      const response = await customFetch<string[]>(`${apiPaths.place.autoComplete}?input=${keyword}`, {
+        next: { revalidate: 3600 },
+      });
+      if (response?.status === 200) {
+        return response.data;
       }
-      const { data } = await response.json();
-      return data as string[];
+      throw new Error('api error');
     } catch {
       return null;
     }
@@ -47,12 +40,22 @@ export const placeApis = {
     const url = 'https://libretranslate.de/translate';
 
     try {
-      const response = await axios.post(url, {
-        q: spaceWord,
-        source: 'en',
-        target: 'ko',
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          q: spaceWord,
+          source: 'en',
+          target: 'ko',
+        }),
       });
-      return response.data.translateText as string;
+      if (!response.ok) {
+        throw new Error('api error');
+      }
+      const {
+        data: { translateText },
+      } = await response.json();
+      return translateText as string;
     } catch {
       return null;
     }
@@ -73,7 +76,6 @@ export const serverPlaceApis = {
           next: { revalidate: 3600 },
         }
       );
-      console.log(response);
       if (!response.ok) {
         throw new Error('api error');
       }

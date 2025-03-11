@@ -1,5 +1,5 @@
 import { apiPaths } from '@/constants/apis';
-import { privateClientFetch } from '@/libs/interceptor';
+import { customFetch, privateClientFetch } from '@/libs/interceptor';
 import {
   ChangePasswordPayload,
   LoginRequest,
@@ -10,12 +10,8 @@ import {
 
 export const authApis = {
   login: async (payload: LoginRequest) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.login.slice(1)}`, {
+    const response = await customFetch(apiPaths.auth.login, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
       body: JSON.stringify(payload),
     });
 
@@ -35,12 +31,8 @@ export const authApis = {
     }
   },
   register: async (payload: SignupFormValues) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.register.slice(1)}`, {
+    const response = await customFetch(apiPaths.auth.register, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
       body: JSON.stringify(payload),
     });
 
@@ -66,26 +58,22 @@ export const authApis = {
   },
   setPassword: async (payload: SetPasswordFormValues) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.setPassword.slice(1)}`, {
+      const response = await customFetch(apiPaths.auth.setPassword, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      const res = await response.json();
-      return res;
+      return response;
     } catch {
       return undefined;
     }
   },
   resetPassword: async (payload: ResetPasswordPayload) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.setPassword.slice(1)}`, {
+      const response = await customFetch(apiPaths.auth.setPassword, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      const res = await response.json();
-      return res;
+      return response;
     } catch {
       return undefined;
     }
@@ -108,14 +96,12 @@ export const authApis = {
   },
   checkBlacklist: async (accessToken: string) => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.checkBlacklist.slice(1)}?accessToken=${accessToken}`
-      );
-      if (!response.ok) {
-        throw new Error('api error');
+      const response = await customFetch<boolean>(`${apiPaths.auth.checkBlacklist}?accessToken=${accessToken}`);
+      if (response?.status === 200) {
+        const { data } = response;
+        return data;
       }
-      const { data } = await response.json();
-      return data as boolean;
+      throw new Error('api error');
     } catch {
       return false;
     }

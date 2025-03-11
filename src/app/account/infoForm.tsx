@@ -73,7 +73,6 @@ export default function InfoForm({ userData }: InfoFormProps) {
       return;
     }
     alert('수정에 실패하였습니다');
-    console.log('Form submitted:', data);
   };
 
   const handleClickEditButton = () => {
