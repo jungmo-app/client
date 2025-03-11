@@ -51,6 +51,9 @@ export const userApis = {
     try {
       const response = await privateClientFetch(apiPaths.user.editInfo, {
         method: 'PUT',
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
         body: payload,
       });
       if (response?.status === 200) {

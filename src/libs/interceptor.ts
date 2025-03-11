@@ -3,16 +3,37 @@ import { ApiResponse } from '@/types/apis';
 import { getCookie, redirectPath } from './serverAction';
 
 const privateFetchApi = async (url: string, token?: string, init?: RequestInit) => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${url.slice(1)}`, {
+  if (init?.headers) {
+    const headers =
+      init.headers instanceof Headers
+        ? (Object.fromEntries(init.headers.entries()) as Record<string, string>)
+        : typeof init.headers === 'object' && !Array.isArray(init.headers)
+          ? ({ ...init.headers } as Record<string, string>)
+          : {};
+
+    if (headers['Content-Type'] === 'multipart/form-data') {
+      const { 'Content-Type': _, ...header } = headers; // 'Content-Type' 제거
+
+      return fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${url.slice(1)}`, {
+        credentials: 'include',
+        ...init,
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+          ...header,
+        },
+      });
+    }
+  }
+
+  return fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${url.slice(1)}`, {
     credentials: 'include',
     ...init,
     headers: {
       Authorization: token ? `Bearer ${token}` : '',
+      'Content-Type': 'application/json',
       ...init?.headers,
     },
   });
-
-  return response;
 };
 
 export const privateServerFetch = async <T>(url: string, refer: string, init?: RequestInit) => {

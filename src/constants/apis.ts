@@ -23,4 +23,7 @@ export const apiPaths = {
     deleteAccount: '/users/info',
     editInfo: '/users/info',
   },
+  place: {
+    autoComplete: '/maps/autocomplete',
+  },
 } as const;

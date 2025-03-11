@@ -1,15 +1,43 @@
-import axios from 'axios';
+import { ApiResponse } from '@/types/apis';
 
-export async function POST(req: Request) {
+const responseData = <T>(value: T, status: number, message?: string) => {
+  return {
+    data: value,
+    message: message ?? '',
+    code: 1,
+    status,
+  } as ApiResponse<T>;
+};
+
+export async function GET(req: Request) {
+  const url = new URL(req.url);
+  const placeId = url.searchParams.get('placeId');
+  const fields = url.searchParams.get('fields');
+  console.log(placeId, fields);
+  if (!placeId || !fields) {
+    return new Response(JSON.stringify(responseData(null, 400, 'placeId와 fields는 필수입니다')), { status: 400 });
+  }
+
   try {
-    const { placeId, fields } = await req.json();
-
-    const response = await axios.get(
-      `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&fields=${fields}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY}&language=ko`
+    const response = await fetch(
+      `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&fields=${fields}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY}&language=ko`,
+      {
+        method: 'GET',
+        cache: 'no-cache',
+      }
     );
 
-    return new Response(JSON.stringify(response.data.result), { status: 200 });
+    if (!response.ok) {
+      throw new Error('api error');
+    }
+    const { result } = await response.json();
+    const res = responseData<google.maps.places.PlaceResult>(result, 200, '장소 가져오기에 성공하였습니다');
+
+    return new Response(JSON.stringify(res), {
+      status: 200,
+    });
   } catch {
-    return new Response('Error', { status: 500 });
+    const res = responseData(null, 500, '장소 가져오기에 실패하였습니다');
+    return new Response(JSON.stringify(res), { status: 500 });
   }
 }

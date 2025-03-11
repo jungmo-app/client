@@ -52,27 +52,31 @@ export default function LocationSettingModal({
 
     const getData = async () => {
       setIsLoaded(false);
-      try {
-        const { data: detailData } = await apis.place.getDetail(
-          placeId,
-          Array.from(
-            new Set(['name', 'formatted_address', 'photo', 'type', 'place_id', ...(target ?? [])])
-          ) as (typeof GOOGLE_MAP_FIELD)[number][]
-        );
-        const locationTags = detailData.types
-          ? await Promise.all(
-              detailData.types.map(
-                async item => placeTypeTranslations[item] ?? (await apis.place.translatePlaceType(item))
-              )
-            )
-          : [];
-        setTags(locationTags);
-        setData(detailData);
-        setIsLoaded(true);
-      } catch {
+
+      const detailData = await apis.place.getDetail(
+        placeId,
+        Array.from(
+          new Set(['name', 'formatted_address', 'photo', 'type', 'place_id', ...(target ?? [])])
+        ) as (typeof GOOGLE_MAP_FIELD)[number][]
+      );
+
+      console.log(detailData);
+
+      if (!detailData) {
         alert('장소 정보를 가져올 수 없습니다');
         onClose();
+        return;
       }
+      const locationTags = detailData.types
+        ? await Promise.all(
+            detailData.types.map(
+              async item => placeTypeTranslations[item] ?? (await apis.place.translatePlaceType(item))
+            )
+          )
+        : [];
+      setTags(locationTags);
+      setData(detailData);
+      setIsLoaded(true);
     };
     getData();
   }, [placeId, onClose, locationData, target /*  getCache, setCache */]);

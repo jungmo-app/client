@@ -5,7 +5,10 @@ import { LucideFileTerminal } from 'lucide-react';
 import { Card, Input, Label } from '@/components/ui';
 
 export default function TitleInput() {
-  const { control } = useFormContext();
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext();
   return (
     <Card className="space-y-4 rounded-2xl bg-[#F7F7F7] p-4">
       <div className="space-y-4">
@@ -17,7 +20,9 @@ export default function TitleInput() {
           name="title"
           control={control}
           render={({ field }) => <Input placeholder="일정 제목을 입력해주세요" className="bg-white" {...field} />}
+          rules={{ validate: { title: value => (value ? true : '제목을 입력해주세요') } }}
         />
+        {errors.title && <span className="text-red-500">제목을 입력해주세요</span>}
       </div>
     </Card>
   );

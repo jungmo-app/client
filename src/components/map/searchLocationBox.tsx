@@ -2,6 +2,7 @@ import { FormEvent, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import debounce from 'lodash.debounce';
 import { Search } from 'lucide-react';
+import { apis } from '@/apis';
 import { Input } from '@/components/ui';
 import useOutsideClick from '@/hooks/useOutsideClick';
 
@@ -16,17 +17,6 @@ export default function SearchLocationBox({ onSubmit }: SearchLocationBoxProps) 
 
   const { targetRef } = useOutsideClick<HTMLFormElement>(() => setIsViewSuggestion(false));
 
-  const getSubstringFromOffset = (str: string, offset: number) => {
-    if (offset >= str.length) return '';
-
-    const first = str.slice(0, offset + 1);
-    const last = str.slice(offset + 1);
-
-    const indexKeyword = first.split(' ');
-
-    return indexKeyword[indexKeyword.length - 1] + last;
-  };
-
   const handleClickSuggestion = (value: string) => {
     setIsViewSuggestion(false);
     setValue('inputValue', value);
@@ -38,36 +28,13 @@ export default function SearchLocationBox({ onSubmit }: SearchLocationBoxProps) 
     onSubmit();
   };
 
-  const getSuggestion = debounce((keyword: string) => {
+  const getSuggestion = debounce(async (keyword: string) => {
     if (!keyword) {
       setSuggestions([]);
     }
-    const autoComplete = new window.google.maps.places.AutocompleteService();
-    autoComplete.getPlacePredictions(
-      { input: keyword, language: 'ko', types: ['establishment'], componentRestrictions: { country: 'kr' } },
-      (predictions, status) => {
-        if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-          const placeNames = predictions
-            ? predictions?.map(prediction => {
-                if (prediction.matched_substrings && prediction.matched_substrings.length > 0) {
-                  const matched = prediction.matched_substrings[0];
-                  const matchedStartIndex = matched.offset;
 
-                  const description = prediction.description;
-                  const placeNameFromMatched = getSubstringFromOffset(description, matchedStartIndex);
-
-                  return placeNameFromMatched;
-                } else {
-                  return prediction.description;
-                }
-              })
-            : [];
-          setSuggestions(Array.from(new Set(placeNames)));
-          return;
-        }
-        setSuggestions([]);
-      }
-    );
+    const response = await apis.place.getSearchKeyword(keyword);
+    setSuggestions(response ?? []);
   }, 500);
 
   return (
