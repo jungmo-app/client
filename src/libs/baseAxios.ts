@@ -1,5 +1,5 @@
 import axios, { type AxiosPromise } from 'axios';
-import { getCookie } from '@/libs/auth/session';
+import { getCookie } from './serverAction';
 
 const axiosConfig = {
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,

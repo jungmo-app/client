@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { REGEX } from '@/constants/regex';
 
-const EMAIL_SCHEMA = z.string().email({ message: '이메일 형식이 올바르지 않아요' });
+const EMAIL_SCHEMA = z.string().email({ message: '이메일 형식이 올바르지 않아요' }).min(1, '이메일을 입력해주세요');
 
 const PASSWORD_SCHEMA = z
   .string()
@@ -19,7 +19,10 @@ const PASSWORD_SCHEMA = z
     message: '패스워드는 최소 1개이상 특수문자를 포함해야해요',
   });
 
+const NAME_SCHEMA = z.string().min(1, '이름을 입력해주세요');
+
 const commonSchemas = {
+  name: NAME_SCHEMA,
   email: EMAIL_SCHEMA,
   password: PASSWORD_SCHEMA,
 };

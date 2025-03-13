@@ -9,7 +9,7 @@ import LogoutButton from './logoutButton';
 export default async function AccountPage() {
   const userData = await apis.serverUser.getInfo();
   if (!userData) {
-    redirect(`/login?refer=/account&date=${Date.now()}`);
+    redirect('/');
   }
   return (
     <div className="h-full bg-white">
@@ -27,7 +27,7 @@ export default async function AccountPage() {
       </div> */}
       <InfoForm userData={userData} />
       <div className="my-8 flex flex-col items-center gap-2">
-        <ChangePasswordSheet />
+        {userData.provider === 'email' && <ChangePasswordSheet />}
         <DeleteAccountSheet />
         <LogoutButton />
       </div>

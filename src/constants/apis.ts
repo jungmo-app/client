@@ -4,6 +4,7 @@ export const apiPaths = {
     logout: '/auth/logout',
     register: '/auth/register',
     changePassword: '/auth/password',
+    setPassword: '/auth/set-password',
     refreshToken: '/auth/refresh',
     checkBlacklist: '/auth/isBlacklist',
   },
@@ -21,5 +22,8 @@ export const apiPaths = {
     search: '/users/search',
     deleteAccount: '/users/info',
     editInfo: '/users/info',
+  },
+  place: {
+    autoComplete: '/maps/autocomplete',
   },
 } as const;

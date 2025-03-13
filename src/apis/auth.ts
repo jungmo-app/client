@@ -1,16 +1,17 @@
 import { apiPaths } from '@/constants/apis';
-import { clientPrivateFetch } from '@/libs/interceptor';
-import { ChangePasswordPayload } from '@/schemas/account';
-import { LoginRequest, SignupFormValues } from '@/types/auth';
+import { customFetch, privateClientFetch } from '@/libs/interceptor';
+import {
+  ChangePasswordPayload,
+  LoginRequest,
+  ResetPasswordPayload,
+  SetPasswordFormValues,
+  SignupFormValues,
+} from '@/types/auth';
 
 export const authApis = {
   login: async (payload: LoginRequest) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.login.slice(1)}`, {
+    const response = await customFetch(apiPaths.auth.login, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
       body: JSON.stringify(payload),
     });
 
@@ -30,12 +31,8 @@ export const authApis = {
     }
   },
   register: async (payload: SignupFormValues) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.register.slice(1)}`, {
+    const response = await customFetch(apiPaths.auth.register, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
       body: JSON.stringify(payload),
     });
 
@@ -43,7 +40,7 @@ export const authApis = {
   },
   changePassword: async (payload: ChangePasswordPayload) => {
     try {
-      const response = await clientPrivateFetch(apiPaths.auth.changePassword, {
+      const response = await privateClientFetch(apiPaths.auth.changePassword, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -57,6 +54,28 @@ export const authApis = {
       throw new Error('api error');
     } catch {
       return false;
+    }
+  },
+  setPassword: async (payload: SetPasswordFormValues) => {
+    try {
+      const response = await customFetch(apiPaths.auth.setPassword, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      return response;
+    } catch {
+      return undefined;
+    }
+  },
+  resetPassword: async (payload: ResetPasswordPayload) => {
+    try {
+      const response = await customFetch(apiPaths.auth.setPassword, {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      });
+      return response;
+    } catch {
+      return undefined;
     }
   },
   refreshToken: async (accessToken: string, refreshToken: string) => {
@@ -77,14 +96,12 @@ export const authApis = {
   },
   checkBlacklist: async (accessToken: string) => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.checkBlacklist.slice(1)}?accessToken=${accessToken}`
-      );
-      if (!response.ok) {
-        throw new Error('api error');
+      const response = await customFetch<boolean>(`${apiPaths.auth.checkBlacklist}?accessToken=${accessToken}`);
+      if (response?.status === 200) {
+        const { data } = response;
+        return data;
       }
-      const { data } = await response.json();
-      return data as boolean;
+      throw new Error('api error');
     } catch {
       return false;
     }

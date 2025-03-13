@@ -4,7 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
 import { Button, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from '@/components/ui';
-import { SignupFormValues, signupSchema } from '@/types/auth';
+import { signupSchema } from '@/schemas/auth';
+import { SignupFormValues } from '@/types/auth';
 
 export default function SignupForm() {
   const router = useRouter();
@@ -22,7 +23,7 @@ export default function SignupForm() {
     console.log(data);
     try {
       const response = await apis.auth.register(data);
-      if (response.status === 200) {
+      if (response?.status === 200) {
         router.push('/');
         return;
       }

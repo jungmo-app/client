@@ -35,7 +35,6 @@
     "dayjs": "^1.11.13",
     "eslint": "8.45.0",
     "jose": "^5.9.6",
-    "jotai": "^2.8.0",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.263.0",
     "next": "^14.2.1",

@@ -5,7 +5,6 @@ import { ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
 import { Button } from '@/components/ui';
-import { revalidateTagData } from '@/libs/revalidateTag';
 
 export default function LogoutButton() {
   const router = useRouter();
@@ -20,7 +19,6 @@ export default function LogoutButton() {
     if (logout) {
       alert('로그아웃 되었습니다');
       setIsClicked(false);
-      revalidateTagData('*');
       router.push('/login');
       return;
     }

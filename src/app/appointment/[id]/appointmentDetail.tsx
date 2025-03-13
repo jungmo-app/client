@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation';
 import { apis } from '@/apis';
 import { LOCATION_TAGS } from '@/mocks/appointment';
 import { VisitLocationDataType } from '@/types/gathering';
@@ -13,12 +12,8 @@ interface AppointmentDetailProps {
 export default async function AppointmentDetail({ id }: AppointmentDetailProps) {
   const appointment = await apis.serverGathering.getDetail(id);
 
-  if (appointment === null) {
+  if (!appointment) {
     return <div className="flex h-screen items-center justify-center">해당 약속을 불러올 수 없습니다.</div>;
-  }
-
-  if (appointment === undefined) {
-    redirect(`/login?refer=/appointment/${id}&date=${Date.now()}`);
   }
 
   const isEditable = appointment.authority === 'WRITE';

@@ -20,9 +20,9 @@ import {
   Label,
 } from '@/components/ui';
 import { useImageUpload } from '@/hooks/useImageUpload';
-import { EditProfileFormValues, editProfileSchema } from '@/schemas/account';
+import { revalidatePage } from '@/libs/serverAction';
+import { EditProfileFormValues, editProfileSchema } from '@/schemas/auth';
 import { UserDataResponse } from '@/types/user';
-import { revalidatePage } from '@/utils/revalidate';
 
 interface InfoFormProps {
   userData: UserDataResponse;
@@ -73,7 +73,6 @@ export default function InfoForm({ userData }: InfoFormProps) {
       return;
     }
     alert('수정에 실패하였습니다');
-    console.log('Form submitted:', data);
   };
 
   const handleClickEditButton = () => {

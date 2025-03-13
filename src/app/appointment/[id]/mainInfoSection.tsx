@@ -9,9 +9,9 @@ import { gatheringApis } from '@/apis/gathering';
 import { DatePickerSheet, TimePickerSheet } from '@/components';
 import AttendeeSelectModal from '@/components/modals/attendeeSelectModal';
 import { Avatar, AvatarImage, Badge, Textarea } from '@/components/ui';
+import { revalidatePage } from '@/libs/serverAction';
 import { DetailGatheringRespose } from '@/types/gathering';
 import { UserDataResponse } from '@/types/user';
-import { revalidatePage } from '@/utils/revalidate';
 
 type MainInfoSectionProps = {
   appointment: DetailGatheringRespose;
@@ -92,7 +92,6 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
       setIsEditMode(false);
       revalidatePage('/appointment');
     } catch (error) {
-      console.log(error);
       alert('수정에 실패하였습니다');
       router.refresh();
       /* revalidate로 변경? => fetch 사용 */

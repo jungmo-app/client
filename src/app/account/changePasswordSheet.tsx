@@ -21,7 +21,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui';
-import { type ChangePasswordFormValues, changePasswordSchema } from '@/schemas/account';
+import { changePasswordSchema } from '@/schemas/auth';
+import { ChangePasswordFormValues } from '@/types/auth';
 
 export default function ChangePasswordSheet() {
   const [isOpen, setIsOpen] = useState(false);

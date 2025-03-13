@@ -32,7 +32,6 @@ export async function POST() {
     }
     throw new Error('계정 삭제 api 오류');
   } catch (error) {
-    console.log(error);
     return NextResponse.json({ message: '계정 삭제에 실패하였습니다' }, { status: 500 });
   }
 }

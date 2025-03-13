@@ -33,8 +33,8 @@ export default function AppointmentList({ appointmentData }: AppointmentListProp
       if (listData) {
         const list = await Promise.all(
           listData.map(async item => {
-            const { data } = await apis.place.getDetail(item.meetingLocation, ['name']);
-            return { ...item, meetingLocation: data.name ?? '' };
+            const location = await apis.place.getDetail(item.meetingLocation, ['name']);
+            return { ...item, meetingLocation: location?.name ?? '' };
           })
         );
         setAppointments(list);
