@@ -5,6 +5,7 @@ export const apiPaths = {
     register: '/auth/register',
     changePassword: '/auth/password',
     setPassword: '/auth/set-password',
+    resetPassword: '/auth/reset-password',
     refreshToken: '/auth/refresh',
     checkBlacklist: '/auth/isBlacklist',
   },
@@ -25,5 +26,11 @@ export const apiPaths = {
   },
   place: {
     autoComplete: '/maps/autocomplete',
+  },
+  notification: {
+    getNotification: '/sse/notifications',
+    deleteNotification: '/sse/notifications',
+    readNotification: '/sse/notifications',
+    subscribe: '/sse/subscribe',
   },
 } as const;

@@ -93,7 +93,7 @@ export default function InfoForm({ userData }: InfoFormProps) {
     }
   };
   return (
-    <Card className="relative px-3 pb-4 pt-8">
+    <Card className="relative mx-4 pb-4 pt-8">
       <Form {...form}>
         <form className="space-y-6 p-4" onSubmit={form.handleSubmit(onSubmit)}>
           {isEditMode ? (
@@ -114,7 +114,7 @@ export default function InfoForm({ userData }: InfoFormProps) {
             <div className="relative">
               <Avatar className="h-32 w-32">
                 <AvatarImage src={preview || ''} />
-                <AvatarFallback>{form.watch('name')[0]}</AvatarFallback>
+                <AvatarFallback>{form.watch('name')}</AvatarFallback>
               </Avatar>
               <Input
                 type="file"
