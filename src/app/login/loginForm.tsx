@@ -2,7 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { apis } from '@/apis';
 import { Button, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from '@/components/ui';
 import { loginSchema } from '@/schemas/auth';
@@ -10,6 +10,8 @@ import { LoginRequest } from '@/types/auth';
 
 export default function LoginForm() {
   const router = useRouter();
+  const params = useSearchParams();
+
   const form = useForm<LoginRequest>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -28,7 +30,8 @@ export default function LoginForm() {
         return;
       }
       if (response?.status === 200) {
-        router.push('/');
+        const refer = params.get('refer');
+        router.push(`/${refer ?? ''}`);
         router.refresh();
         return;
       }

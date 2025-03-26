@@ -13,7 +13,7 @@ const setHeaders = (init?: RequestInit, token?: string) => {
   if (headers['Content-Type'] === 'multipart/form-data') {
     const { 'Content-Type': _, ...header } = headers; // 'Content-Type' 제거
     if (token) {
-      return { Authorization: token, ...header };
+      return { Authorization: `Bearer ${token}`, ...header };
     }
     return header;
   }
@@ -34,23 +34,18 @@ const fetchApi = async (url: string, init?: RequestInit, token?: string) => {
 };
 export const privateServerFetch = async <T>(url: string, refer: string, init?: RequestInit) => {
   const accessToken = await getCookie('accessToken');
-  try {
-    const response = await fetchApi(url, init, accessToken);
-    if (!response.ok) {
-      if (response.status === 401) {
-        redirectPath(`/login?refer=${refer}&date=${Date.now()}`);
-      }
-      throw new Error('api error');
-    }
-    const res: ApiResponse<T> = await response.json();
-    return res;
-  } catch (error) {
-    const e = error as Error;
-    if (e.message.includes('NEXT_REDIRECT')) {
-      throw error;
-    }
-    return null;
+  const response = await fetchApi(url, init, accessToken);
+  if (response.status === 401) {
+    redirectPath(`/login?refer=${refer}&date=${Date.now()}`);
+    return;
   }
+
+  if (!response.ok) {
+    throw new Error('api error');
+  }
+
+  const res: ApiResponse<T> = await response.json();
+  return res;
 };
 
 export const privateClientFetch = async <T>(url: string, init?: RequestInit) => {
@@ -63,22 +58,25 @@ export const privateClientFetch = async <T>(url: string, init?: RequestInit) => 
       const refreshToken = await getCookie('refreshToken');
 
       if (accessToken && refreshToken) {
-        try {
-          const res = await apis.auth.refreshToken(accessToken, refreshToken);
-          if (!res || !res.ok) throw new Error('Token refresh failed');
-
-          const newToken = await getCookie('accessToken');
-          const retrypResponse = await fetchApi(url, init, newToken);
-          const restryRes = (await retrypResponse.json()) as ApiResponse<T>;
-          return restryRes;
-        } catch {
-          // Refresh 실패 시 기존 response 반환
+        const res = await apis.auth.refreshToken(accessToken, refreshToken);
+        if (!res || !res.ok) {
+          throw new Error('unauthorization');
         }
+
+        const newToken = await getCookie('accessToken');
+        console.log('newToken:', newToken);
+        const retrypResponse = await fetchApi(url, init, newToken);
+        const restryRes = (await retrypResponse.json()) as ApiResponse<T>;
+        return restryRes;
+      } else {
+        throw new Error('unauthorization');
       }
     }
     const res = (await response.json()) as ApiResponse<T>;
     return res;
   } catch {
+    await apis.auth.deleteCookie();
+    alert('세션이 만료되었습니다');
     return null;
   }
 };

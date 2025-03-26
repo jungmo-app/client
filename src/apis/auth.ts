@@ -110,4 +110,14 @@ export const authApis = {
       return false;
     }
   },
+  deleteCookie: async () => {
+    const refer = window.location.pathname;
+    const response = await fetch(`/api/cookie?refer=${refer}`, {
+      method: 'POST',
+    });
+
+    if (response.redirected) {
+      window.location.href = response.url;
+    }
+  },
 } as const;
