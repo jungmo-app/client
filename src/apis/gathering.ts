@@ -118,7 +118,6 @@ export const serverGatheringApis = {
 
     const response = await privateServerFetch<GatheringListResponse[]>(
       `${apiPaths.gathering.getList}?currentDate=${currentDate}`,
-      '/',
       {
         method: 'GET',
         cache: 'no-cache',
@@ -128,15 +127,11 @@ export const serverGatheringApis = {
     return response?.data;
   },
   getDetail: async (id: number) => {
-    const response = await privateServerFetch<DetailGatheringRespose>(
-      `${apiPaths.gathering.getDetail}/${id}`,
-      `/appointment/${id}`,
-      {
-        method: 'GET',
-        cache: 'no-cache',
-        next: { tags: [`gathering-${id}`] },
-      }
-    );
+    const response = await privateServerFetch<DetailGatheringRespose>(`${apiPaths.gathering.getDetail}/${id}`, {
+      method: 'GET',
+      cache: 'no-cache',
+      next: { tags: [`gathering-${id}`] },
+    });
     return response?.data;
   },
 };

@@ -2,21 +2,17 @@
 
 import { useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { apis } from '@/apis';
 import { Button } from '@/components/ui';
-import { NotificationContext } from '@/contexts/NotificationProvider';
+import { SessionContext } from '@/contexts/SessionProvider';
 
 export default function AuthPage() {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
-  const { changeNotification } = useContext(NotificationContext);
+  const { connectSession } = useContext(SessionContext);
 
   const handleButtonClick = async () => {
     setIsPending(true);
-    const response = await apis.notification.getNotification();
-    if (response?.data) {
-      changeNotification(response.data);
-    }
+    await connectSession();
     router.push('/');
     setIsPending(false);
   };

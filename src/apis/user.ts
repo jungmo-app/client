@@ -68,7 +68,7 @@ export const userApis = {
 
 export const serverUserApis = {
   getInfo: async () => {
-    const response = await privateServerFetch<UserInfoResponse>(apiPaths.user.userInfo, '/account', {
+    const response = await privateServerFetch<UserInfoResponse>(apiPaths.user.userInfo, {
       method: 'GET',
       cache: 'no-cache',
       next: { tags: ['userInfo'] },

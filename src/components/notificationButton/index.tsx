@@ -3,12 +3,12 @@
 import { useContext, useState } from 'react';
 import { Bell } from 'lucide-react';
 import { Button, Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
-import { NotificationContext } from '@/contexts/NotificationProvider';
+import { SessionContext } from '@/contexts/SessionProvider';
 import Notification from './notification';
 
 export default function NotificationButton() {
   /* const router = useRouter(); */
-  const { notification, changeNotification } = useContext(NotificationContext);
+  const { notification, changeNotification } = useContext(SessionContext);
   const [isEdit, setIsEdit] = useState<boolean>(false);
 
   const unReadCount = notification.filter(item => !item.read).length;

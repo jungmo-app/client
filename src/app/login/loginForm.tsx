@@ -1,12 +1,12 @@
 'use client';
 
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apis } from '@/apis';
 import { Button, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from '@/components/ui';
-import { NotificationContext } from '@/contexts/NotificationProvider';
+import { SessionContext } from '@/contexts/SessionProvider';
 import { loginSchema } from '@/schemas/auth';
 import { LoginRequest } from '@/types/auth';
 
@@ -15,7 +15,7 @@ export default function LoginForm() {
   const params = useSearchParams();
   const [isPending, setIsPending] = useState(false);
 
-  const { changeNotification } = useContext(NotificationContext);
+  const { connectSession, closeSession } = useContext(SessionContext);
 
   const form = useForm<LoginRequest>({
     resolver: zodResolver(loginSchema),
@@ -36,10 +36,7 @@ export default function LoginForm() {
         return;
       }
       if (response?.status === 200) {
-        const res = await apis.notification.getNotification();
-        if (res?.data) {
-          changeNotification(res.data);
-        }
+        await connectSession();
         const refer = params.get('refer');
         router.push(`/${refer ?? ''}`);
         router.refresh();
@@ -52,6 +49,11 @@ export default function LoginForm() {
       setIsPending(false);
     }
   };
+
+  useEffect(() => {
+    closeSession();
+  }, [closeSession]);
+
   return (
     <Form {...form}>
       <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>

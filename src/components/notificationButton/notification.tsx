@@ -5,7 +5,7 @@ import { X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
-import { NotificationContext } from '@/contexts/NotificationProvider';
+import { SessionContext } from '@/contexts/SessionProvider';
 import { NotificationType } from '@/types/notification';
 
 interface NotificationProps {
@@ -17,7 +17,7 @@ export default function Notification({ notification, isEdit }: NotificationProps
   const router = useRouter();
   const { notificationId, gatheringId } = notification;
 
-  const { changeNotification } = useContext(NotificationContext);
+  const { changeNotification } = useContext(SessionContext);
 
   const handleClickNotification = async () => {
     const response = await apis.notification.readNotification([notificationId]);

@@ -1,6 +1,6 @@
 import { apis } from '@/apis';
 import { ApiResponse } from '@/types/apis';
-import { getCookie, redirectPath } from './serverAction';
+import { getCookie } from './serverAction';
 
 const setHeaders = (init?: RequestInit, token?: string) => {
   const headers =
@@ -32,16 +32,11 @@ const fetchApi = async (url: string, init?: RequestInit, token?: string) => {
     headers: header,
   });
 };
-export const privateServerFetch = async <T>(url: string, refer?: string, init?: RequestInit) => {
+export const privateServerFetch = async <T>(url: string, init?: RequestInit) => {
   const accessToken = await getCookie('accessToken');
   const response = await fetchApi(url, init, accessToken);
   if (response.status === 401) {
-    redirectPath(`/login?refer=${refer ?? '/'}&date=${Date.now()}`);
-    return;
-  }
-
-  if (!response.ok) {
-    throw new Error('api error');
+    return null;
   }
 
   const res: ApiResponse<T> = await response.json();

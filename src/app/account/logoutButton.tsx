@@ -1,14 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
 import { Button } from '@/components/ui';
+import { SessionContext } from '@/contexts/SessionProvider';
 
 export default function LogoutButton() {
   const router = useRouter();
   const [isClicked, setIsClicked] = useState(false);
+  const { closeSession } = useContext(SessionContext);
 
   const handleClickButton = async () => {
     if (isClicked) {
@@ -17,6 +19,7 @@ export default function LogoutButton() {
     setIsClicked(true);
     const logout = await apis.auth.logout();
     if (logout) {
+      closeSession();
       alert('로그아웃 되었습니다');
       setIsClicked(false);
       router.push('/login');

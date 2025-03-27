@@ -11,7 +11,7 @@ interface LoginPageProps {
 export default function LoginPage({ searchParams }: LoginPageProps) {
   const accessToken = cookies().get('accessToken')?.value;
   const { refer } = searchParams;
-  if (accessToken && refer) {
+  if (accessToken) {
     redirect(refer ? `${refer}?date=${Date.now()}` : '/');
   }
 

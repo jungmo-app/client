@@ -28,7 +28,7 @@ export const notificationApis = {
 
 export const serverNotificationApis = {
   getNotification: async () => {
-    const response = await privateServerFetch<NotificationType[]>(apiPaths.notification.getNotification, '/', {
+    const response = await privateServerFetch<NotificationType[]>(apiPaths.notification.getNotification, {
       method: 'GET',
       cache: 'no-store',
     });

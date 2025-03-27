@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
 import { Button, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from '@/components/ui';
-import { NotificationContext } from '@/contexts/NotificationProvider';
+import { SessionContext } from '@/contexts/SessionProvider';
 import { signupSchema } from '@/schemas/auth';
 import { SignupFormValues } from '@/types/auth';
 
@@ -21,17 +21,14 @@ export default function SignupForm() {
     },
     mode: 'onChange',
   });
-  const { changeNotification } = useContext(NotificationContext);
+  const { connectSession } = useContext(SessionContext);
 
   const onSubmit = async (data: SignupFormValues) => {
     setIsPending(true);
     try {
       const response = await apis.auth.register(data);
       if (response?.status === 200) {
-        const res = await apis.notification.getNotification();
-        if (res?.data) {
-          changeNotification(res.data);
-        }
+        await connectSession();
         router.push('/');
         return;
       }
