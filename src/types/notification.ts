@@ -3,6 +3,8 @@ export interface NotificationType {
   userId: number;
   message: string;
   gatheringId: number;
+  title: string;
+  profileImage: string | null;
   createdAt: string;
   read: boolean;
 }

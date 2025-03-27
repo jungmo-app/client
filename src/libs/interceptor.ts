@@ -32,11 +32,11 @@ const fetchApi = async (url: string, init?: RequestInit, token?: string) => {
     headers: header,
   });
 };
-export const privateServerFetch = async <T>(url: string, refer: string, init?: RequestInit) => {
+export const privateServerFetch = async <T>(url: string, refer?: string, init?: RequestInit) => {
   const accessToken = await getCookie('accessToken');
   const response = await fetchApi(url, init, accessToken);
   if (response.status === 401) {
-    redirectPath(`/login?refer=${refer}&date=${Date.now()}`);
+    redirectPath(`/login?refer=${refer ?? '/'}&date=${Date.now()}`);
     return;
   }
 

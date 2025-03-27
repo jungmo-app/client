@@ -2,24 +2,20 @@
 
 import { useState } from 'react';
 import { MapPin } from 'lucide-react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { gatheringApis } from '@/apis/gathering';
-import { badgeVariants } from '@/components/ui';
 import { revalidatePage } from '@/libs/serverAction';
 import { DetailGatheringRespose, LocationDataType } from '@/types/gathering';
 import { PlaceDataType } from '@/types/map';
-import { cn } from '@/utils/styles';
 import EditLocation from './editLocation';
 
 type MainLocationProps = {
   appointment: DetailGatheringRespose;
   location: google.maps.places.PlaceResult | null;
-  tags: string[];
   isEditable?: boolean;
 };
 
-export default function MainLocation({ appointment, location, tags, isEditable }: MainLocationProps) {
+export default function MainLocation({ appointment, location, isEditable }: MainLocationProps) {
   const router = useRouter();
   const [locationData, setLocationData] = useState<LocationDataType | null>(
     location
@@ -66,7 +62,7 @@ export default function MainLocation({ appointment, location, tags, isEditable }
         </div>
       </div>
 
-      <div className="mt-4 flex gap-2 px-4">
+      {/*       <div className="mt-4 flex gap-2 px-4">
         {tags.map(tag => (
           <Link
             key={tag}
@@ -76,7 +72,7 @@ export default function MainLocation({ appointment, location, tags, isEditable }
             + {tag}
           </Link>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 }

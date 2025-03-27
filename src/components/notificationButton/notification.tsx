@@ -3,6 +3,8 @@
 import { useContext } from 'react';
 import { X } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { apis } from '@/apis';
 import { NotificationContext } from '@/contexts/NotificationProvider';
 import { NotificationType } from '@/types/notification';
 
@@ -12,22 +14,31 @@ interface NotificationProps {
 }
 
 export default function Notification({ notification, isEdit }: NotificationProps) {
-  const { notificationId /* gatheringId */ } = notification;
-  /* const router = useRouter(); */
+  const router = useRouter();
+  const { notificationId, gatheringId } = notification;
+
   const { changeNotification } = useContext(NotificationContext);
+
   const handleClickNotification = async () => {
-    console.log('click');
-    /* api function */
-    changeNotification(prev =>
-      prev.map(item => (item.notificationId === notificationId ? { ...item, read: true } : item))
-    );
-    /* router.push(`/appointment/${gatheringId}`); */
+    const response = await apis.notification.readNotification([notificationId]);
+    if (response?.status === 200) {
+      changeNotification(prev =>
+        prev.map(item => (item.notificationId === notificationId ? { ...item, read: true } : item))
+      );
+      router.push(`/appointment/${gatheringId}`);
+    }
   };
 
   const handleClickDeleteButton = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('delete');
-    changeNotification(prev => prev.filter(item => item.notificationId !== notificationId));
+    const response = await apis.notification.deleteNotification([notificationId]);
+    if (response?.status === 200) {
+      changeNotification(prev => prev.filter(item => item.notificationId !== notificationId));
+      return;
+    }
+    if (response) {
+      alert('삭제에 실패하였습니다.');
+    }
   };
 
   return (
@@ -45,7 +56,7 @@ export default function Notification({ notification, isEdit }: NotificationProps
       >
         <div className="flex flex-shrink-0 items-center gap-2">
           <Image
-            src="https://picsum.photos/id/517/200/200/"
+            src={notification.profileImage ?? 'https://picsum.photos/id/517/200/200/'}
             width={28}
             height={28}
             alt="image"
@@ -54,9 +65,7 @@ export default function Notification({ notification, isEdit }: NotificationProps
         </div>
         <div className="flex flex-1 flex-col overflow-hidden">
           <div className="flex flex-1 items-center justify-between gap-2">
-            <div className="text-bold flex-shrink truncate">
-              제목제목제목제목제목제목제목제목제목제목제목제목제목제목제목
-            </div>
+            <div className="text-bold flex-shrink truncate">{notification.title}</div>
             <div className="flex-shrink-0 text-xs text-gray-500">{notification.createdAt}</div>
           </div>
           <div>

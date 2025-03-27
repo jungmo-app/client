@@ -1,6 +1,6 @@
 'use client';
 
-import { PropsWithChildren, createContext, useCallback, useEffect, useMemo, useState } from 'react';
+import { ReactNode, createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import { EventSourcePolyfill } from 'event-source-polyfill';
 import { apis } from '@/apis';
 import { apiPaths } from '@/constants/apis';
@@ -15,6 +15,11 @@ interface NotificationContextType {
   closeSSE: () => void;
 }
 
+interface NotificationContextProviderProps {
+  children: ReactNode;
+  initialNotification: NotificationType[];
+}
+
 export const NotificationContext = createContext<NotificationContextType>({
   eventSource: null,
   notification: [],
@@ -23,25 +28,9 @@ export const NotificationContext = createContext<NotificationContextType>({
   closeSSE: () => {},
 });
 
-export function NotificationContextProvider({ children }: PropsWithChildren) {
+export function NotificationContextProvider({ children, initialNotification }: NotificationContextProviderProps) {
   const [eventSource, setEventSource] = useState<null | EventSource>(null);
-  const [notification, setNotification] = useState<NotificationType[]>([
-    {
-      notificationId: 1,
-      userId: -1,
-      gatheringId: 1,
-      createdAt: '2024-02-14',
-      read: false,
-      message:
-        '초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. 초대되었습니다. ',
-    },
-    { notificationId: 2, userId: -1, gatheringId: 2, createdAt: '2024-03-17', read: true, message: '초대되었습니다' },
-    { notificationId: 3, userId: -1, gatheringId: 2, createdAt: '2024-03-17', read: false, message: '초대되었습니다' },
-    { notificationId: 4, userId: -1, gatheringId: 2, createdAt: '2024-03-17', read: true, message: '초대되었습니다' },
-    { notificationId: 5, userId: -1, gatheringId: 2, createdAt: '2024-03-17', read: true, message: '초대되었습니다' },
-    { notificationId: 6, userId: -1, gatheringId: 2, createdAt: '2024-03-17', read: false, message: '초대되었습니다' },
-    { notificationId: 7, userId: -1, gatheringId: 2, createdAt: '2024-03-17', read: true, message: '초대되었습니다' },
-  ]);
+  const [notification, setNotification] = useState<NotificationType[]>(initialNotification);
 
   const changeNotification = useCallback((value: React.SetStateAction<NotificationType[]>) => {
     setNotification(value);
