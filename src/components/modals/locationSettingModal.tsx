@@ -60,8 +60,6 @@ export default function LocationSettingModal({
         ) as (typeof GOOGLE_MAP_FIELD)[number][]
       );
 
-      console.log(detailData);
-
       if (!detailData) {
         alert('장소 정보를 가져올 수 없습니다');
         onClose();

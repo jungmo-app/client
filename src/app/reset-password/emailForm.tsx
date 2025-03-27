@@ -44,7 +44,7 @@ export default function EmailForm({ onSubmit }: EmailFormProps) {
                 <FormControl>
                   <Input
                     type="email"
-                    className="h-12 rounded-full border-gray-300 bg-gray-100 px-4"
+                    className="h-12 rounded-full px-4"
                     {...field}
                     placeholder="이메일을 입력해주세요"
                   />
@@ -58,7 +58,7 @@ export default function EmailForm({ onSubmit }: EmailFormProps) {
             isLoading={isClicked}
             loadingText="링크 생성 중"
             disabled={!form.formState.isValid || isClicked}
-            className={`h-12 w-full rounded-full bg-blue-500 font-semibold text-white hover:bg-blue-600 ${isClicked && 'bg-gray-400'}`}
+            className={`h-12 w-full rounded-full bg-blue-500 font-semibold hover:bg-blue-600 ${isClicked && 'bg-gray-400'}`}
             style={{ marginTop: '42px' }}
           >
             링크 전송하기

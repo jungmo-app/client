@@ -48,8 +48,8 @@ export default function Footer({ id, onAddLocation }: FooterProps) {
   };
   return (
     <>
-      <div className="z-10 border-t bg-white fixed-mobile-bottom">
-        <div className="p-4">
+      <div className="z-10 border-t bg-background fixed-mobile-bottom">
+        <div className="bg-background p-4">
           <Button className="w-full rounded-xl" size="lg" onClick={handleClickButton}>
             장소 추가하기
           </Button>

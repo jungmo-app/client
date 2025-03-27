@@ -64,7 +64,6 @@ export const privateClientFetch = async <T>(url: string, init?: RequestInit) => 
         }
 
         const newToken = await getCookie('accessToken');
-        console.log('newToken:', newToken);
         const retrypResponse = await fetchApi(url, init, newToken);
         const restryRes = (await retrypResponse.json()) as ApiResponse<T>;
         return restryRes;

@@ -3,6 +3,20 @@
 @tailwind utilities;
 
 @layer base {
+  .gm-control-active {
+    background-color: white !important;
+    color: black !important;
+  }
+
+  /* 다크 모드용 스타일: Tailwind `dark` 클래스 기반 */
+  html.dark .gm-control-active {
+    background-color: #020916 !important; /* Tailwind bg-gray-800 */
+  }
+
+  html.dark .gm-control-active img {
+    filter: brightness(0) invert(1) !important;
+  }
+
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;

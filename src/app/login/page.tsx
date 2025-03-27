@@ -11,12 +11,12 @@ interface LoginPageProps {
 export default function LoginPage({ searchParams }: LoginPageProps) {
   const accessToken = cookies().get('accessToken')?.value;
   const { refer } = searchParams;
-  if (accessToken) {
+  if (accessToken && refer) {
     redirect(refer ? `${refer}?date=${Date.now()}` : '/');
   }
 
   return (
-    <div className="flex min-h-screen flex-col justify-center bg-white p-4">
+    <div className="flex min-h-screen flex-col justify-center bg-background p-4">
       <div className="mx-auto w-full max-w-md space-y-6">
         <div className="space-y-2 text-center">
           <h1 className="text-2xl font-bold">로그인</h1>
@@ -28,14 +28,14 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
             <span className="w-full border-t" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-white px-2 text-muted-foreground">Or</span>
+            <span className="bg-background px-2 text-muted-foreground">Or</span>
           </div>
         </div>
 
         <Link href="https://jungmoserver.shop/oauth2/authorization/kakao">
           <Button
             variant="outline"
-            className="h-12 w-full rounded-full border-2 border-yellow-400 bg-yellow-400 font-semibold text-black hover:bg-yellow-500"
+            className="h-12 w-full rounded-full border-2 border-yellow-400 bg-yellow-400 font-semibold text-black hover:bg-yellow-500 dark:hover:border-yellow-600 dark:hover:bg-yellow-600 dark:hover:text-black"
           >
             카카오로 로그인하기
           </Button>

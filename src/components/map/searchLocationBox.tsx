@@ -45,7 +45,7 @@ export default function SearchLocationBox({ onSubmit }: SearchLocationBoxProps) 
         <Search className="absolute left-2 top-3 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="장소를 검색해주세요"
-          className="bg-white pl-8 outline-none"
+          className="bg-background pl-8 outline-none"
           {...register('inputValue', {
             onChange: e => {
               getSuggestion(e.target.value);
@@ -53,11 +53,11 @@ export default function SearchLocationBox({ onSubmit }: SearchLocationBoxProps) 
           })}
         />
         {suggestions.length > 0 && isViewSuggestion && (
-          <div className="absolute top-full z-[60] w-full rounded-md bg-white py-2">
+          <div className="absolute top-full z-[60] w-full rounded-md bg-background py-2">
             {suggestions.slice(0, 6).map(item => (
               <div
                 key={item}
-                className="flex h-10 w-full cursor-pointer items-center rounded-md p-4 hover:bg-blue-50"
+                className="flex h-10 w-full cursor-pointer items-center rounded-md p-4 hover:bg-blue-50 dark:hover:bg-gray-600"
                 onClick={() => handleClickSuggestion(item)}
               >
                 {item}

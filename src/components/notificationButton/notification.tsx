@@ -52,7 +52,7 @@ export default function Notification({ notification, isEdit }: NotificationProps
         </button>
       )}
       <div
-        className={`relative flex w-full gap-3 rounded-lg border border-gray-300 bg-white p-3 text-left shadow-sm ${notification.read && 'opacity-50'} hover:shadow-md`}
+        className={`relative flex w-full gap-3 rounded-lg border border-gray-300 bg-background p-3 text-left shadow-sm ${notification.read && 'opacity-50'} hover:shadow-md`}
       >
         <div className="flex flex-shrink-0 items-center gap-2">
           <Image

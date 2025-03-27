@@ -12,8 +12,8 @@ export default async function AccountPage() {
     redirect('/');
   }
   return (
-    <div className="h-full bg-white">
-      <Header title="메뉴" />
+    <div className="h-screen bg-background">
+      <Header title="메뉴" routeUrl="/" />
 
       {/* 알림 배너 */}
       {/* <div className="mx-4 mb-6 rounded-lg bg-gray-50 p-4">

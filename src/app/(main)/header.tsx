@@ -25,7 +25,7 @@ export default function Header() {
     });
   };
   return (
-    <header className="flex h-14 items-center justify-between p-4">
+    <header className="flex h-14 items-center justify-between bg-background p-4">
       <Link href="/account">
         <Button variant="ghost" size="icon">
           <User className="h-5 w-5" />

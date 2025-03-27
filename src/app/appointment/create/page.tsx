@@ -58,8 +58,8 @@ export default function CreateAppointment() {
 
   return (
     <FormProvider {...methods}>
-      <div className="relative min-h-screen bg-white">
-        <Header title="일정 추가" />
+      <div className="relative min-h-screen bg-background">
+        <Header title="일정 추가" routeUrl="/" />
         <div className="space-y-4 p-4">
           <TitleInput />
           <DateInput />
@@ -67,7 +67,7 @@ export default function CreateAppointment() {
           <DescriptionInput />
           <AttendeeInput selectedAttendees={attendees} onAttendeesChange={setAttendees} />
 
-          <div className="sticky bottom-0 z-10 border-t bg-white">
+          <div className="sticky bottom-0 z-10 border-t bg-background">
             <div className="p-4">
               <Button
                 className="w-full rounded-xl"

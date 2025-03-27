@@ -60,7 +60,7 @@ export default function ResetConfirm({ token }: ResetConfirmProps) {
                 <FormControl>
                   <Input
                     type="password"
-                    className="h-12 rounded-full border-gray-300 bg-gray-100 px-4"
+                    className="h-12 rounded-full px-4"
                     {...field}
                     placeholder="새 비밀번호를 입력해주세요"
                   />
@@ -78,7 +78,7 @@ export default function ResetConfirm({ token }: ResetConfirmProps) {
                 <FormControl>
                   <Input
                     type="password"
-                    className="h-12 rounded-full border-gray-300 bg-gray-100 px-4"
+                    className="h-12 rounded-full px-4"
                     {...field}
                     placeholder="새 비밀번호를 다시 입력해주세요"
                   />
@@ -90,7 +90,7 @@ export default function ResetConfirm({ token }: ResetConfirmProps) {
           <Button
             type="submit"
             disabled={isClicked}
-            className="h-12 w-full rounded-full bg-blue-500 font-semibold text-white hover:bg-blue-600"
+            className="h-12 w-full rounded-full bg-blue-500 font-semibold hover:bg-blue-600"
             style={{ marginTop: '42px' }}
           >
             비밀번호 변경하기

@@ -3,7 +3,7 @@ import SignupForm from './signupForm';
 
 export default function SignupPage() {
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-background">
       <Header routeUrl="/login" />
       <div className="mx-auto w-full max-w-md flex-grow space-y-6">
         <div className="space-y-2">

@@ -84,7 +84,7 @@ export default function LoginForm() {
         />
         <Button
           type="submit"
-          className="h-12 w-full rounded-full bg-blue-500 font-semibold text-white hover:bg-blue-600"
+          className="h-12 w-full rounded-full bg-blue-500 font-semibold text-white hover:bg-blue-600 dark:bg-gray-500 dark:hover:bg-gray-700"
           style={{ marginTop: '24px' }}
         >
           로그인

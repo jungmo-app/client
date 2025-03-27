@@ -39,7 +39,7 @@ export default function LocationInput({ value, onChange }: LocationInputProps) {
         readOnly
         placeholder="장소를 검색해주세요"
         value={value}
-        className="cursor-pointer bg-white"
+        className="cursor-pointer bg-background"
         onClick={handleButtonClick}
       />
       <Map

@@ -11,7 +11,7 @@ export default function resetPasswordPage({ searchParams }: ResetPasswordProps) 
 
   return (
     <div>
-      <Header />
+      <Header routeUrl="/login" />
       <div className="mx-auto w-full max-w-md space-y-6 p-2">
         <div className="space-y-2">
           <h1 className="text-2xl font-bold">비밀번호 초기화</h1>
