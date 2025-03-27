@@ -1,16 +1,21 @@
 'use client';
 
+import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apis } from '@/apis';
 import { Button, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from '@/components/ui';
+import { NotificationContext } from '@/contexts/NotificationProvider';
 import { loginSchema } from '@/schemas/auth';
 import { LoginRequest } from '@/types/auth';
 
 export default function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
+  const [isPending, setIsPending] = useState(false);
+
+  const { changeNotification } = useContext(NotificationContext);
 
   const form = useForm<LoginRequest>({
     resolver: zodResolver(loginSchema),
@@ -22,6 +27,7 @@ export default function LoginForm() {
   });
 
   const onSubmit = async (data: LoginRequest) => {
+    setIsPending(true);
     try {
       const response = await apis.auth.login(data);
       if (response?.status === 400) {
@@ -30,6 +36,10 @@ export default function LoginForm() {
         return;
       }
       if (response?.status === 200) {
+        const res = await apis.notification.getNotification();
+        if (res?.data) {
+          changeNotification(res.data);
+        }
         const refer = params.get('refer');
         router.push(`/${refer ?? ''}`);
         router.refresh();
@@ -38,6 +48,8 @@ export default function LoginForm() {
       throw new Error('api Error');
     } catch {
       alert('로그인을 할 수 없습니다.');
+    } finally {
+      setIsPending(false);
     }
   };
   return (
@@ -86,6 +98,7 @@ export default function LoginForm() {
           type="submit"
           className="h-12 w-full rounded-full bg-blue-500 font-semibold text-white hover:bg-blue-600 dark:bg-gray-500 dark:hover:bg-gray-700"
           style={{ marginTop: '24px' }}
+          disabled={isPending}
         >
           로그인
         </Button>

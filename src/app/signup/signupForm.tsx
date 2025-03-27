@@ -1,14 +1,17 @@
 'use client';
+import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
 import { Button, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from '@/components/ui';
+import { NotificationContext } from '@/contexts/NotificationProvider';
 import { signupSchema } from '@/schemas/auth';
 import { SignupFormValues } from '@/types/auth';
 
 export default function SignupForm() {
   const router = useRouter();
+  const [isPending, setIsPending] = useState(false);
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -18,12 +21,17 @@ export default function SignupForm() {
     },
     mode: 'onChange',
   });
+  const { changeNotification } = useContext(NotificationContext);
 
   const onSubmit = async (data: SignupFormValues) => {
-    console.log(data);
+    setIsPending(true);
     try {
       const response = await apis.auth.register(data);
       if (response?.status === 200) {
+        const res = await apis.notification.getNotification();
+        if (res?.data) {
+          changeNotification(res.data);
+        }
         router.push('/');
         return;
       }
@@ -31,6 +39,8 @@ export default function SignupForm() {
     } catch (error) {
       console.error(error);
       alert('회원가입에 실패하였습니다');
+    } finally {
+      setIsPending(false);
     }
   };
   return (
@@ -93,6 +103,7 @@ export default function SignupForm() {
           type="submit"
           className="h-12 w-full rounded-full bg-blue-500 font-semibold text-white hover:bg-blue-600"
           style={{ marginTop: '42px' }}
+          disabled={isPending}
         >
           회원가입
         </Button>
