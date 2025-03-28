@@ -17,17 +17,14 @@ interface AppointmentListProps {
 const IMAGE = 'https://picsum.photos/id/517/200/200';
 
 export default function AppointmentList({ appointmentData }: AppointmentListProps) {
-  const { date } = useContext(DateContext);
+  const { date, appointments, updateAppointment } = useContext(DateContext);
   const [isLoading, setIsLoading] = useState(false);
-  const [appointments, setAppointments] = useState(appointmentData);
   const isInitial = useRef<boolean>(true);
+
+  const currentAppointment = appointments ?? appointmentData;
 
   useEffect(() => {
     const getData = async () => {
-      if (isInitial.current) {
-        isInitial.current = false;
-        return;
-      }
       setIsLoading(true);
       const listData = await apis.gathering.getList(date);
       if (listData) {
@@ -37,26 +34,31 @@ export default function AppointmentList({ appointmentData }: AppointmentListProp
             return { ...item, meetingLocation: location?.name ?? '' };
           })
         );
-        setAppointments(list);
+        updateAppointment(list);
         setIsLoading(false);
         return;
       }
-      setAppointments([]);
+      updateAppointment([]);
       setIsLoading(false);
     };
+
+    if (isInitial.current) {
+      isInitial.current = false;
+      return;
+    }
     getData();
-  }, [appointmentData, date]);
+  }, [date, updateAppointment]);
 
   return (
     <div className="flex flex-grow flex-col space-y-6 p-4">
-      <h2 className="text-lg font-semibold">나의 일정 {!isLoading && appointments.length}</h2>
+      <h2 className="text-lg font-semibold">나의 일정 {!isLoading && currentAppointment.length}</h2>
       {isLoading ? (
         <div className="flex flex-grow items-center justify-center">
           <LoadingIcon />
         </div>
       ) : (
         <>
-          {appointments.map(appointment => (
+          {currentAppointment.map(appointment => (
             <Link key={appointment.id} href={`/appointment/${appointment.id}`} className="flex items-center gap-4 p-2">
               <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg">
                 <Image
