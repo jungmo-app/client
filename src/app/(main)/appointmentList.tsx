@@ -1,13 +1,14 @@
 'use client';
 
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PlusCircle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useShallow } from 'zustand/react/shallow';
 import { apis } from '@/apis';
 import LoadingIcon from '@/components/common/loadingIcon';
 import { Button } from '@/components/ui';
-import { DateContext } from '@/contexts/DateProvider';
+import { useAppointmentStore } from '@/store/appointmentStore';
 import { GatheringListResponse } from '@/types/gathering';
 
 interface AppointmentListProps {
@@ -17,7 +18,13 @@ interface AppointmentListProps {
 const IMAGE = 'https://picsum.photos/id/517/200/200';
 
 export default function AppointmentList({ appointmentData }: AppointmentListProps) {
-  const { date, appointments, updateAppointment } = useContext(DateContext);
+  const { date, appointments, setAppointment } = useAppointmentStore(
+    useShallow(state => ({
+      date: state.date,
+      appointments: state.appointments,
+      setAppointment: state.setAppointments,
+    }))
+  );
   const [isLoading, setIsLoading] = useState(false);
   const isInitial = useRef<boolean>(true);
 
@@ -34,11 +41,11 @@ export default function AppointmentList({ appointmentData }: AppointmentListProp
             return { ...item, meetingLocation: location?.name ?? '' };
           })
         );
-        updateAppointment(list);
+        setAppointment(list);
         setIsLoading(false);
         return;
       }
-      updateAppointment([]);
+      setAppointment([]);
       setIsLoading(false);
     };
 
@@ -47,7 +54,7 @@ export default function AppointmentList({ appointmentData }: AppointmentListProp
       return;
     }
     getData();
-  }, [date, updateAppointment]);
+  }, [date, setAppointment]);
 
   return (
     <div className="flex flex-grow flex-col space-y-6 p-4">

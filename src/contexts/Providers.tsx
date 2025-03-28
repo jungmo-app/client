@@ -3,7 +3,6 @@ import { apis } from '@/apis';
 import GlobalErrorBoundary from '@/components/ErrorBoundary/GlobalErrorBoundary';
 import { verifyToken } from '@/libs/auth/jwt';
 import { StrictPropsWithChildren } from '@/types/common';
-import { DateContexProvider } from './DateProvider';
 import { QueryClientProvider } from './QueryClientProvider';
 import { SessionContextProvider } from './SessionProvider';
 import { ThemeProvider } from './ThemeProvider';
@@ -30,9 +29,7 @@ export default async function Providers({ children }: StrictPropsWithChildren) {
     <ThemeProvider>
       <GlobalErrorBoundary>
         <QueryClientProvider>
-          <DateContexProvider>
-            <SessionContextProvider {...notificationProps}>{children}</SessionContextProvider>
-          </DateContexProvider>
+          <SessionContextProvider {...notificationProps}>{children}</SessionContextProvider>
         </QueryClientProvider>
       </GlobalErrorBoundary>
     </ThemeProvider>

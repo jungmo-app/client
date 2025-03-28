@@ -1,16 +1,21 @@
 'use client';
 
-import { useContext } from 'react';
 import { CalendarRange, ChevronLeft, ChevronRight, User } from 'lucide-react';
 import Link from 'next/link';
+import { useShallow } from 'zustand/react/shallow';
 import NotificationButton from '@/components/notificationButton';
 import { Button, Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
-import { DateContext } from '@/contexts/DateProvider';
+import { useAppointmentStore } from '@/store/appointmentStore';
 
 export default function Header() {
-  const { date, updateDate } = useContext(DateContext);
+  const { date, setDate } = useAppointmentStore(
+    useShallow(state => ({
+      date: state.date,
+      setDate: state.setDate,
+    }))
+  );
   const handleClickPrevMonthButton = () => {
-    updateDate(prev => {
+    setDate(prev => {
       const newDate = new Date(prev);
       newDate.setMonth(newDate.getMonth() - 1);
       return newDate;
@@ -18,7 +23,7 @@ export default function Header() {
   };
 
   const handleClickNextMonthButton = () => {
-    updateDate(prev => {
+    setDate(prev => {
       const newDate = new Date(prev);
       newDate.setMonth(newDate.getMonth() + 1);
       return newDate;
