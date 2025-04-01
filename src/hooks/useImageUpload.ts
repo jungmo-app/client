@@ -7,7 +7,7 @@ interface UseImageUploadProps {
 }
 
 export const useImageUpload = ({ onImageChange, initialImage }: UseImageUploadProps = {}) => {
-  const [preview, setPreview] = useState<string>(initialImage ?? 'https://picsum.photos/id/517/200/200');
+  const [preview, setPreview] = useState<string>(initialImage ?? '/sample.jpg');
   const [error, setError] = useState<string | null>(null);
 
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,7 +31,7 @@ export const useImageUpload = ({ onImageChange, initialImage }: UseImageUploadPr
   };
 
   const resetImage = () => {
-    setPreview(initialImage ?? 'https://picsum.photos/id/517/200/200');
+    setPreview(initialImage ?? 'sample.jpg');
     setError(null);
   };
 

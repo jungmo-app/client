@@ -1,48 +1,43 @@
 'use client';
 
 import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
 import { Calendar, LucideFileTerminal, PenLine, Settings } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { gatheringApis } from '@/apis/gathering';
 import { DatePickerSheet, TimePickerSheet } from '@/components';
 import AttendeeSelectModal from '@/components/modals/attendeeSelectModal';
 import { Avatar, AvatarImage, Badge, Input, Textarea } from '@/components/ui';
-import { revalidateData, revalidatePage } from '@/libs/serverAction';
-import { DetailGatheringRespose, GatheringListResponse } from '@/types/gathering';
+import { useEditAppointment } from '@/hooks/useMutate/useEditAppointment';
+import { useAppointment } from '@/hooks/useQuery/useAppointment';
+import { DetailGatheringType } from '@/types/gathering';
 import { UserDataResponse } from '@/types/user';
 
 type MainInfoSectionProps = {
-  appointment: DetailGatheringRespose;
+  appointment: DetailGatheringType;
   isEditable?: boolean;
 };
 
 export default function MainInfoSection({ appointment, isEditable }: MainInfoSectionProps) {
-  const router = useRouter();
-  const queryClient = useQueryClient();
   const appointmentDate = new Date(appointment.startDate);
 
-  const [data, setData] = useState({
-    title: appointment.title,
-    startDate: appointment.startDate,
-    startTime: appointment.startTime,
-    description: appointment.memo,
-    userList: appointment.gatheringUsers,
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const [isOpenSelectModal, setIsOpenSelectModal] = useState(false);
+
+  const { data: appointmentData } = useAppointment(appointment);
+
+  const { mutate: editAppointment } = useEditAppointment(appointment.id, appointmentDate, () => {
+    setIsEditMode(false);
   });
 
   const { control, getValues, reset, setValue } = useForm({
     defaultValues: {
-      title: appointment.title,
-      startDate: appointment.startDate,
-      startTime: appointment.startTime,
-      description: appointment.memo,
-      userList: appointment.gatheringUsers,
+      title: appointmentData?.title ?? '',
+      startDate: appointmentData?.startDate ?? '',
+      startTime: appointmentData?.startTime ?? '',
+      description: appointmentData?.memo ?? '',
+      userList: appointmentData?.gatheringUsers ?? [],
     },
   });
 
-  const [isEditMode, setIsEditMode] = useState<boolean>(false);
-  const [isOpenSelectModal, setIsOpenSelectModal] = useState(false);
   const visibleParticipants = getValues('userList').slice(0, 3);
   const remainingCount = getValues('userList').length - 3;
 
@@ -52,7 +47,9 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
 
   const handleClickCancleButton = () => {
     setIsEditMode(false);
-    reset(data);
+    if (appointmentData) {
+      reset(appointmentData);
+    }
   };
 
   const handleChangeAttendee = (attendees: UserDataResponse[]) => {
@@ -84,44 +81,12 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
       startDate: getValues('startDate'),
       endDate: appointment.endDate,
       startTime: getValues('startTime'),
-      meetingLocation: {
-        placeId: appointment.meetingLocation.placeId,
-      },
+      meetingLocation: appointment.meetingLocation,
       memo: getValues('description'),
       userIds: getValues('userList').map(user => user.userId),
     };
 
-    try {
-      await gatheringApis.edit(appointment.id, payload);
-      setData(getValues());
-      setIsEditMode(false);
-      queryClient.setQueryData<GatheringListResponse[]>(
-        ['appointments', appointmentDate.getFullYear(), appointmentDate.getMonth() + 1, appointmentDate.getDate()],
-        prev => {
-          if (!prev) {
-            return [];
-          }
-          return prev.map(item =>
-            item.id === appointment.id
-              ? {
-                  ...item,
-                  title: getValues('title'),
-                  startDate: getValues('startDate'),
-                  startTime: getValues('startTime'),
-                }
-              : item
-          );
-        }
-      );
-      revalidateData(`gathering-${appointment.id}`);
-      revalidatePage(`/appointment/${appointment.id}`);
-
-      /* revalidate appointment/id data, path */
-    } catch (error) {
-      alert('수정에 실패하였습니다');
-      router.refresh();
-      /* revalidate로 변경? => fetch 사용 */
-    }
+    editAppointment(payload);
   };
 
   return (
@@ -137,7 +102,7 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
                 render={({ field }) => <Input className="h-7 rounded-sm px-3 text-base font-semibold" {...field} />}
               />
             ) : (
-              <h2 className="truncate font-semibold">{data.title}</h2>
+              <h2 className="truncate font-semibold">{appointmentData?.title}</h2>
             )}
           </div>
 
@@ -198,7 +163,7 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
               />
             </div>
           ) : (
-            <span>{`${data.startDate} ${data.startTime}`}</span>
+            <span>{`${appointmentData?.startDate} ${appointmentData?.startTime}`}</span>
           )}
         </div>
         <div className="flex text-sm text-gray-500">
@@ -217,7 +182,7 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
                 )}
               />
             ) : (
-              <div className="flex-shrink whitespace-pre-line break-all">{data.description}</div>
+              <div className="flex-shrink whitespace-pre-line break-all">{appointmentData?.memo}</div>
             )}
           </div>
         </div>

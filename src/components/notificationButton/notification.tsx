@@ -60,7 +60,7 @@ export default function Notification({ notification, isEdit }: NotificationProps
       >
         <div className="flex flex-shrink-0 items-center gap-2">
           <Image
-            src={notification.profileImage ?? 'https://picsum.photos/id/517/200/200/'}
+            src={notification.profileImage ?? '/sample.jpg'}
             width={28}
             height={28}
             alt="image"

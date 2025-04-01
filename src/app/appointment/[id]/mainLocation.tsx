@@ -1,66 +1,39 @@
 'use client';
 
-import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { MapPin } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { gatheringApis } from '@/apis/gathering';
-import { revalidateData, revalidatePage } from '@/libs/serverAction';
-import { DetailGatheringRespose, GatheringListResponse, LocationDataType } from '@/types/gathering';
+import { useEditAppointment } from '@/hooks/useMutate/useEditAppointment';
+import { useAppointment } from '@/hooks/useQuery/useAppointment';
+import { DetailGatheringType } from '@/types/gathering';
 import { PlaceDataType } from '@/types/map';
 import EditLocation from './editLocation';
 
 type MainLocationProps = {
-  appointment: DetailGatheringRespose;
-  location: google.maps.places.PlaceResult | null;
+  appointment: DetailGatheringType;
   isEditable?: boolean;
 };
 
-export default function MainLocation({ appointment, location, isEditable }: MainLocationProps) {
-  const router = useRouter();
-  const queryClient = useQueryClient();
+export default function MainLocation({ appointment, isEditable }: MainLocationProps) {
   const appointmentDate = new Date(appointment.startDate);
 
-  const [locationData, setLocationData] = useState<LocationDataType | null>(
-    location
-      ? {
-          name: location?.name ?? '',
-          address: location?.formatted_address ?? '',
-        }
-      : null
-  );
+  const { data: appointmentData } = useAppointment(appointment);
+
+  const { mutate: editAppointment } = useEditAppointment(appointment.id, appointmentDate);
 
   const handleChangeLocation = async (value: PlaceDataType) => {
     const payload = {
-      title: appointment.title,
-      startDate: appointment.startDate,
-      endDate: appointment.endDate,
-      startTime: appointment.startTime,
+      title: appointmentData?.title ?? '',
+      startDate: appointmentData?.startDate ?? '',
+      endDate: appointmentData?.endDate ?? '',
+      startTime: appointmentData?.startTime ?? '',
       meetingLocation: {
         placeId: value.placeId,
+        placeName: value.name,
       },
-      memo: appointment.memo,
-      userIds: appointment.gatheringUsers.map(user => user.userId),
+      memo: appointmentData?.memo ?? '',
+      userIds: appointmentData?.gatheringUsers.map(user => user.userId) ?? [],
     };
 
-    const response = await gatheringApis.edit(appointment.id, payload);
-    if (!response) {
-      alert('수정에 실패하였습니다');
-      router.refresh();
-      return;
-    }
-    setLocationData({ name: value.name, address: value.address });
-    queryClient.setQueryData<GatheringListResponse[]>(
-      ['appointments', appointmentDate.getFullYear(), appointmentDate.getMonth() + 1, appointmentDate.getDate()],
-      prev => {
-        if (!prev) {
-          return [];
-        }
-        return prev.map(item => (item.id === appointment.id ? { ...item, meetingLocation: value.name } : item));
-      }
-    );
-    revalidatePage(`/appointment/${appointment.id}`);
-    revalidateData(`gathering-${appointment.id}`);
+    editAppointment(payload);
   };
 
   return (
@@ -69,10 +42,12 @@ export default function MainLocation({ appointment, location, isEditable }: Main
         <MapPin className="h-5 w-5 flex-shrink-0 text-primary" />
         <div className="flex-1 overflow-hidden">
           <div className="flex flex-1 items-center gap-2 overflow-hidden">
-            <h3 className="flex-1 truncate font-medium">{locationData?.name ?? '위치를 불러올 수 없습니다'}</h3>
+            <h3 className="flex-1 truncate font-medium">
+              {appointmentData?.meetingLocation.placeName ?? '위치를 불러올 수 없습니다'}
+            </h3>
             {isEditable && <EditLocation onChange={handleChangeLocation} />}
           </div>
-          <p className="mt-1 truncate text-sm text-gray-500">{locationData?.address}</p>
+          <p className="mt-1 truncate text-sm text-gray-500">{appointmentData?.meetingLocation.placeAddress}</p>
         </div>
       </div>
 

@@ -1,7 +1,12 @@
 import { apiPaths } from '@/constants/apis';
 import { privateClientFetch, privateServerFetch } from '@/libs/interceptor';
 import { apis } from '.';
-import type { CreateGatheringRequest, DetailGatheringRespose, GatheringListResponse } from '@/types/gathering';
+import type {
+  CreateGatheringRequest,
+  DetailGatheringRespose,
+  DetailGatheringType,
+  GatheringListResponse,
+} from '@/types/gathering';
 
 export const gatheringApis = {
   create: async (payload: CreateGatheringRequest) => {
@@ -39,17 +44,12 @@ export const gatheringApis = {
   },
 
   edit: async (id: number, payload: CreateGatheringRequest) => {
-    try {
-      const response = await privateClientFetch(`${apiPaths.gathering.edit}/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-      });
-      if (response?.status === 200) {
-        return true;
-      }
+    const response = await privateClientFetch(`${apiPaths.gathering.edit}/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+    if (response?.status !== 200) {
       throw new Error('api error');
-    } catch {
-      return false;
     }
   },
 
@@ -67,7 +67,7 @@ export const gatheringApis = {
     }
   },
 
-  getDetail: async (id: number) => {
+  getDetail: async (id: number): Promise<DetailGatheringType | null> => {
     try {
       const response = await privateClientFetch<DetailGatheringRespose>(`${apiPaths.gathering.getDetail}/${id}`, {
         method: 'GET',
@@ -75,14 +75,20 @@ export const gatheringApis = {
         next: { tags: [`gathering-${id}`] },
       });
       if (response?.status === 200) {
-        return response.data;
-      }
-      if (response?.status === 404) {
-        return null;
+        const res = await apis.place.getDetail(String(id), ['name', 'formatted_address']);
+
+        return {
+          ...response.data,
+          meetingLocation: {
+            placeId: response.data.meetingLocation.placeId,
+            placeName: res?.name,
+            placeAddress: res?.formatted_address,
+          },
+        };
       }
       throw new Error('api error');
     } catch {
-      return undefined;
+      return null;
     }
   },
 
@@ -133,12 +139,27 @@ export const serverGatheringApis = {
     );
     return response?.data;
   },
-  getDetail: async (id: number) => {
+  getDetail: async (id: number): Promise<DetailGatheringType | null> => {
     const response = await privateServerFetch<DetailGatheringRespose>(`${apiPaths.gathering.getDetail}/${id}`, {
       method: 'GET',
       cache: 'force-cache',
       next: { tags: [`gathering-${id}`] },
     });
-    return response?.data;
+
+    if (response?.status === 200) {
+      const res = await apis.serverPlace.getDetail(response.data.meetingLocation.placeId, [
+        'name',
+        'formatted_address',
+      ]);
+      return {
+        ...response.data,
+        meetingLocation: {
+          placeId: response.data.meetingLocation.placeId,
+          placeName: res?.name,
+          placeAddress: res?.formatted_address,
+        },
+      };
+    }
+    return null;
   },
 };

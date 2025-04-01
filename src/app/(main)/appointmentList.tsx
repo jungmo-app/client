@@ -1,14 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { PlusCircle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useShallow } from 'zustand/react/shallow';
-import { apis } from '@/apis';
 import LoadingIcon from '@/components/common/loadingIcon';
 import { Button } from '@/components/ui';
+import { useAppointmentList } from '@/hooks/useQuery/useAppointmentList';
 import { useDateStore } from '@/store/appointmentStore';
 import { GatheringListResponse } from '@/types/gathering';
 import { isSameDay } from '@/utils/date';
@@ -17,26 +15,15 @@ interface AppointmentListProps {
   appointmentData: GatheringListResponse[];
 }
 
-const IMAGE = 'https://picsum.photos/id/517/200/200';
-
 export default function AppointmentList({ appointmentData }: AppointmentListProps) {
   const [isPending, setIsPending] = useState(false);
   const [appointments, setAppointments] = useState<GatheringListResponse[]>(appointmentData);
 
-  const { date } = useDateStore(
-    useShallow(state => ({
-      date: state.date,
-    }))
-  );
+  const date = useDateStore(state => state.date);
 
   const isInitial = useRef<boolean>(isSameDay(date, new Date()));
 
-  const { refetch } = useQuery({
-    queryKey: ['appointments', date.getFullYear(), date.getMonth() + 1, date.getDate()],
-    initialData: appointmentData,
-    queryFn: () => apis.gathering.getList(date),
-    enabled: false,
-  });
+  const { refetch } = useAppointmentList(appointmentData);
 
   useEffect(() => {
     const fetching = async () => {
@@ -70,7 +57,7 @@ export default function AppointmentList({ appointmentData }: AppointmentListProp
               <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg">
                 <Image
                   fill
-                  src={appointment.profileImage ?? IMAGE}
+                  src={appointment.profileImage ?? '/sample.jpg'}
                   alt={appointment.title}
                   className="object-cover"
                   priority={true}

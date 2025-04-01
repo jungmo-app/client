@@ -40,6 +40,14 @@ export interface DetailGatheringRespose {
   locations: Location[];
 }
 
+export interface DetailGatheringType extends Omit<DetailGatheringRespose, 'meetingLocation'> {
+  meetingLocation: {
+    placeId: string;
+    placeName: string | undefined;
+    placeAddress: string | undefined;
+  };
+}
+
 export interface LocationDataType {
   name: string;
   address: string;

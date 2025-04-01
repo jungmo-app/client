@@ -1,12 +1,12 @@
 import { apis } from '@/apis';
-import { DetailGatheringRespose, VisitLocationDataType } from '@/types/gathering';
+import { DetailGatheringType, VisitLocationDataType } from '@/types/gathering';
 import MainInfoSection from './mainInfoSection';
 import MainLocation from './mainLocation';
 import PlacesToVisit from './placesToVisit';
 
 interface AppointmentDetailProps {
   id: number;
-  appointment: DetailGatheringRespose | null;
+  appointment: DetailGatheringType | null;
 }
 
 export default async function AppointmentDetail({ id, appointment }: AppointmentDetailProps) {
@@ -52,7 +52,7 @@ export default async function AppointmentDetail({ id, appointment }: Appointment
     <main className={`relative flex w-full flex-grow px-4 pb-${isEditable ? '20' : '14'}`}>
       <div className="flex w-full flex-col space-y-6 py-4">
         <MainInfoSection appointment={appointment} isEditable={isEditable} />
-        <MainLocation appointment={appointment} location={locationData} isEditable={isEditable} />
+        <MainLocation appointment={appointment} isEditable={isEditable} />
         <PlacesToVisit
           appointmentId={id}
           visitPlaces={visitLocationData.filter(location => location !== null) as VisitLocationDataType[]}
