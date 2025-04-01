@@ -1,13 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { MoreVertical, Share2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { apis } from '@/apis';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
 import { Button } from '@/components/ui/button';
-import { GatheringListResponse } from '@/types/gathering';
+import { useDeleteAppointment } from '@/hooks/useMutate/useDeleteAppointment';
 
 interface HeaderToolProps {
   id: number;
@@ -15,31 +12,23 @@ interface HeaderToolProps {
 }
 
 export default function HeaderTool({ id, appointmentDate }: HeaderToolProps) {
-  const router = useRouter();
   const [isOpenPopOver, setIsOpenPopover] = useState(false);
-  const queryClient = useQueryClient();
+
+  const { mutate: deleteAppointment } = useDeleteAppointment(
+    id,
+    appointmentDate,
+    () => {},
+    () => {
+      setIsOpenPopover(false);
+    }
+  );
 
   const handleOpenPopover = (value: boolean) => {
     setIsOpenPopover(value);
   };
 
   const handleDeleteAppointment = async () => {
-    const result = await apis.gathering.delete(id);
-    if (!result) {
-      setIsOpenPopover(false);
-      alert('삭제에 실패하였습니다');
-      return;
-    }
-    queryClient.setQueryData<GatheringListResponse[]>(
-      ['appointments', appointmentDate.getFullYear(), appointmentDate.getMonth() + 1, appointmentDate.getDate()],
-      prev => {
-        if (!prev) {
-          return [];
-        }
-        return prev.filter(item => item.id !== id);
-      }
-    );
-    router.push('/');
+    deleteAppointment();
   };
   return (
     <div className="flex items-center gap-2">

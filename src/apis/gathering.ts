@@ -54,16 +54,12 @@ export const gatheringApis = {
   },
 
   delete: async (id: number) => {
-    try {
-      const response = await privateClientFetch(`${apiPaths.gathering.delete}/${id}`, {
-        method: 'DELETE',
-      });
-      if (response?.status === 200) {
-        return true;
-      }
+    const response = await privateClientFetch(`${apiPaths.gathering.delete}/${id}`, {
+      method: 'DELETE',
+    });
+    console.log(response?.status);
+    if (response?.status !== 200) {
       throw new Error('api error');
-    } catch {
-      return false;
     }
   },
 

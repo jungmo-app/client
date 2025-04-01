@@ -3,7 +3,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
-import { revalidateData, revalidatePage } from '@/libs/serverAction';
 import { CreateGatheringRequest, GatheringListResponse } from '@/types/gathering';
 
 interface CreateGatheringType extends Omit<CreateGatheringRequest, 'meetingLocation'> {
@@ -43,9 +42,7 @@ export const useEditAppointment = (id: number, prevDate: Date, onSuccess?: () =>
           );
         }
       );
-      revalidateData(`gathering-${id}`);
-      revalidatePage(`/appointment/${id}`);
-      console.log(variable);
+
       queryClient.setQueryData(['appointment', id], variable);
       if (onSuccess) {
         onSuccess();
