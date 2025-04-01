@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { MapPin } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { gatheringApis } from '@/apis/gathering';
-import { revalidatePage } from '@/libs/serverAction';
-import { DetailGatheringRespose, LocationDataType } from '@/types/gathering';
+import { revalidateData, revalidatePage } from '@/libs/serverAction';
+import { DetailGatheringRespose, GatheringListResponse, LocationDataType } from '@/types/gathering';
 import { PlaceDataType } from '@/types/map';
 import EditLocation from './editLocation';
 
@@ -17,6 +18,9 @@ type MainLocationProps = {
 
 export default function MainLocation({ appointment, location, isEditable }: MainLocationProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const appointmentDate = new Date(appointment.startDate);
+
   const [locationData, setLocationData] = useState<LocationDataType | null>(
     location
       ? {
@@ -46,7 +50,17 @@ export default function MainLocation({ appointment, location, isEditable }: Main
       return;
     }
     setLocationData({ name: value.name, address: value.address });
-    revalidatePage('/appointment');
+    queryClient.setQueryData<GatheringListResponse[]>(
+      ['appointments', appointmentDate.getFullYear(), appointmentDate.getMonth() + 1, appointmentDate.getDate()],
+      prev => {
+        if (!prev) {
+          return [];
+        }
+        return prev.map(item => (item.id === appointment.id ? { ...item, meetingLocation: value.name } : item));
+      }
+    );
+    revalidatePage(`/appointment/${appointment.id}`);
+    revalidateData(`gathering-${appointment.id}`);
   };
 
   return (

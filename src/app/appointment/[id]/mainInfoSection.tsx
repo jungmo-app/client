@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
 import { Calendar, LucideFileTerminal, PenLine, Settings } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -8,8 +9,8 @@ import { gatheringApis } from '@/apis/gathering';
 import { DatePickerSheet, TimePickerSheet } from '@/components';
 import AttendeeSelectModal from '@/components/modals/attendeeSelectModal';
 import { Avatar, AvatarImage, Badge, Input, Textarea } from '@/components/ui';
-import { revalidatePage } from '@/libs/serverAction';
-import { DetailGatheringRespose } from '@/types/gathering';
+import { revalidateData, revalidatePage } from '@/libs/serverAction';
+import { DetailGatheringRespose, GatheringListResponse } from '@/types/gathering';
 import { UserDataResponse } from '@/types/user';
 
 type MainInfoSectionProps = {
@@ -19,6 +20,9 @@ type MainInfoSectionProps = {
 
 export default function MainInfoSection({ appointment, isEditable }: MainInfoSectionProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const appointmentDate = new Date(appointment.startDate);
+
   const [data, setData] = useState({
     title: appointment.title,
     startDate: appointment.startDate,
@@ -26,6 +30,7 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
     description: appointment.memo,
     userList: appointment.gatheringUsers,
   });
+
   const { control, getValues, reset, setValue } = useForm({
     defaultValues: {
       title: appointment.title,
@@ -35,6 +40,7 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
       userList: appointment.gatheringUsers,
     },
   });
+
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [isOpenSelectModal, setIsOpenSelectModal] = useState(false);
   const visibleParticipants = getValues('userList').slice(0, 3);
@@ -89,7 +95,28 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
       await gatheringApis.edit(appointment.id, payload);
       setData(getValues());
       setIsEditMode(false);
-      revalidatePage('/appointment');
+      queryClient.setQueryData<GatheringListResponse[]>(
+        ['appointments', appointmentDate.getFullYear(), appointmentDate.getMonth() + 1, appointmentDate.getDate()],
+        prev => {
+          if (!prev) {
+            return [];
+          }
+          return prev.map(item =>
+            item.id === appointment.id
+              ? {
+                  ...item,
+                  title: getValues('title'),
+                  startDate: getValues('startDate'),
+                  startTime: getValues('startTime'),
+                }
+              : item
+          );
+        }
+      );
+      revalidateData(`gathering-${appointment.id}`);
+      revalidatePage(`/appointment/${appointment.id}`);
+
+      /* revalidate appointment/id data, path */
     } catch (error) {
       alert('수정에 실패하였습니다');
       router.refresh();

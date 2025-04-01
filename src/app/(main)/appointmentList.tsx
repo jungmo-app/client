@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { PlusCircle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -8,8 +9,9 @@ import { useShallow } from 'zustand/react/shallow';
 import { apis } from '@/apis';
 import LoadingIcon from '@/components/common/loadingIcon';
 import { Button } from '@/components/ui';
-import { useAppointmentStore } from '@/store/appointmentStore';
+import { useDateStore } from '@/store/appointmentStore';
 import { GatheringListResponse } from '@/types/gathering';
+import { isSameDay } from '@/utils/date';
 
 interface AppointmentListProps {
   appointmentData: GatheringListResponse[];
@@ -18,54 +20,52 @@ interface AppointmentListProps {
 const IMAGE = 'https://picsum.photos/id/517/200/200';
 
 export default function AppointmentList({ appointmentData }: AppointmentListProps) {
-  const { date, appointments, setAppointment } = useAppointmentStore(
+  const [isPending, setIsPending] = useState(false);
+  const [appointments, setAppointments] = useState<GatheringListResponse[]>(appointmentData);
+
+  const { date } = useDateStore(
     useShallow(state => ({
       date: state.date,
-      appointments: state.appointments,
-      setAppointment: state.setAppointments,
     }))
   );
-  const [isLoading, setIsLoading] = useState(false);
-  const isInitial = useRef<boolean>(true);
 
-  const currentAppointment = appointments ?? appointmentData;
+  const isInitial = useRef<boolean>(isSameDay(date, new Date()));
+
+  const { refetch } = useQuery({
+    queryKey: ['appointments', date.getFullYear(), date.getMonth() + 1, date.getDate()],
+    initialData: appointmentData,
+    queryFn: () => apis.gathering.getList(date),
+    enabled: false,
+  });
 
   useEffect(() => {
-    const getData = async () => {
-      setIsLoading(true);
-      const listData = await apis.gathering.getList(date);
-      if (listData) {
-        const list = await Promise.all(
-          listData.map(async item => {
-            const location = await apis.place.getDetail(item.meetingLocation, ['name']);
-            return { ...item, meetingLocation: location?.name ?? '' };
-          })
-        );
-        setAppointment(list);
-        setIsLoading(false);
+    const fetching = async () => {
+      if (isInitial.current) {
+        isInitial.current = false;
         return;
       }
-      setAppointment([]);
-      setIsLoading(false);
+
+      setIsPending(true);
+      const { data } = await refetch();
+      if (data) {
+        setAppointments(data);
+      }
+      setIsPending(false);
     };
 
-    if (isInitial.current) {
-      isInitial.current = false;
-      return;
-    }
-    getData();
-  }, [date, setAppointment]);
+    fetching();
+  }, [date, refetch]);
 
   return (
     <div className="flex flex-grow flex-col space-y-6 p-4">
-      <h2 className="text-lg font-semibold">나의 일정 {!isLoading && currentAppointment.length}</h2>
-      {isLoading ? (
+      <h2 className="text-lg font-semibold">나의 일정 {!isPending && appointments?.length}</h2>
+      {isPending ? (
         <div className="flex flex-grow items-center justify-center">
           <LoadingIcon />
         </div>
       ) : (
         <>
-          {currentAppointment.map(appointment => (
+          {appointments?.map(appointment => (
             <Link key={appointment.id} href={`/appointment/${appointment.id}`} className="flex items-center gap-4 p-2">
               <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg">
                 <Image

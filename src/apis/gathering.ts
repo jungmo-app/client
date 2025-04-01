@@ -1,5 +1,6 @@
 import { apiPaths } from '@/constants/apis';
 import { privateClientFetch, privateServerFetch } from '@/libs/interceptor';
+import { apis } from '.';
 import type { CreateGatheringRequest, DetailGatheringRespose, GatheringListResponse } from '@/types/gathering';
 
 export const gatheringApis = {
@@ -23,7 +24,13 @@ export const gatheringApis = {
         }
       );
       if (response?.status === 200) {
-        return response.data;
+        const appointmentList = await Promise.all(
+          response.data.map(async item => {
+            const place = await apis.place.getDetail(item.meetingLocation, ['name']);
+            return { ...item, meetingLocation: place?.name ?? '' };
+          })
+        );
+        return appointmentList;
       }
       throw new Error('api error');
     } catch {
@@ -120,7 +127,7 @@ export const serverGatheringApis = {
       `${apiPaths.gathering.getList}?currentDate=${currentDate}`,
       {
         method: 'GET',
-        cache: 'no-cache',
+        cache: 'no-store',
         next: { tags: [`gatheringList-${currentDate}`] },
       }
     );
@@ -129,7 +136,7 @@ export const serverGatheringApis = {
   getDetail: async (id: number) => {
     const response = await privateServerFetch<DetailGatheringRespose>(`${apiPaths.gathering.getDetail}/${id}`, {
       method: 'GET',
-      cache: 'no-cache',
+      cache: 'force-cache',
       next: { tags: [`gathering-${id}`] },
     });
     return response?.data;

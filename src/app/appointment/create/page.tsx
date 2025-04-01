@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
@@ -8,6 +9,7 @@ import { DateInput, DescriptionInput, PlaceInput, TitleInput } from '@/app/appoi
 import { AttendeeInput, Header } from '@/components';
 import { Button } from '@/components/ui';
 import { formattedDate } from '@/libs/date';
+import { GatheringListResponse } from '@/types/gathering';
 import { UserDataResponse } from '@/types/user';
 
 type AppointmentFormData = {
@@ -17,6 +19,7 @@ type AppointmentFormData = {
   meetingLocation: {
     id: string;
     address: string;
+    name: string;
   };
   memo: string;
   userIds: number[];
@@ -25,13 +28,14 @@ type AppointmentFormData = {
 export default function CreateAppointment() {
   const router = useRouter();
   const [attendees, setAttendees] = useState<UserDataResponse[]>([]);
+  const queryClient = useQueryClient();
 
   const methods = useForm<AppointmentFormData>({
     defaultValues: {
       title: '',
       startDate: formattedDate(new Date()),
       startTime: `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')}`,
-      meetingLocation: { id: '', address: '' },
+      meetingLocation: { id: '', address: '', name: '' },
       memo: '',
       userIds: [],
     },
@@ -47,6 +51,25 @@ export default function CreateAppointment() {
         userIds: attendees.map(user => user.userId),
       });
       if (response?.status === 200) {
+        const date = new Date(data.startDate);
+        const newAppointment: GatheringListResponse = {
+          id: Number(response.data),
+          profileImage: null,
+          title: data.title,
+          startDate: data.startDate,
+          endDate: data.startDate,
+          startTime: data.startTime,
+          meetingLocation: data.meetingLocation.name,
+        };
+        queryClient.setQueryData<GatheringListResponse[]>(
+          ['appointments', date.getFullYear(), date.getMonth() + 1, date.getDate()],
+          prev => {
+            if (!prev) {
+              return [newAppointment];
+            }
+            return [...prev, newAppointment];
+          }
+        );
         router.push('/');
         return;
       }

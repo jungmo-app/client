@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { useShallow } from 'zustand/react/shallow';
 import NotificationButton from '@/components/notificationButton';
 import { Button, Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
-import { useAppointmentStore } from '@/store/appointmentStore';
+import { useDateStore } from '@/store/appointmentStore';
 
 export default function Header() {
-  const { date, setDate } = useAppointmentStore(
+  const { date, setDate } = useDateStore(
     useShallow(state => ({
       date: state.date,
       setDate: state.setDate,

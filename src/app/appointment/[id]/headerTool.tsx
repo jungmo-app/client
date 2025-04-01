@@ -1,19 +1,23 @@
 'use client';
 
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { MoreVertical, Share2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
 import { Button } from '@/components/ui/button';
+import { GatheringListResponse } from '@/types/gathering';
 
 interface HeaderToolProps {
   id: number;
+  appointmentDate: Date;
 }
 
-export default function HeaderTool({ id }: HeaderToolProps) {
+export default function HeaderTool({ id, appointmentDate }: HeaderToolProps) {
   const router = useRouter();
   const [isOpenPopOver, setIsOpenPopover] = useState(false);
+  const queryClient = useQueryClient();
 
   const handleOpenPopover = (value: boolean) => {
     setIsOpenPopover(value);
@@ -26,6 +30,15 @@ export default function HeaderTool({ id }: HeaderToolProps) {
       alert('삭제에 실패하였습니다');
       return;
     }
+    queryClient.setQueryData<GatheringListResponse[]>(
+      ['appointments', appointmentDate.getFullYear(), appointmentDate.getMonth() + 1, appointmentDate.getDate()],
+      prev => {
+        if (!prev) {
+          return [];
+        }
+        return prev.filter(item => item.id !== id);
+      }
+    );
     router.push('/');
   };
   return (

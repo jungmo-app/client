@@ -2,11 +2,11 @@
 
 import { useShallow } from 'zustand/react/shallow';
 import { Calendar } from '@/components';
-import { useAppointmentStore } from '@/store/appointmentStore';
+import { useDateStore } from '@/store/appointmentStore';
 import { isSameDay } from '@/utils/date';
 
 export default function AppointmentCalendar() {
-  const { date, setDate } = useAppointmentStore(
+  const { date, setDate } = useDateStore(
     useShallow(state => ({
       date: state.date,
       setDate: state.setDate,
