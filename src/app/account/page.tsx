@@ -1,25 +1,16 @@
-import { redirect } from 'next/navigation';
-import { apis } from '@/apis';
 import { Header } from '@/components';
-import ChangePasswordSheet from './changePasswordSheet';
-import DeleteAccountSheet from './deleteAccountSheet';
+import Footer from './footer';
 import InfoForm from './infoForm';
-import LogoutButton from './logoutButton';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AccountPage() {
-  try {
-    const userData = await apis.serverUser.getInfo();
-    if (!userData) {
-      redirect('/');
-    }
-    return (
-      <div className="h-screen bg-background">
-        <Header title="메뉴" routeUrl="/" />
+  return (
+    <div className="h-screen bg-background">
+      <Header title="메뉴" routeUrl="/" />
 
-        {/* 알림 배너 */}
-        {/* <div className="mx-4 mb-6 rounded-lg bg-gray-50 p-4">
+      {/* 알림 배너 */}
+      {/* <div className="mx-4 mb-6 rounded-lg bg-gray-50 p-4">
           <div className="flex items-center justify-between">
             <div>
               <div>결제 내역 관리 서비스</div>
@@ -28,19 +19,8 @@ export default async function AccountPage() {
             <ChevronRight className="h-5 w-5 text-gray-400" />
           </div>
         </div> */}
-        <InfoForm userData={userData} />
-        <div className="my-8 flex flex-col items-center gap-2">
-          {userData.provider === 'email' && <ChangePasswordSheet />}
-          <DeleteAccountSheet />
-          <LogoutButton />
-        </div>
-      </div>
-    );
-  } catch (e) {
-    if (e instanceof Error && e.message === 'unauthorization') {
-      redirect(`/login?refer=/account&date${Date.now()}`);
-    }
-    const error = e as Error;
-    throw new Error(error.message);
-  }
+      <InfoForm />
+      <Footer />
+    </div>
+  );
 }

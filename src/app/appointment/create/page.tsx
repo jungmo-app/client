@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
@@ -8,6 +8,7 @@ import { apis } from '@/apis';
 import { DateInput, DescriptionInput, PlaceInput, TitleInput } from '@/app/appointment/create';
 import { AttendeeInput, Header } from '@/components';
 import { Button } from '@/components/ui';
+import { SessionContext } from '@/contexts/SessionProvider';
 import { formattedDate } from '@/libs/date';
 import { GatheringListResponse } from '@/types/gathering';
 import { UserDataResponse } from '@/types/user';
@@ -28,6 +29,7 @@ type AppointmentFormData = {
 export default function CreateAppointment() {
   const router = useRouter();
   const [attendees, setAttendees] = useState<UserDataResponse[]>([]);
+  const { userData } = useContext(SessionContext);
   const queryClient = useQueryClient();
 
   const methods = useForm<AppointmentFormData>({
@@ -54,7 +56,7 @@ export default function CreateAppointment() {
         const date = new Date(data.startDate);
         const newAppointment: GatheringListResponse = {
           id: Number(response.data),
-          profileImage: null,
+          profileImage: userData?.profileImage ?? null,
           title: data.title,
           startDate: data.startDate,
           endDate: data.startDate,

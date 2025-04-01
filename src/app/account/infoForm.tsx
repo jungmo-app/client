@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Copy, Edit, Save, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
 import {
   Avatar,
@@ -19,19 +20,18 @@ import {
   Input,
   Label,
 } from '@/components/ui';
+import { SessionContext } from '@/contexts/SessionProvider';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { revalidatePage } from '@/libs/serverAction';
 import { EditProfileFormValues, editProfileSchema } from '@/schemas/auth';
-import { UserDataResponse } from '@/types/user';
 
-interface InfoFormProps {
-  userData: UserDataResponse;
-}
+export default function InfoForm() {
+  const router = useRouter();
+  const { userData, changeUserData } = useContext(SessionContext);
 
-export default function InfoForm({ userData }: InfoFormProps) {
   const [isEditMode, setIsEditMode] = useState(false);
   const [data, setData] = useState<EditProfileFormValues>({
-    name: userData.userName,
+    name: userData?.userName ?? '',
     profileImage: undefined,
   });
 
@@ -40,7 +40,7 @@ export default function InfoForm({ userData }: InfoFormProps) {
     error: imageError,
     handleImageChange,
   } = useImageUpload({
-    initialImage: userData.profileImage,
+    initialImage: userData?.profileImage,
     onImageChange: data => {
       form.setValue('profileImage', data);
     },
@@ -54,6 +54,11 @@ export default function InfoForm({ userData }: InfoFormProps) {
     },
     mode: 'onChange',
   });
+
+  if (!userData) {
+    router.replace('/login');
+    return;
+  }
 
   const onSubmit = async (data: EditProfileFormValues) => {
     /* if (!data.profileImage) {
@@ -73,6 +78,12 @@ export default function InfoForm({ userData }: InfoFormProps) {
       return;
     }
     alert('수정에 실패하였습니다');
+    changeUserData(prev => {
+      if (!prev) {
+        return null;
+      }
+      return { ...prev, userName: data.name, profileImage: preview };
+    });
   };
 
   const handleClickEditButton = () => {

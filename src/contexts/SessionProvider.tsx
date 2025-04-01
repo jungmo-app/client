@@ -6,36 +6,52 @@ import { apis } from '@/apis';
 import { apiPaths } from '@/constants/apis';
 import { getCookie } from '@/libs/serverAction';
 import { InviteSSEType, NotificationType } from '@/types/notification';
+import { UserInfoResponse } from '@/types/user';
 
 interface SessionContextType {
   isLogin: boolean;
   notification: NotificationType[];
+  userData: UserInfoResponse | null;
   connectSession: () => Promise<void>;
   closeSession: () => void;
   changeNotification: React.Dispatch<React.SetStateAction<NotificationType[]>>;
+  changeUserData: React.Dispatch<React.SetStateAction<UserInfoResponse | null>>;
 }
 
 interface SessionContextProviderProps {
   children: ReactNode;
   accessToken?: string;
   initialNotification: NotificationType[];
+  initialUserData: UserInfoResponse | null;
 }
 
 export const SessionContext = createContext<SessionContextType>({
   isLogin: false,
   notification: [],
+  userData: null,
   connectSession: async () => {},
   closeSession: () => {},
   changeNotification: () => {},
+  changeUserData: () => {},
 });
 
-export function SessionContextProvider({ children, accessToken, initialNotification }: SessionContextProviderProps) {
+export function SessionContextProvider({
+  children,
+  accessToken,
+  initialNotification,
+  initialUserData,
+}: SessionContextProviderProps) {
   const eventSource = useRef<EventSource | null>(null);
   const [notification, setNotification] = useState<NotificationType[]>(initialNotification);
+  const [userData, setUserData] = useState<UserInfoResponse | null>(initialUserData);
   const [isLogin, setIsLogin] = useState(Boolean(accessToken));
 
   const changeNotification = useCallback((value: React.SetStateAction<NotificationType[]>) => {
     setNotification(value);
+  }, []);
+
+  const changeUserData = useCallback((value: React.SetStateAction<UserInfoResponse | null>) => {
+    setUserData(value);
   }, []);
 
   const closeSSE = useCallback(() => {
@@ -98,27 +114,35 @@ export function SessionContextProvider({ children, accessToken, initialNotificat
       return;
     }
     closeSession();
+
     const notification = await apis.notification.getNotification();
+    const user = await apis.user.getInfo();
+
     setNotification(notification?.data ?? []);
+    setUserData(user);
+
     await connectSSE(token);
     setIsLogin(true);
   }, [closeSession, connectSSE]);
 
   useEffect(() => {
     if (accessToken) {
-      connectSession();
+      setIsLogin(true);
+      connectSSE(accessToken);
     }
-  }, [connectSession, accessToken]);
+  }, [connectSSE, accessToken]);
 
   const value = useMemo(
     () => ({
       isLogin,
       notification,
+      userData,
       connectSession,
       closeSession,
       changeNotification,
+      changeUserData,
     }),
-    [isLogin, notification, connectSession, closeSession, changeNotification]
+    [isLogin, notification, userData, connectSession, closeSession, changeNotification, changeUserData]
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
