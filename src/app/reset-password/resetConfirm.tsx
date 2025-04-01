@@ -92,6 +92,7 @@ export default function ResetConfirm({ token }: ResetConfirmProps) {
             disabled={isClicked}
             className="h-12 w-full rounded-full bg-blue-500 font-semibold hover:bg-blue-600"
             style={{ marginTop: '42px' }}
+            aria-label="비밀번호 변경"
           >
             비밀번호 변경하기
           </Button>

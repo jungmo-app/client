@@ -81,7 +81,11 @@ export default function DatePickerSheet({ value, onSelect, classNames }: DatePic
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" className={cn('w-full justify-start text-left font-normal', classNames)}>
+        <Button
+          variant="outline"
+          className={cn('w-full justify-start text-left font-normal', classNames)}
+          aria-label="현재 날짜"
+        >
           {formatDate(selectedDate)}
         </Button>
       </SheetTrigger>
@@ -108,6 +112,8 @@ export default function DatePickerSheet({ value, onSelect, classNames }: DatePic
                     <div key={i} className="aspect-square">
                       {date && (
                         <button
+                          type="button"
+                          aria-label={`${month}월 ${i}일`}
                           className={cn(
                             'flex h-full w-full items-center justify-center rounded-full text-sm',
                             date.getDate() === selectedDate.getDate() &&

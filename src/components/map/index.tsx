@@ -8,6 +8,7 @@ import { GOOGLE_MAP_FIELD } from '@/constants/place';
 import { getRadius } from '@/libs/map/calculateDistance';
 import { MarkerType, Position, SearchStatusType } from '@/types/map';
 import GoogleMapLoader from './googleMapLoader';
+import './map.css';
 import SearchLocationBox from './searchLocationBox';
 
 interface MapProps {

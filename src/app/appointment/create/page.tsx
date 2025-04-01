@@ -73,6 +73,7 @@ export default function CreateAppointment() {
                 className="w-full rounded-xl"
                 size="lg"
                 disabled={!methods.formState.isValid}
+                aria-label="일정 추가"
                 onClick={methods.handleSubmit(handleSubmitAppointment)}
               >
                 일정 추가

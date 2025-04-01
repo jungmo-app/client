@@ -32,17 +32,17 @@ export default function Header() {
   return (
     <header className="flex h-14 items-center justify-between bg-background p-4">
       <Link href="/account">
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" aria-label="계정 정보">
           <User className="h-5 w-5" />
         </Button>
       </Link>
       <div className="flex items-center gap-2">
-        <Button size="icon" variant="ghost" onClick={handleClickPrevMonthButton}>
+        <Button size="icon" variant="ghost" aria-label="이전 달" onClick={handleClickPrevMonthButton}>
           <ChevronLeft />
         </Button>
         <Popover>
           <PopoverTrigger asChild>
-            <button className="flex items-center gap-2 text-nowrap">
+            <button className="flex items-center gap-2 text-nowrap" type="button" aria-label="날짜">
               <h1 className="text-xl font-semibold">
                 {date.getFullYear()}. {(date.getMonth() + 1).toString().padStart(2, '0')}
               </h1>
@@ -54,7 +54,7 @@ export default function Header() {
           </PopoverContent>
         </Popover>
 
-        <Button size="icon" variant="ghost" onClick={handleClickNextMonthButton}>
+        <Button size="icon" variant="ghost" aria-label="다음 달" onClick={handleClickNextMonthButton}>
           <ChevronRight />
         </Button>
       </div>

@@ -53,7 +53,18 @@ export default function DateTimePicker({ onSelect }: { onSelect: (date: Date) =>
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" className="w-full justify-start text-left font-normal">
+        <Button
+          variant="outline"
+          className="w-full justify-start text-left font-normal"
+          aria-label={date.toLocaleString('ko-KR', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+          })}
+        >
           {date.toLocaleString('ko-KR', {
             year: 'numeric',
             month: 'long',
@@ -130,7 +141,7 @@ export default function DateTimePicker({ onSelect }: { onSelect: (date: Date) =>
             </SelectContent>
           </Select>
         </div>
-        <Button className="w-full" onClick={handleConfirm}>
+        <Button className="w-full" aria-label="확인" onClick={handleConfirm}>
           확인
         </Button>
       </SheetContent>

@@ -97,7 +97,7 @@ export default function VisitPlace({ visitPlace, point, onDeleteLoation, isEdita
             <div ref={popOverRef}>
               <Popover open={isOpenSetting} onOpenChange={handleOpenPopover}>
                 <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon" className="flex-shrink-0 self-start">
+                  <Button variant="ghost" size="icon" className="flex-shrink-0 self-start" aria-label="더보기">
                     <MoreVertical className="h-5 w-5" />
                   </Button>
                 </PopoverTrigger>
@@ -105,7 +105,7 @@ export default function VisitPlace({ visitPlace, point, onDeleteLoation, isEdita
                   className="flex -translate-x-8 items-center justify-center p-0 text-sm"
                   style={{ width: '88px', height: '48px' }}
                 >
-                  <Button variant="ghost" onClick={handleDeleteLocation}>
+                  <Button variant="ghost" aria-label="삭제" onClick={handleDeleteLocation}>
                     삭제하기
                   </Button>
                 </PopoverContent>

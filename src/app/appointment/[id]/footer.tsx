@@ -50,7 +50,7 @@ export default function Footer({ id, onAddLocation }: FooterProps) {
     <>
       <div className="z-10 border-t bg-background fixed-mobile-bottom">
         <div className="bg-background p-4">
-          <Button className="w-full rounded-xl" size="lg" onClick={handleClickButton}>
+          <Button className="w-full rounded-xl" size="lg" aria-label="장소 추가" onClick={handleClickButton}>
             장소 추가하기
           </Button>
         </div>

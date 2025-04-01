@@ -24,7 +24,11 @@ export default function TimePickerSheet({ value, onSelect, classNames }: TimePic
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" className={cn('w-full justify-start text-left font-normal', classNames)}>
+        <Button
+          variant="outline"
+          className={cn('w-full justify-start text-left font-normal', classNames)}
+          aria-label="시간 변경"
+        >
           {formatTime(selectedHour, selectedMinute)}
         </Button>
       </SheetTrigger>

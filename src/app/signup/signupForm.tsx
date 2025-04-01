@@ -101,6 +101,7 @@ export default function SignupForm() {
           className="h-12 w-full rounded-full bg-blue-500 font-semibold text-white hover:bg-blue-600"
           style={{ marginTop: '42px' }}
           disabled={isPending}
+          aria-label="회원가입"
         >
           회원가입
         </Button>

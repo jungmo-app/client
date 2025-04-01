@@ -92,6 +92,7 @@ export default function AttendeeSelectModal({ isOpen, value, onClose, onSelect }
                       variant="ghost"
                       size="icon"
                       className="h-4 w-4 p-0"
+                      aria-label="닫기"
                       onClick={() => handleUserRemove(user.userId)}
                     >
                       <X className="h-3 w-3" />
@@ -127,6 +128,7 @@ export default function AttendeeSelectModal({ isOpen, value, onClose, onSelect }
                     variant="ghost"
                     className="w-full gap-2"
                     style={{ justifyContent: 'flex-start' }}
+                    aria-label="사용자 선택"
                     onClick={() => handleUserSelect(user)}
                   >
                     <Avatar className="h-8 w-8">
@@ -148,7 +150,7 @@ export default function AttendeeSelectModal({ isOpen, value, onClose, onSelect }
 
           {/* 하단 버튼 */}
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" aria-label="취소" onClick={onClose}>
               취소
             </Button>
             <Button onClick={handleConfirm}>확인</Button>

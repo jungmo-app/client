@@ -6,6 +6,8 @@ import DeleteAccountSheet from './deleteAccountSheet';
 import InfoForm from './infoForm';
 import LogoutButton from './logoutButton';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AccountPage() {
   try {
     const userData = await apis.serverUser.getInfo();
@@ -38,6 +40,7 @@ export default async function AccountPage() {
     if (e instanceof Error && e.message === 'unauthorization') {
       redirect(`/login?refer=/account&date${Date.now()}`);
     }
-    throw new Error('api error');
+    const error = e as Error;
+    throw new Error(error.message);
   }
 }

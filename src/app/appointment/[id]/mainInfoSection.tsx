@@ -118,7 +118,11 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
             <div className="flex flex-shrink-0 items-center gap-2">
               {isEditMode ? (
                 <>
-                  <button className="flex h-[22px] w-[44px] items-center justify-center">
+                  <button
+                    className="flex h-[22px] w-[44px] items-center justify-center"
+                    aria-label="저장"
+                    type="button"
+                  >
                     <Badge
                       variant="destructive"
                       className="rounded-full bg-green-500 text-white hover:bg-green-600"
@@ -127,7 +131,11 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
                       저장
                     </Badge>
                   </button>
-                  <button className="flex h-[22px] w-[44px] items-center justify-center">
+                  <button
+                    className="flex h-[22px] w-[44px] items-center justify-center"
+                    aria-label="취소"
+                    type="button"
+                  >
                     <Badge
                       variant="destructive"
                       className="rounded-full bg-red-500 text-white hover:bg-red-600"
@@ -138,7 +146,7 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
                   </button>
                 </>
               ) : (
-                <button onClick={handleClickEditButton}>
+                <button aria-label="편집" type="button" onClick={handleClickEditButton}>
                   <Badge variant="secondary" className="rounded-full">
                     편집
                   </Badge>

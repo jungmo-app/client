@@ -10,7 +10,9 @@ export default function RequestInfo() {
           확인해보세요.
         </p>
         <Link href="/login" className="mt-4 inline-block rounded px-4 py-2 font-semibold">
-          <Button size="sm">로그인 페이지로 이동</Button>
+          <Button size="sm" aria-label="로그인 페이지 이동">
+            로그인 페이지로 이동
+          </Button>
         </Link>
       </div>
     </div>

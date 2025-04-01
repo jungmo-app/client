@@ -62,7 +62,7 @@ export default function MemoSheet({ initialMemo, onSave }: MemoSheetProps) {
             </div>
           </div>
           <SheetClose asChild>
-            <Button className="w-full" onClick={handleSave}>
+            <Button className="w-full" aria-label="확인" onClick={handleSave}>
               확인
             </Button>
           </SheetClose>

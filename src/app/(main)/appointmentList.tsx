@@ -77,14 +77,14 @@ export default function AppointmentList({ appointmentData }: AppointmentListProp
                 />
               </div>
               <div className="flex-1 overflow-hidden">
-                <h4 className="truncate font-medium">{appointment.title}</h4>
+                <h3 className="truncate font-medium">{appointment.title}</h3>
                 <p className="truncate text-sm text-muted-foreground">{`${appointment.startDate} ${appointment.startTime}`}</p>
                 <p className="truncate text-sm text-muted-foreground">{appointment.meetingLocation}</p>
               </div>
             </Link>
           ))}
           <div className="mx-2">
-            <Button asChild variant="outline" className="h-auto w-full justify-start gap-2 py-4">
+            <Button asChild variant="outline" className="h-auto w-full justify-start gap-2 py-4" aria-label="일정 추가">
               <Link href="/appointment/create">
                 <PlusCircle className="h-5 w-5 text-blue-500" />
                 <span className="text-muted-foreground">새로운 일정을 추가해보세요</span>

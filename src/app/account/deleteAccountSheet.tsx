@@ -37,7 +37,11 @@ export default function DeleteAccountSheet() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" className="flex w-full justify-between px-0 text-gray-500 hover:bg-transparent">
+        <Button
+          variant="ghost"
+          className="flex w-full justify-between px-0 text-gray-500 hover:bg-transparent"
+          aria-label="계정 삭제"
+        >
           <span>계정 삭제</span>
           <ChevronRight className="h-5 w-5" />
         </Button>
@@ -51,11 +55,17 @@ export default function DeleteAccountSheet() {
         </SheetHeader>
         <SheetFooter className="flex-col gap-2">
           <SheetClose asChild>
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-full" aria-label="취소">
               취소
             </Button>
           </SheetClose>
-          <Button variant="destructive" className="w-full" disabled={isClicked} onClick={handleDeleteAccount}>
+          <Button
+            variant="destructive"
+            className="w-full"
+            disabled={isClicked}
+            aria-label="탈퇴"
+            onClick={handleDeleteAccount}
+          >
             탈퇴하기
           </Button>
         </SheetFooter>

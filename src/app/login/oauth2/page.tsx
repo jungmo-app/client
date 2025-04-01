@@ -20,7 +20,7 @@ export default function AuthPage() {
   return (
     <div>
       <div>카카오 로그인 redirect</div>
-      <Button type="button" disabled={isPending} onClick={handleButtonClick}>
+      <Button type="button" disabled={isPending} aria-label="메인 페이지 이동" onClick={handleButtonClick}>
         메인 페이지로 돌아가기
       </Button>
     </div>

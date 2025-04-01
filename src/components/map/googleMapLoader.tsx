@@ -178,6 +178,7 @@ const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderP
             variant="ghost"
             size="icon"
             style={{ borderRadius: '9999px' }}
+            aria-label="현재 위치로 이동"
             onClick={handleClickUpdateCenterButton}
           >
             <LocateFixed />
@@ -187,6 +188,7 @@ const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderP
           <Button
             variant="ghost"
             className="absolute bottom-5 left-1/2 -translate-x-1/2 bg-background"
+            aria-label="현재 위치에서 검색"
             onClick={handleClickUpdateButton}
           >
             현재 위치에서 검색

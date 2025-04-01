@@ -48,7 +48,7 @@ export default function EditLocation({ onChange }: EditLocationProps) {
   };
   return (
     <>
-      <button onClick={handleClickEditButton}>
+      <button type="button" aria-label="편집" onClick={handleClickEditButton}>
         <Badge>편집</Badge>
       </button>
       <Map

@@ -75,6 +75,7 @@ export default function Calendar({ date, fontSize, showAdjacentDays = false, onS
               <div key={`prev-${prevDate}`} className="flex size-full items-center justify-center">
                 <Button
                   variant="ghost"
+                  aria-label="이전 달"
                   className={`border border-solid border-transparent font-normal ${i === 0 ? 'text-red-300' : 'text-gray-400'}`}
                   style={{
                     width: '100%',
@@ -102,6 +103,7 @@ export default function Calendar({ date, fontSize, showAdjacentDays = false, onS
               variant="ghost"
               className={`border border-solid font-normal ${num === day ? 'border-gray-400' : 'border-transparent'} ${(firstDay + num) % 7 === 0 ? 'text-blue-500' : (firstDay + num) % 7 === 1 ? 'text-red-500' : ''}`}
               style={{ width: '100%', height: '100%', padding: '2%' }}
+              aria-label={`${num}일`}
               onClick={() => handleClickDay(num, month)}
             >
               <div
@@ -124,6 +126,7 @@ export default function Calendar({ date, fontSize, showAdjacentDays = false, onS
                   variant="ghost"
                   className={`border border-solid border-transparent font-normal ${i === nextMonthDays - 1 ? 'text-blue-300' : 'text-gray-400'}`}
                   style={{ width: '100%', height: '100%', padding: '2%' }}
+                  aria-label="다음 달"
                   onClick={() => handleClickDay(nextDate, month + 1)}
                 >
                   <div

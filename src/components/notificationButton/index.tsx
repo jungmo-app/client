@@ -27,7 +27,7 @@ export default function NotificationButton() {
     <Popover onOpenChange={() => setIsEdit(false)}>
       <PopoverTrigger asChild>
         <div className="relative">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" aria-label="알림">
             <Bell className="size-5" />
           </Button>
           {unReadCount > 0 && (

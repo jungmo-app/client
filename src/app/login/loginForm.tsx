@@ -101,6 +101,7 @@ export default function LoginForm() {
           className="h-12 w-full rounded-full bg-blue-500 font-semibold text-white hover:bg-blue-600 dark:bg-gray-500 dark:hover:bg-gray-700"
           style={{ marginTop: '24px' }}
           disabled={isPending}
+          aria-label="로그인"
         >
           로그인
         </Button>

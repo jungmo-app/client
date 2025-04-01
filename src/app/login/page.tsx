@@ -35,6 +35,7 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
         <Link href="https://jungmoserver.shop/oauth2/authorization/kakao">
           <Button
             variant="outline"
+            aria-label="카카오톡 로그인"
             className="h-12 w-full rounded-full border-2 border-yellow-400 bg-yellow-400 font-semibold text-black hover:bg-yellow-500 dark:hover:border-yellow-600 dark:hover:bg-yellow-600 dark:hover:text-black"
           >
             카카오로 로그인하기

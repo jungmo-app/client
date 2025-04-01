@@ -109,7 +109,12 @@ export default function LocationSettingModal({
                   <Label className="text-neutral-400">카테고리 태그</Label>
                   <div className="mt-1 flex flex-wrap items-center gap-2 p-1">
                     {tags.map((item, index) => (
-                      <Button key={index} className="cursor-default" variant={index !== 0 ? 'outline' : 'default'}>
+                      <Button
+                        key={index}
+                        className="cursor-default"
+                        variant={index !== 0 ? 'outline' : 'default'}
+                        aria-label={`카테고리 ${item}`}
+                      >
                         #{item}
                       </Button>
                     ))}
@@ -147,7 +152,12 @@ export default function LocationSettingModal({
             </ScrollArea>
             {onSelect && (
               <div className="absolute bottom-0 left-0 z-[60] flex w-full border-t border-solid border-neutral-300 p-4">
-                <Button className="h-12 w-full" style={{ fontSize: '16px' }} onClick={handleClickButton}>
+                <Button
+                  className="h-12 w-full"
+                  style={{ fontSize: '16px' }}
+                  aria-label="저장"
+                  onClick={handleClickButton}
+                >
                   저장하기
                 </Button>
               </div>

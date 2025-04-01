@@ -1,6 +1,5 @@
 export { default as AttendeeInput } from './attendeeInput';
 export { default as Calendar } from './calendar';
-export { default as DatePicker } from './datePicker';
 export { default as DatePickerSheet } from './datePickerSheet';
 export { default as DateTimePicker } from './dateTimePicker';
 export { default as Header } from './header';

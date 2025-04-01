@@ -56,7 +56,11 @@ export default function ChangePasswordSheet() {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" className="flex w-full justify-between px-0 text-gray-500 hover:bg-transparent">
+        <Button
+          variant="ghost"
+          className="flex w-full justify-between px-0 text-gray-500 hover:bg-transparent"
+          aria-label="비밀번호 변경"
+        >
           <span>비밀번호 변경하기</span>
           <ChevronRight className="h-5 w-5 text-muted-foreground" />
         </Button>
@@ -115,7 +119,7 @@ export default function ChangePasswordSheet() {
               )}
             />
 
-            <Button type="submit" className="w-full" disabled={!form.formState.isValid}>
+            <Button type="submit" className="w-full" disabled={!form.formState.isValid} aria-label="변경">
               변경하기
             </Button>
           </form>

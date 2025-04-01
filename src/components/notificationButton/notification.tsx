@@ -5,6 +5,7 @@ import { X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
+import { Button } from '@/components/ui';
 import { SessionContext } from '@/contexts/SessionProvider';
 import { NotificationType } from '@/types/notification';
 
@@ -42,14 +43,17 @@ export default function Notification({ notification, isEdit }: NotificationProps
   };
 
   return (
-    <button className="relative w-full" onClick={handleClickNotification}>
+    <div className="relative w-full" onClick={handleClickNotification}>
       {isEdit && (
-        <button
+        <Button
           className="absolute -right-2 -top-2 z-10 flex items-center justify-center rounded-full bg-gray-200 p-[2px]"
+          aria-label="닫기"
+          variant="ghost"
+          size="icon"
           onClick={handleClickDeleteButton}
         >
           <X className="size-[14px]" />
-        </button>
+        </Button>
       )}
       <div
         className={`relative flex w-full gap-3 rounded-lg border border-gray-300 bg-background p-3 text-left shadow-sm ${notification.read && 'opacity-50'} hover:shadow-md`}
@@ -73,6 +77,6 @@ export default function Notification({ notification, isEdit }: NotificationProps
           </div>
         </div>
       </div>
-    </button>
+    </div>
   );
 }

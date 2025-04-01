@@ -33,6 +33,7 @@ export default function LogoutButton() {
       variant="ghost"
       disabled={isClicked}
       className="flex w-full justify-between px-0 text-red-500 hover:bg-transparent hover:text-red-400"
+      aria-label="로그아웃"
       onClick={handleClickButton}
     >
       <span>로그아웃</span>
