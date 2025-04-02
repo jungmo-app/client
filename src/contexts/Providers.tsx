@@ -15,24 +15,19 @@ export default async function Providers({ children }: StrictPropsWithChildren) {
   };
 
   const accessToken = cookies().get('accessToken')?.value;
-  try {
-    if (accessToken) {
-      const isValidToken = await verifyToken(accessToken);
-      if (isValidToken) {
-        const userData = await apis.serverUser.getInfo();
-        const notification = await apis.serverNotification.getNotification();
+  if (accessToken) {
+    const isValidToken = await verifyToken(accessToken);
+    if (isValidToken) {
+      const userData = await apis.serverUser.getInfo();
+      const notification = await apis.serverNotification.getNotification();
 
-        Object.assign(notificationProps, {
-          initialNotification: notification?.data ?? [],
-          accessToken,
-          initialUserData: userData?.data ?? null,
-        });
-      }
+      Object.assign(notificationProps, {
+        initialNotification: notification?.data ?? [],
+        accessToken,
+        initialUserData: userData?.data ?? null,
+      });
     }
-  } catch (error) {
-    console.error(error);
   }
-
   return (
     <ThemeProvider>
       <GlobalErrorBoundary>

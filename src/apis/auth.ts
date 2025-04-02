@@ -18,16 +18,11 @@ export const authApis = {
     return response;
   },
   logout: async () => {
-    try {
-      const response = await fetch('/api/logout', {
-        method: 'POST',
-      });
-      if (!response.ok) {
-        throw new Error('로그아웃 실패');
-      }
-      return true;
-    } catch {
-      return false;
+    const response = await fetch('/api/logout', {
+      method: 'POST',
+    });
+    if (!response.ok) {
+      throw new Error('로그아웃 실패');
     }
   },
   register: async (payload: SignupFormValues) => {

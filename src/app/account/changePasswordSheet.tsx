@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronRight } from 'lucide-react';
@@ -20,12 +20,15 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui';
+import { ButtonContext } from '@/contexts/ButtonClickProvider';
 import { useChangePassword } from '@/hooks/useMutate/useChangePassword';
 import { changePasswordSchema } from '@/schemas/auth';
 import { ChangePasswordFormValues } from '@/types/auth';
 
 export default function ChangePasswordSheet() {
   const [isOpen, setIsOpen] = useState(false);
+  const { isClicked, changeClick } = useContext(ButtonContext);
+
   const form = useForm<ChangePasswordFormValues>({
     resolver: zodResolver(changePasswordSchema),
     defaultValues: {
@@ -38,16 +41,19 @@ export default function ChangePasswordSheet() {
 
   const handleSuccess = () => {
     setIsOpen(false);
+    changeClick(false);
     form.reset();
   };
 
   const handleError = () => {
+    changeClick(false);
     form.setError('oldPassword', { message: '비밀번호가 잘못되었습니다' });
   };
 
   const { mutate: changePassword } = useChangePassword(handleSuccess, handleError);
 
   const handleChangePassword = async (value: ChangePasswordFormValues) => {
+    changeClick(true);
     const { oldPassword, newPassword } = value;
     changePassword({ oldPassword, newPassword });
   };
@@ -59,6 +65,7 @@ export default function ChangePasswordSheet() {
           variant="ghost"
           className="flex w-full justify-between px-0 text-gray-500 hover:bg-transparent"
           aria-label="비밀번호 변경"
+          disabled={isClicked}
         >
           <span>비밀번호 변경하기</span>
           <ChevronRight className="h-5 w-5 text-muted-foreground" />
@@ -131,7 +138,7 @@ export default function ChangePasswordSheet() {
               )}
             />
 
-            <Button type="submit" className="w-full" disabled={!form.formState.isValid} aria-label="변경">
+            <Button type="submit" className="w-full" disabled={!form.formState.isValid || isClicked} aria-label="변경">
               변경하기
             </Button>
           </form>

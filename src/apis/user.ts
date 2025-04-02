@@ -35,16 +35,11 @@ export const userApis = {
     }
   },
   deleteAccount: async () => {
-    try {
-      const response = await fetch('/api/deleteAccount', {
-        method: 'POST',
-      });
-      if (!response.ok) {
-        throw new Error('계정 삭제 실패');
-      }
-      return true;
-    } catch {
-      return false;
+    const response = await fetch('/api/deleteAccount', {
+      method: 'POST',
+    });
+    if (!response.ok) {
+      throw new Error('계정 삭제 실패');
     }
   },
   editInfo: async (payload: FormData) => {

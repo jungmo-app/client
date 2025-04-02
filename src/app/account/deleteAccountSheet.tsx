@@ -1,9 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useContext } from 'react';
 import { ChevronRight } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { apis } from '@/apis';
 import {
   Button,
   Sheet,
@@ -15,24 +13,23 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui';
+import { ButtonContext } from '@/contexts/ButtonClickProvider';
+import { useDeleteAccount } from '@/hooks/useMutate/useDeleteAccount';
 
 export default function DeleteAccountSheet() {
-  const router = useRouter();
-  const [isClicked, setIsClicked] = useState(false);
+  const { isClicked, changeClick } = useContext(ButtonContext);
+  const handleSuccess = () => {
+    changeClick(false);
+  };
+
+  const handleError = () => {
+    changeClick(false);
+  };
+
+  const { mutate: deleteAccount } = useDeleteAccount(handleSuccess, handleError);
   const handleDeleteAccount = async () => {
-    if (isClicked) {
-      return;
-    }
-    setIsClicked(true);
-    const deleteAccount = await apis.user.deleteAccount();
-    if (deleteAccount) {
-      alert('계정이 삭제되었습니다');
-      router.push('/login');
-      setIsClicked(false);
-      return;
-    }
-    setIsClicked(false);
-    alert('계정삭제에 실패하였습니다');
+    changeClick(true);
+    deleteAccount();
   };
   return (
     <Sheet>
@@ -41,6 +38,7 @@ export default function DeleteAccountSheet() {
           variant="ghost"
           className="flex w-full justify-between px-0 text-gray-500 hover:bg-transparent"
           aria-label="계정 삭제"
+          disabled={isClicked}
         >
           <span>계정 삭제</span>
           <ChevronRight className="h-5 w-5" />
@@ -55,7 +53,7 @@ export default function DeleteAccountSheet() {
         </SheetHeader>
         <SheetFooter className="flex-col gap-2">
           <SheetClose asChild>
-            <Button variant="outline" className="w-full" aria-label="취소">
+            <Button variant="outline" className="w-full" aria-label="취소" disabled={isClicked}>
               취소
             </Button>
           </SheetClose>

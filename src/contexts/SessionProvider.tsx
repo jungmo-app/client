@@ -35,12 +35,12 @@ export const SessionContext = createContext<SessionContextType>({
   changeUserData: () => {},
 });
 
-export function SessionContextProvider({
+export const SessionContextProvider = ({
   children,
   accessToken,
   initialNotification,
   initialUserData,
-}: SessionContextProviderProps) {
+}: SessionContextProviderProps) => {
   const eventSource = useRef<EventSource | null>(null);
   const isInitial = useRef<boolean>(true);
 
@@ -161,4 +161,4 @@ export function SessionContextProvider({
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
-}
+};

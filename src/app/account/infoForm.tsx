@@ -1,10 +1,11 @@
 'use client';
 
-import { useContext, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Copy, Edit, Save, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import LoadingIcon from '@/components/common/loadingIcon';
 import {
   Avatar,
   AvatarFallback,
@@ -52,9 +53,18 @@ export default function InfoForm() {
     mode: 'onChange',
   });
 
+  useEffect(() => {
+    if (!userData) {
+      router.push(`/login?date=${Date.now()}`);
+    }
+  }, [router, userData]);
+
   if (!userData) {
-    router.replace('/login');
-    return;
+    return (
+      <div className="flex size-full flex-grow items-center justify-center">
+        <LoadingIcon />
+      </div>
+    );
   }
 
   const onSubmit = async (data: EditProfileFormValues) => {
@@ -71,12 +81,12 @@ export default function InfoForm() {
     if (inputRef.current) {
       inputRef.current.value = '';
     }
-    form.reset({ userName: userData.userName, profileImage: undefined });
+    form.reset({ userName: userData?.userName ?? '', profileImage: undefined });
   };
 
   const handleClickCopyButton = async () => {
     try {
-      await navigator.clipboard.writeText(userData.userCode);
+      await navigator.clipboard.writeText(userData?.userCode ?? '');
       alert('클립보드에 복사하였습니다.');
     } catch {
       alert('클립보드 복사에 실패하였습니다');
@@ -166,7 +176,7 @@ export default function InfoForm() {
               aria-label="유저코드 복사"
               onClick={handleClickCopyButton}
             >
-              <span className="pl-6">{userData.userCode}</span>
+              <span className="pl-6">{userData?.userCode}</span>
               <div className="absolute left-3 top-1/2 size-4 -translate-y-1/2">
                 <Copy className="size-4" />
               </div>
