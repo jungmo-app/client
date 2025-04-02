@@ -22,7 +22,11 @@ export default async function Providers({ children }: StrictPropsWithChildren) {
       if (isValidToken) {
         const userData = (await apis.serverUser.getInfo()) ?? null;
         const notification = (await apis.serverNotification.getNotification())?.data;
-        Object.assign(notificationProps, { initialNotification: notification ?? [], accessToken, userData });
+        Object.assign(notificationProps, {
+          initialNotification: notification ?? [],
+          accessToken,
+          initialUserData: userData,
+        });
       }
     }
   } catch (error) {

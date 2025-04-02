@@ -17,7 +17,7 @@ export default function MainLocation({ appointment, isEditable }: MainLocationPr
 
   const { data: appointmentData } = useAppointment(appointment);
 
-  const { mutate: editAppointment } = useEditAppointment(appointment.id, appointmentDate);
+  const { mutate: editAppointment, isPending } = useEditAppointment(appointment.id, appointmentDate);
 
   const handleChangeLocation = async (value: PlaceDataType) => {
     const payload = {
@@ -45,7 +45,7 @@ export default function MainLocation({ appointment, isEditable }: MainLocationPr
             <h3 className="flex-1 truncate font-medium">
               {appointmentData?.meetingLocation.placeName ?? '위치를 불러올 수 없습니다'}
             </h3>
-            {isEditable && <EditLocation onChange={handleChangeLocation} />}
+            {isEditable && <EditLocation isPending={isPending} onChange={handleChangeLocation} />}
           </div>
           <p className="mt-1 truncate text-sm text-gray-500">{appointmentData?.meetingLocation.placeAddress}</p>
         </div>

@@ -25,7 +25,7 @@ type AppointmentFormData = {
 export default function CreateAppointment() {
   const [attendees, setAttendees] = useState<UserDataResponse[]>([]);
 
-  const { mutate: CreateAppointment } = useCreateAppointment();
+  const { mutate: CreateAppointment, isPending } = useCreateAppointment();
 
   const methods = useForm<AppointmentFormData>({
     defaultValues: {
@@ -59,7 +59,7 @@ export default function CreateAppointment() {
               <Button
                 className="w-full rounded-xl"
                 size="lg"
-                disabled={!methods.formState.isValid}
+                disabled={!methods.formState.isValid || isPending}
                 aria-label="일정 추가"
                 onClick={methods.handleSubmit(handleSubmitAppointment)}
               >

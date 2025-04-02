@@ -48,20 +48,15 @@ export const userApis = {
     }
   },
   editInfo: async (payload: FormData) => {
-    try {
-      const response = await privateClientFetch(apiPaths.user.editInfo, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        body: payload,
-      });
-      if (response?.status === 200) {
-        return true;
-      }
+    const response = await privateClientFetch(apiPaths.user.editInfo, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      body: payload,
+    });
+    if (response?.status !== 200) {
       throw new Error('api error');
-    } catch {
-      return false;
     }
   },
 };

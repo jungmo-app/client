@@ -2,7 +2,7 @@ import { z } from 'zod';
 import commonSchemas from './common';
 
 export const editProfileSchema = z.object({
-  name: z.string().min(1, '이름을 입력해주세요'),
+  userName: z.string().min(1, '이름을 입력해주세요'),
   profileImage: z.instanceof(File).optional(),
 });
 

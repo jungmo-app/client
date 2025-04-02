@@ -10,9 +10,10 @@ import { Photos, PlaceDataType, Position } from '@/types/map';
 
 interface EditLocationProps {
   onChange: (value: PlaceDataType) => Promise<void>;
+  isPending?: boolean;
 }
 
-export default function EditLocation({ onChange }: EditLocationProps) {
+export default function EditLocation({ onChange, isPending }: EditLocationProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [currentLocation, setCurrentLocation] = useState<Position | null>(null);
 
@@ -48,7 +49,7 @@ export default function EditLocation({ onChange }: EditLocationProps) {
   };
   return (
     <>
-      <button type="button" aria-label="편집" onClick={handleClickEditButton}>
+      <button type="button" aria-label="편집" disabled={isPending} onClick={handleClickEditButton}>
         <Badge>편집</Badge>
       </button>
       <Map

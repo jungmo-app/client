@@ -14,7 +14,7 @@ interface HeaderToolProps {
 export default function HeaderTool({ id, appointmentDate }: HeaderToolProps) {
   const [isOpenPopOver, setIsOpenPopover] = useState(false);
 
-  const { mutate: deleteAppointment } = useDeleteAppointment(
+  const { mutate: deleteAppointment, isPending } = useDeleteAppointment(
     id,
     appointmentDate,
     () => {},
@@ -45,7 +45,7 @@ export default function HeaderTool({ id, appointmentDate }: HeaderToolProps) {
           className="flex -translate-x-8 items-center justify-center p-0 text-sm"
           style={{ width: '88px', height: '48px' }}
         >
-          <Button variant="ghost" aria-label="삭제" onClick={handleDeleteAppointment}>
+          <Button variant="ghost" aria-label="삭제" disabled={isPending} onClick={handleDeleteAppointment}>
             삭제하기
           </Button>
         </PopoverContent>

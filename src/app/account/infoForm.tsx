@@ -1,15 +1,15 @@
 'use client';
 
-import { useContext, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Copy, Edit, Save, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { apis } from '@/apis';
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
+  Button,
   Card,
   Form,
   FormControl,
@@ -22,35 +22,32 @@ import {
 } from '@/components/ui';
 import { SessionContext } from '@/contexts/SessionProvider';
 import { useImageUpload } from '@/hooks/useImageUpload';
-import { revalidatePage } from '@/libs/serverAction';
+import { useEditAccount } from '@/hooks/useMutate/useEditAccount';
 import { EditProfileFormValues, editProfileSchema } from '@/schemas/auth';
 
 export default function InfoForm() {
   const router = useRouter();
-  const { userData, changeUserData } = useContext(SessionContext);
+  const { userData } = useContext(SessionContext);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const [isEditMode, setIsEditMode] = useState(false);
-  const [data, setData] = useState<EditProfileFormValues>({
-    name: userData?.userName ?? '',
-    profileImage: undefined,
-  });
+  const { mutate: editAccount, isPending } = useEditAccount();
 
   const {
     preview,
+    file,
     error: imageError,
     handleImageChange,
+    resetImage,
   } = useImageUpload({
     initialImage: userData?.profileImage,
-    onImageChange: data => {
-      form.setValue('profileImage', data);
-    },
   });
 
   const form = useForm<EditProfileFormValues>({
     resolver: zodResolver(editProfileSchema),
     defaultValues: {
-      name: data.name,
-      profileImage: data.profileImage,
+      userName: userData?.userName ?? '',
+      profileImage: undefined,
     },
     mode: 'onChange',
   });
@@ -61,29 +58,7 @@ export default function InfoForm() {
   }
 
   const onSubmit = async (data: EditProfileFormValues) => {
-    /* if (!data.profileImage) {
-      const filename;
-    } */
-    const formData = new FormData();
-    formData.append('userName', data.name);
-    if (data.profileImage) {
-      formData.append('profileImage', data.profileImage);
-    }
-    const response = await apis.user.editInfo(formData);
-    if (response) {
-      alert('수정하였습니다');
-      setData(form.getValues());
-      setIsEditMode(false);
-      revalidatePage('/account');
-      return;
-    }
-    alert('수정에 실패하였습니다');
-    changeUserData(prev => {
-      if (!prev) {
-        return null;
-      }
-      return { ...prev, userName: data.name, profileImage: preview };
-    });
+    editAccount({ ...data, profileImage: file, preview });
   };
 
   const handleClickEditButton = () => {
@@ -92,7 +67,11 @@ export default function InfoForm() {
 
   const handleClickCancelButton = () => {
     setIsEditMode(false);
-    form.reset(data);
+    resetImage();
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
+    form.reset({ userName: userData.userName, profileImage: undefined });
   };
 
   const handleClickCopyButton = async () => {
@@ -109,7 +88,7 @@ export default function InfoForm() {
         <form className="space-y-6 p-4" onSubmit={form.handleSubmit(onSubmit)}>
           {isEditMode ? (
             <div className="absolute right-3 top-3 flex items-center gap-2">
-              <button type="submit" className="group" aria-label="저장">
+              <button type="submit" className="group" aria-label="저장" disabled={isPending}>
                 <Save className="size-5 stroke-neutral-400 group-hover:stroke-neutral-500" />
               </button>
               <button className="group" type="button" aria-label="취소" onClick={handleClickCancelButton}>
@@ -130,9 +109,10 @@ export default function InfoForm() {
             <div className="relative">
               <Avatar className="h-32 w-32">
                 <AvatarImage src={preview || ''} />
-                <AvatarFallback>{form.watch('name')}</AvatarFallback>
+                <AvatarFallback>{form.watch('userName')}</AvatarFallback>
               </Avatar>
               <Input
+                ref={inputRef}
                 type="file"
                 accept="image/*"
                 className="hidden"
@@ -157,7 +137,7 @@ export default function InfoForm() {
           <Card className="space-y-4 rounded-2xl bg-[#F7F7F7] p-4">
             <FormField
               control={form.control}
-              name="name"
+              name="userName"
               render={({ field }) => (
                 <FormItem className="space-y-2">
                   <FormLabel>이름</FormLabel>
@@ -178,10 +158,11 @@ export default function InfoForm() {
 
           <Card className="space-y-4 rounded-2xl bg-[#F7F7F7] p-4">
             <Label>유저 코드</Label>
-            <button
-              className="relative flex h-10 w-full rounded-md border border-black border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+            <Button
+              className="relative flex w-full border border-input bg-background"
               type="button"
-              style={{ marginTop: '8px' }}
+              variant="ghost"
+              style={{ marginTop: '8px', justifyContent: 'normal' }}
               aria-label="유저코드 복사"
               onClick={handleClickCopyButton}
             >
@@ -189,7 +170,7 @@ export default function InfoForm() {
               <div className="absolute left-3 top-1/2 size-4 -translate-y-1/2">
                 <Copy className="size-4" />
               </div>
-            </button>
+            </Button>
           </Card>
         </form>
       </Form>

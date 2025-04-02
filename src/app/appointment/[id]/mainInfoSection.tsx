@@ -24,7 +24,7 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
 
   const { data: appointmentData } = useAppointment(appointment);
 
-  const { mutate: editAppointment } = useEditAppointment(appointment.id, appointmentDate, () => {
+  const { mutate: editAppointment, isPending } = useEditAppointment(appointment.id, appointmentDate, () => {
     setIsEditMode(false);
   });
 
@@ -114,6 +114,7 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
                     className="flex h-[22px] w-[44px] items-center justify-center"
                     aria-label="저장"
                     type="button"
+                    disabled={isPending}
                   >
                     <Badge
                       variant="destructive"
@@ -127,6 +128,7 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
                     className="flex h-[22px] w-[44px] items-center justify-center"
                     aria-label="취소"
                     type="button"
+                    disabled={isPending}
                   >
                     <Badge
                       variant="destructive"
