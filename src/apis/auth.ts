@@ -39,21 +39,16 @@ export const authApis = {
     return response;
   },
   changePassword: async (payload: ChangePasswordPayload) => {
-    try {
-      const response = await privateClientFetch(apiPaths.auth.changePassword, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(payload),
-      });
-      if (response?.status === 200) {
-        return true;
-      }
+    const response = await privateClientFetch(apiPaths.auth.changePassword, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(payload),
+    });
+    if (response?.status !== 200) {
       throw new Error('api error');
-    } catch {
-      return false;
     }
   },
   setPassword: async (payload: SetPasswordFormValues) => {

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronRight } from 'lucide-react';
-import { apis } from '@/apis';
 import {
   Button,
   Form,
@@ -21,6 +20,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui';
+import { useChangePassword } from '@/hooks/useMutate/useChangePassword';
 import { changePasswordSchema } from '@/schemas/auth';
 import { ChangePasswordFormValues } from '@/types/auth';
 
@@ -36,21 +36,20 @@ export default function ChangePasswordSheet() {
     mode: 'onChange',
   });
 
-  const handleChangePassword = async (value: ChangePasswordFormValues) => {
-    const response = await apis.auth.changePassword({
-      oldPassword: value.oldPassword,
-      newPassword: value.newPassword,
-    });
+  const handleSuccess = () => {
+    setIsOpen(false);
+    form.reset();
+  };
 
-    if (response) {
-      alert('비밀번호를 변경하였습니다');
-      setIsOpen(false);
-      return;
-    }
-    if (response === null) {
-      form.setError('oldPassword', { message: '비밀번호가 잘못되었습니다' });
-    }
-    alert('비밀번호 변경에 실패하였습니다.');
+  const handleError = () => {
+    form.setError('oldPassword', { message: '비밀번호가 잘못되었습니다' });
+  };
+
+  const { mutate: changePassword } = useChangePassword(handleSuccess, handleError);
+
+  const handleChangePassword = async (value: ChangePasswordFormValues) => {
+    const { oldPassword, newPassword } = value;
+    changePassword({ oldPassword, newPassword });
   };
 
   return (
@@ -78,7 +77,20 @@ export default function ChangePasswordSheet() {
                 <FormItem>
                   <FormLabel>현재 비밀번호</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} placeholder="현재 비밀번호를 입력해주세요" />
+                    <Input
+                      type="password"
+                      {...field}
+                      placeholder="현재 비밀번호를 입력해주세요"
+                      onChange={e => {
+                        field.onChange(e.target.value);
+                        if (
+                          e.target.value &&
+                          (e.target.value === form.getValues('newPassword') || form.formState.errors.newPassword)
+                        ) {
+                          form.trigger('newPassword');
+                        }
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

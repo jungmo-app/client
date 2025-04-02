@@ -25,13 +25,22 @@ export const changePasswordSchema = z
     newPassword: commonSchemas.password,
     confirmPassword: commonSchemas.password,
   })
-  .refine(data => data.newPassword === data.confirmPassword, {
-    message: '새 비밀번호가 일치하지 않아요',
-    path: ['confirmPassword'],
-  })
-  .refine(data => data.oldPassword !== data.newPassword, {
-    message: '현재 비밀번호와 동일한 비밀번호로 변경할 수 없어요',
-    path: ['newPassword'],
+  .superRefine((data, ctx) => {
+    if (data.newPassword !== data.confirmPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: '새 비밀번호가 일치하지 않아요',
+        path: ['confirmPassword'],
+      });
+    }
+
+    if (data.oldPassword === data.newPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: '현재 비밀번호와 동일한 비밀번호로 변경할 수 없어요',
+        path: ['newPassword'],
+      });
+    }
   });
 
 export const resetPasswordSchema = z

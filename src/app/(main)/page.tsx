@@ -13,7 +13,7 @@ export default async function Main() {
 
   const appointmentData = await apis.serverGathering.getList(new Date());
   if (!appointmentData) {
-    redirect(`/login?refer=/&date${Date.now()}`);
+    redirect(`/login?refer=/&date=${Date.now()}`);
   }
   const appointmentList = await Promise.all(
     (appointmentData ?? []).map(async item => {

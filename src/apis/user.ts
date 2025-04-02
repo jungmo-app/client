@@ -55,9 +55,10 @@ export const userApis = {
       },
       body: payload,
     });
-    if (response?.status !== 200) {
-      throw new Error('api error');
+    if (response?.status === 200) {
+      return true;
     }
+    throw new Error('api error');
   },
 };
 
@@ -68,6 +69,6 @@ export const serverUserApis = {
       cache: 'no-cache',
       next: { tags: ['userInfo'] },
     });
-    return response?.data;
+    return response;
   },
 };

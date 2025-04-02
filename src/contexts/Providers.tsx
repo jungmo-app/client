@@ -10,28 +10,29 @@ import { ThemeProvider } from './ThemeProvider';
 export default async function Providers({ children }: StrictPropsWithChildren) {
   const notificationProps = {
     initialNotification: [],
-    accessToken: '',
+    accessToken: null,
     initialUserData: null,
   };
 
   const accessToken = cookies().get('accessToken')?.value;
-
   try {
     if (accessToken) {
       const isValidToken = await verifyToken(accessToken);
       if (isValidToken) {
-        const userData = (await apis.serverUser.getInfo()) ?? null;
-        const notification = (await apis.serverNotification.getNotification())?.data;
+        const userData = await apis.serverUser.getInfo();
+        const notification = await apis.serverNotification.getNotification();
+
         Object.assign(notificationProps, {
-          initialNotification: notification ?? [],
+          initialNotification: notification?.data ?? [],
           accessToken,
-          initialUserData: userData,
+          initialUserData: userData?.data ?? null,
         });
       }
     }
   } catch (error) {
     console.error(error);
   }
+
   return (
     <ThemeProvider>
       <GlobalErrorBoundary>

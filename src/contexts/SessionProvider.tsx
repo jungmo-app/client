@@ -20,7 +20,7 @@ interface SessionContextType {
 
 interface SessionContextProviderProps {
   children: ReactNode;
-  accessToken?: string;
+  accessToken: string | null;
   initialNotification: NotificationType[];
   initialUserData: UserInfoResponse | null;
 }
@@ -42,6 +42,8 @@ export function SessionContextProvider({
   initialUserData,
 }: SessionContextProviderProps) {
   const eventSource = useRef<EventSource | null>(null);
+  const isInitial = useRef<boolean>(true);
+
   const [notification, setNotification] = useState<NotificationType[]>(initialNotification);
   const [userData, setUserData] = useState<UserInfoResponse | null>(initialUserData);
   const [isLogin, setIsLogin] = useState(Boolean(accessToken));
@@ -105,6 +107,7 @@ export function SessionContextProvider({
   const closeSession = useCallback(() => {
     closeSSE();
     setNotification([]);
+    setUserData(null);
     setIsLogin(false);
   }, [closeSSE]);
 
@@ -126,11 +129,23 @@ export function SessionContextProvider({
   }, [closeSession, connectSSE]);
 
   useEffect(() => {
-    if (accessToken) {
+    const getInitialConnetSession = async () => {
+      if (!accessToken) {
+        return;
+      }
       setIsLogin(true);
-      connectSSE(accessToken);
+
+      if (!userData) {
+        const user = await apis.user.getInfo();
+        setUserData(user);
+      }
+      await connectSSE(accessToken);
+    };
+    if (isInitial.current) {
+      getInitialConnetSession();
     }
-  }, [connectSSE, accessToken]);
+    isInitial.current = false;
+  }, [connectSSE, userData, accessToken]);
 
   const value = useMemo(
     () => ({
