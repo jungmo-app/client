@@ -1,17 +1,20 @@
 'use client';
 
-import { useContext, useState } from 'react';
+import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Bell } from 'lucide-react';
 import { Button, Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
-import { SessionContext } from '@/contexts/SessionProvider';
+import { NotificationType } from '@/types/notification';
 import Notification from './notification';
 
 export default function NotificationButton() {
   /* const router = useRouter(); */
-  const { notification, changeNotification } = useContext(SessionContext);
+  const queryClient = useQueryClient();
+  const notification = queryClient.getQueryData<NotificationType[]>(['notification']);
+
   const [isEdit, setIsEdit] = useState<boolean>(false);
 
-  const unReadCount = notification.filter(item => !item.read).length;
+  const unReadCount = notification?.filter(item => !item.read).length ?? 0;
 
   const handleClickEditButton = () => {
     setIsEdit(prev => !prev);
@@ -19,7 +22,7 @@ export default function NotificationButton() {
 
   const handleClickDeleteAllButton = async () => {
     /* api */
-    changeNotification([]);
+    queryClient.setQueryData(['notification'], []);
     setIsEdit(false);
   };
 
@@ -41,18 +44,17 @@ export default function NotificationButton() {
       </PopoverTrigger>
       <PopoverContent style={{ width: '300px', padding: '8px' }} align="end">
         <div className="item-center my-2 ml-2 flex justify-between">
-          <span>{`알림 ${notification.length}개`}</span>
-          {notification.length > 0 && (
-            <button className="mr-4 text-xs text-gray-400" onClick={handleClickEditButton}>
-              {isEdit ? '끝내기' : '편집하기'}
-            </button>
-          )}
-        </div>
-        {notification.length > 0 ? (
-          <div className="mb-6 mt-2 flex max-h-80 w-full flex-col items-center gap-2 overflow-auto p-2 pb-2 text-sm">
-            {notification.map(item => (
-              <Notification key={item.notificationId} notification={item} isEdit={isEdit} />
+          <span>{`알림 ${notification?.length}개`}</span>
+          {notification?.length ??
+            (0 > 0 && (
+              <button className="mr-4 text-xs text-gray-400" onClick={handleClickEditButton}>
+                {isEdit ? '끝내기' : '편집하기'}
+              </button>
             ))}
+        </div>
+        {(notification?.length ?? 0 > 0) ? (
+          <div className="mb-6 mt-2 flex max-h-80 w-full flex-col items-center gap-2 overflow-auto p-2 pb-2 text-sm">
+            {notification?.map(item => <Notification key={item.notificationId} notification={item} isEdit={isEdit} />)}
           </div>
         ) : (
           <div className="flex h-56 flex-1 items-center justify-center text-sm text-gray-500">알림이 없습니다</div>

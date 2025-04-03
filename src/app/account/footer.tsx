@@ -1,13 +1,12 @@
 'use client';
 
-import { useContext } from 'react';
-import { SessionContext } from '@/contexts/SessionProvider';
+import { useUserData } from '@/hooks/useQuery/useUserData';
 import ChangePasswordSheet from './changePasswordSheet';
 import DeleteAccountSheet from './deleteAccountSheet';
 import LogoutButton from './logoutButton';
 
 export default function Footer() {
-  const { userData } = useContext(SessionContext);
+  const { data: userData } = useUserData();
   if (!userData) {
     return <div />;
   }

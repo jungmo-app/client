@@ -1,60 +1,26 @@
 'use client';
 
-import { ReactNode, createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { PropsWithChildren, createContext, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { EventSourcePolyfill } from 'event-source-polyfill';
 import { apis } from '@/apis';
 import { apiPaths } from '@/constants/apis';
 import { getCookie } from '@/libs/serverAction';
-import { InviteSSEType, NotificationType } from '@/types/notification';
-import { UserInfoResponse } from '@/types/user';
+import { InviteSSEType } from '@/types/notification';
 
 interface SessionContextType {
-  isLogin: boolean;
-  notification: NotificationType[];
-  userData: UserInfoResponse | null;
-  connectSession: () => Promise<void>;
+  openSession: () => Promise<void>;
   closeSession: () => void;
-  changeNotification: React.Dispatch<React.SetStateAction<NotificationType[]>>;
-  changeUserData: React.Dispatch<React.SetStateAction<UserInfoResponse | null>>;
-}
-
-interface SessionContextProviderProps {
-  children: ReactNode;
-  accessToken: string | null;
-  initialNotification: NotificationType[];
-  initialUserData: UserInfoResponse | null;
 }
 
 export const SessionContext = createContext<SessionContextType>({
-  isLogin: false,
-  notification: [],
-  userData: null,
-  connectSession: async () => {},
+  openSession: async () => {},
   closeSession: () => {},
-  changeNotification: () => {},
-  changeUserData: () => {},
 });
 
-export const SessionContextProvider = ({
-  children,
-  accessToken,
-  initialNotification,
-  initialUserData,
-}: SessionContextProviderProps) => {
+export const SessionContextProvider = ({ children }: PropsWithChildren) => {
+  const queryClient = useQueryClient();
   const eventSource = useRef<EventSource | null>(null);
-  const isInitial = useRef<boolean>(true);
-
-  const [notification, setNotification] = useState<NotificationType[]>(initialNotification);
-  const [userData, setUserData] = useState<UserInfoResponse | null>(initialUserData);
-  const [isLogin, setIsLogin] = useState(Boolean(accessToken));
-
-  const changeNotification = useCallback((value: React.SetStateAction<NotificationType[]>) => {
-    setNotification(value);
-  }, []);
-
-  const changeUserData = useCallback((value: React.SetStateAction<UserInfoResponse | null>) => {
-    setUserData(value);
-  }, []);
 
   const closeSSE = useCallback(() => {
     eventSource.current?.close();
@@ -62,8 +28,14 @@ export const SessionContextProvider = ({
   }, []);
 
   const connectSSE = useCallback(
-    async (accessToken: string, retry = 2) => {
+    async (retry = 2) => {
       if (retry === 0) {
+        return;
+      }
+
+      const accessToken = await getCookie('accessToken');
+
+      if (!accessToken) {
         return;
       }
 
@@ -85,9 +57,8 @@ export const SessionContextProvider = ({
           console.log('sse error');
           const refreshToken = await getCookie('refreshToken');
           const response = await apis.auth.refreshToken(accessToken, refreshToken ?? '');
-          const token = await getCookie('accessToken');
-          if (response && token) {
-            await connectSSE(token, retry - 1);
+          if (response) {
+            await connectSSE(retry - 1);
           }
         }
       });
@@ -106,58 +77,43 @@ export const SessionContextProvider = ({
 
   const closeSession = useCallback(() => {
     closeSSE();
-    setNotification([]);
-    setUserData(null);
-    setIsLogin(false);
-  }, [closeSSE]);
+    queryClient.removeQueries({ queryKey: ['notification'] });
+    queryClient.removeQueries({ queryKey: ['userData'] });
+  }, [closeSSE, queryClient]);
 
-  const connectSession = useCallback(async () => {
-    const token = await getCookie('accessToken');
-    if (!token) {
-      return;
+  const openSession = useCallback(async () => {
+    await connectSSE();
+    try {
+      /* await connectSSE(); */
+      await Promise.all([
+        queryClient.fetchQuery({ queryKey: ['userData'], queryFn: apis.user.getInfo }),
+        queryClient.fetchQuery({ queryKey: ['notification'], queryFn: apis.notification.getNotification }),
+      ]);
+
+      queryClient.invalidateQueries({ queryKey: ['appointment'] });
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+    } catch {
+      closeSSE();
+      throw new Error('로그인 오류');
     }
-    closeSession();
-
-    const notification = await apis.notification.getNotification();
-    const user = await apis.user.getInfo();
-
-    setNotification(notification?.data ?? []);
-    setUserData(user);
-
-    await connectSSE(token);
-    setIsLogin(true);
-  }, [closeSession, connectSSE]);
+  }, [connectSSE, closeSSE, queryClient]);
 
   useEffect(() => {
     const getInitialConnetSession = async () => {
-      if (!accessToken) {
-        return;
+      const accessToken = await getCookie('accessToken');
+      if (accessToken) {
+        await connectSSE();
       }
-      setIsLogin(true);
-
-      if (!userData) {
-        const user = await apis.user.getInfo();
-        setUserData(user);
-      }
-      await connectSSE(accessToken);
     };
-    if (isInitial.current) {
-      getInitialConnetSession();
-    }
-    isInitial.current = false;
-  }, [connectSSE, userData, accessToken]);
+    getInitialConnetSession();
+  }, [connectSSE]);
 
   const value = useMemo(
     () => ({
-      isLogin,
-      notification,
-      userData,
-      connectSession,
+      openSession,
       closeSession,
-      changeNotification,
-      changeUserData,
     }),
-    [isLogin, notification, userData, connectSession, closeSession, changeNotification, changeUserData]
+    [openSession, closeSession]
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;

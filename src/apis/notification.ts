@@ -8,7 +8,10 @@ export const notificationApis = {
       method: 'GET',
       cache: 'no-store',
     });
-    return response;
+    if (!response || response.status !== 200) {
+      throw new Error('api error');
+    }
+    return response.data;
   },
   deleteNotification: async (notificationIds: number[]) => {
     const response = await privateClientFetch(apiPaths.notification.deleteNotification, {
@@ -32,6 +35,9 @@ export const serverNotificationApis = {
       method: 'GET',
       cache: 'no-store',
     });
-    return response;
+    if (!response || response?.status !== 200) {
+      throw new Error('api error');
+    }
+    return response.data;
   },
 };

@@ -24,7 +24,7 @@ export const gatheringApis = {
         `${apiPaths.gathering.getList}?currentDate=${currentDate}`,
         {
           method: 'GET',
-          cache: 'no-cache',
+          cache: 'no-store',
           next: { tags: [`gatheringList-${date}`] },
         }
       );
@@ -67,7 +67,7 @@ export const gatheringApis = {
     try {
       const response = await privateClientFetch<DetailGatheringRespose>(`${apiPaths.gathering.getDetail}/${id}`, {
         method: 'GET',
-        cache: 'no-cache',
+        cache: 'no-store',
         next: { tags: [`gathering-${id}`] },
       });
       if (response?.status === 200) {
@@ -138,7 +138,7 @@ export const serverGatheringApis = {
   getDetail: async (id: number): Promise<DetailGatheringType | null> => {
     const response = await privateServerFetch<DetailGatheringRespose>(`${apiPaths.gathering.getDetail}/${id}`, {
       method: 'GET',
-      cache: 'force-cache',
+      cache: 'no-store',
       next: { tags: [`gathering-${id}`] },
     });
 

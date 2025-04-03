@@ -7,7 +7,7 @@ export const userApis = {
     try {
       const respone = await privateClientFetch<UserDataResponse[]>(`${apiPaths.user.search}?userCode=${userCode}`, {
         method: 'GET',
-        cache: 'no-cache',
+        cache: 'no-store',
         next: { tags: ['info'] },
       });
 
@@ -20,19 +20,15 @@ export const userApis = {
     }
   },
   getInfo: async () => {
-    try {
-      const response = await privateClientFetch<UserInfoResponse>(apiPaths.user.userInfo, {
-        method: 'GET',
-        cache: 'no-cache',
-        next: { tags: ['userInfo'] },
-      });
-      if (response?.status === 200) {
-        return response.data;
-      }
+    const response = await privateClientFetch<UserInfoResponse>(apiPaths.user.userInfo, {
+      method: 'GET',
+      cache: 'no-store',
+      next: { tags: ['userInfo'] },
+    });
+    if (!response || response?.status !== 200) {
       throw new Error('api error');
-    } catch {
-      return null;
     }
+    return response.data;
   },
   deleteAccount: async () => {
     const response = await fetch('/api/deleteAccount', {
@@ -61,9 +57,12 @@ export const serverUserApis = {
   getInfo: async () => {
     const response = await privateServerFetch<UserInfoResponse>(apiPaths.user.userInfo, {
       method: 'GET',
-      cache: 'no-cache',
+      cache: 'no-store',
       next: { tags: ['userInfo'] },
     });
-    return response;
+    if (!response || response.status !== 200) {
+      throw new Error('api error');
+    }
+    return response.data;
   },
 };

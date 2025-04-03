@@ -1,11 +1,10 @@
 'use client';
 
-import { useContext } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
-import { SessionContext } from '@/contexts/SessionProvider';
 import { GatheringListResponse } from '@/types/gathering';
+import { UserDataResponse } from '@/types/user';
 
 type AppointmentFormData = {
   title: string;
@@ -24,7 +23,7 @@ export const useCreateAppointment = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const { userData } = useContext(SessionContext);
+  const userData = queryClient.getQueryData<UserDataResponse>(['userData']);
 
   return useMutation({
     mutationFn: (payload: AppointmentFormData) =>

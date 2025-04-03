@@ -13,9 +13,10 @@ import { LoginRequest } from '@/types/auth';
 export default function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
+
   const [isPending, setIsPending] = useState(false);
 
-  const { connectSession, closeSession } = useContext(SessionContext);
+  const { openSession, closeSession } = useContext(SessionContext);
 
   const form = useForm<LoginRequest>({
     resolver: zodResolver(loginSchema),
@@ -36,7 +37,12 @@ export default function LoginForm() {
         return;
       }
       if (response?.status === 200) {
-        await connectSession();
+        try {
+          await openSession();
+        } catch (error) {
+          console.error(error);
+        }
+
         const refer = params.get('refer');
         router.push(`/${refer ?? ''}`);
         router.refresh();

@@ -1,12 +1,11 @@
 'use client';
 
-import { useContext } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
 import { Button } from '@/components/ui';
-import { SessionContext } from '@/contexts/SessionProvider';
 import { NotificationType } from '@/types/notification';
 
 interface NotificationProps {
@@ -18,13 +17,13 @@ export default function Notification({ notification, isEdit }: NotificationProps
   const router = useRouter();
   const { notificationId, gatheringId } = notification;
 
-  const { changeNotification } = useContext(SessionContext);
+  const queryClient = useQueryClient();
 
   const handleClickNotification = async () => {
     const response = await apis.notification.readNotification([notificationId]);
     if (response?.status === 200) {
-      changeNotification(prev =>
-        prev.map(item => (item.notificationId === notificationId ? { ...item, read: true } : item))
+      queryClient.setQueryData<NotificationType[]>(['notification'], prev =>
+        prev ? prev.map(item => (item.notificationId === notificationId ? { ...item, read: true } : item)) : []
       );
       router.push(`/appointment/${gatheringId}`);
     }
@@ -34,7 +33,9 @@ export default function Notification({ notification, isEdit }: NotificationProps
     e.stopPropagation();
     const response = await apis.notification.deleteNotification([notificationId]);
     if (response?.status === 200) {
-      changeNotification(prev => prev.filter(item => item.notificationId !== notificationId));
+      queryClient.setQueryData<NotificationType[]>(['notification'], prev =>
+        prev ? prev.filter(item => item.notificationId !== notificationId) : []
+      );
       return;
     }
     if (response) {

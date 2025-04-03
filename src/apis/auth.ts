@@ -61,7 +61,6 @@ export const authApis = {
     try {
       const response = await customFetch(apiPaths.auth.resetPassword, {
         method: 'PATCH',
-        cache: 'no-cache',
         headers: {
           Accept: 'application/json',
         },

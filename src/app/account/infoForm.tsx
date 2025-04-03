@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Copy, Edit, Save, X } from 'lucide-react';
@@ -21,14 +21,14 @@ import {
   Input,
   Label,
 } from '@/components/ui';
-import { SessionContext } from '@/contexts/SessionProvider';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useEditAccount } from '@/hooks/useMutate/useEditAccount';
+import { useUserData } from '@/hooks/useQuery/useUserData';
 import { EditProfileFormValues, editProfileSchema } from '@/schemas/auth';
 
 export default function InfoForm() {
   const router = useRouter();
-  const { userData } = useContext(SessionContext);
+  const { data: userData } = useUserData();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [isEditMode, setIsEditMode] = useState(false);

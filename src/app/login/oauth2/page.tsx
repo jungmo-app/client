@@ -8,11 +8,16 @@ import { SessionContext } from '@/contexts/SessionProvider';
 export default function AuthPage() {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
-  const { connectSession } = useContext(SessionContext);
+  const { openSession } = useContext(SessionContext);
 
   const handleButtonClick = async () => {
     setIsPending(true);
-    await connectSession();
+    try {
+      await openSession();
+    } catch (error) {
+      console.error(error);
+    }
+
     router.push('/');
     setIsPending(false);
   };

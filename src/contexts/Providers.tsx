@@ -1,3 +1,4 @@
+import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { cookies } from 'next/headers';
 import { apis } from '@/apis';
 import GlobalErrorBoundary from '@/components/ErrorBoundary/GlobalErrorBoundary';
@@ -8,31 +9,30 @@ import { SessionContextProvider } from './SessionProvider';
 import { ThemeProvider } from './ThemeProvider';
 
 export default async function Providers({ children }: StrictPropsWithChildren) {
-  const notificationProps = {
-    initialNotification: [],
-    accessToken: null,
-    initialUserData: null,
-  };
+  const queryClient = new QueryClient();
 
   const accessToken = cookies().get('accessToken')?.value;
   if (accessToken) {
     const isValidToken = await verifyToken(accessToken);
     if (isValidToken) {
-      const userData = await apis.serverUser.getInfo();
-      const notification = await apis.serverNotification.getNotification();
+      await queryClient.prefetchQuery({
+        queryKey: ['userData'],
+        queryFn: apis.serverUser.getInfo,
+      });
 
-      Object.assign(notificationProps, {
-        initialNotification: notification?.data ?? [],
-        accessToken,
-        initialUserData: userData?.data ?? null,
+      await queryClient.prefetchQuery({
+        queryKey: ['notification'],
+        queryFn: apis.serverNotification.getNotification,
       });
     }
   }
+
+  const dehydratedState = dehydrate(queryClient);
   return (
     <ThemeProvider>
       <GlobalErrorBoundary>
-        <QueryClientProvider>
-          <SessionContextProvider {...notificationProps}>{children}</SessionContextProvider>
+        <QueryClientProvider dehydratedState={dehydratedState}>
+          <SessionContextProvider>{children}</SessionContextProvider>
         </QueryClientProvider>
       </GlobalErrorBoundary>
     </ThemeProvider>

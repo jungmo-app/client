@@ -4,13 +4,16 @@ import React, { useContext } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { ButtonContext } from '@/contexts/ButtonClickProvider';
+import { SessionContext } from '@/contexts/SessionProvider';
 import { useLogout } from '@/hooks/useMutate/useLogout';
 
 export default function LogoutButton() {
+  const { closeSession } = useContext(SessionContext);
   const { isClicked, changeClick } = useContext(ButtonContext);
 
   const handleSuccess = () => {
     changeClick(false);
+    closeSession();
   };
 
   const handleError = () => {

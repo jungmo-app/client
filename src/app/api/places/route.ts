@@ -22,7 +22,8 @@ export async function GET(req: Request) {
       `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&fields=${fields}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY}&language=ko`,
       {
         method: 'GET',
-        cache: 'no-cache',
+        cache: 'force-cache',
+        next: { revalidate: 60 },
       }
     );
 

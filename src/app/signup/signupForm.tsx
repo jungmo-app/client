@@ -21,14 +21,14 @@ export default function SignupForm() {
     },
     mode: 'onChange',
   });
-  const { connectSession } = useContext(SessionContext);
+  const { openSession } = useContext(SessionContext);
 
   const onSubmit = async (data: SignupFormValues) => {
     setIsPending(true);
     try {
       const response = await apis.auth.register(data);
       if (response?.status === 200) {
-        await connectSession();
+        await openSession();
         router.push('/');
         return;
       }

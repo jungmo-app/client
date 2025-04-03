@@ -1,9 +1,8 @@
 'use client';
 
-import { useContext } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apis } from '@/apis';
-import { SessionContext } from '@/contexts/SessionProvider';
+import { UserDataResponse } from '@/types/user';
 
 interface PayloadType {
   userName: string;
@@ -12,7 +11,8 @@ interface PayloadType {
 }
 
 export const useEditAccount = () => {
-  const { changeUserData } = useContext(SessionContext);
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (payload: PayloadType) => {
       const { userName, profileImage } = payload;
@@ -29,7 +29,9 @@ export const useEditAccount = () => {
     onSuccess: (_, variable) => {
       alert('수정하였습니다');
       const { userName, preview } = variable;
-      changeUserData(prev => (prev ? { ...prev, userName, profileImage: preview } : null));
+      queryClient.setQueryData<UserDataResponse>(['userData'], prev =>
+        prev ? { ...prev, userName, profileImage: preview } : undefined
+      );
     },
     onError: () => {
       alert('수정에 실패하였습니다');
