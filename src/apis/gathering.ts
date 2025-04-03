@@ -25,19 +25,19 @@ export const gatheringApis = {
         {
           method: 'GET',
           cache: 'no-store',
-          next: { tags: [`gatheringList-${date}`] },
         }
       );
-      if (response?.status === 200) {
-        const appointmentList = await Promise.all(
-          response.data.map(async item => {
-            const place = await apis.place.getDetail(item.meetingLocation, ['name']);
-            return { ...item, meetingLocation: place?.name ?? '' };
-          })
-        );
-        return appointmentList;
+      if (!response || response.status !== 200) {
+        throw new Error('api error');
       }
-      throw new Error('api error');
+
+      const appointmentList = await Promise.all(
+        response.data.map(async item => {
+          const place = await apis.place.getDetail(item.meetingLocation, ['name']);
+          return { ...item, meetingLocation: place?.name ?? '' };
+        })
+      );
+      return appointmentList as GatheringListResponse[];
     } catch {
       return null;
     }
@@ -63,29 +63,26 @@ export const gatheringApis = {
     }
   },
 
-  getDetail: async (id: number): Promise<DetailGatheringType | null> => {
-    try {
-      const response = await privateClientFetch<DetailGatheringRespose>(`${apiPaths.gathering.getDetail}/${id}`, {
-        method: 'GET',
-        cache: 'no-store',
-        next: { tags: [`gathering-${id}`] },
-      });
-      if (response?.status === 200) {
-        const res = await apis.place.getDetail(String(id), ['name', 'formatted_address']);
-
-        return {
-          ...response.data,
-          meetingLocation: {
-            placeId: response.data.meetingLocation.placeId,
-            placeName: res?.name,
-            placeAddress: res?.formatted_address,
-          },
-        };
-      }
+  getDetail: async (id: number): Promise<DetailGatheringType> => {
+    const response = await privateClientFetch<DetailGatheringRespose>(`${apiPaths.gathering.getDetail}/${id}`, {
+      method: 'GET',
+      cache: 'no-store',
+      next: { tags: [`gathering-${id}`] },
+    });
+    if (!response || response.status !== 200) {
       throw new Error('api error');
-    } catch {
-      return null;
     }
+
+    const res = await apis.place.getDetail(String(id), ['name', 'formatted_address']);
+
+    return {
+      ...response.data,
+      meetingLocation: {
+        placeId: response.data.meetingLocation.placeId,
+        placeName: res?.name ?? '',
+        placeAddress: res?.formatted_address ?? '',
+      },
+    };
   },
 
   deleteLocation: async (gatheringId: number, locationId: number) => {
@@ -130,32 +127,40 @@ export const serverGatheringApis = {
       {
         method: 'GET',
         cache: 'no-store',
-        next: { tags: [`gatheringList-${currentDate}`] },
       }
     );
-    return response?.data;
+
+    if (!response || response.status !== 200) {
+      throw new Error('api error');
+    }
+
+    const appointmentList = await Promise.all(
+      response.data.map(async item => {
+        const place = await apis.serverPlace.getDetail(item.meetingLocation, ['name']);
+        return { ...item, meetingLocation: place?.name ?? '' };
+      })
+    );
+    return appointmentList as GatheringListResponse[];
   },
-  getDetail: async (id: number): Promise<DetailGatheringType | null> => {
+  getDetail: async (id: number): Promise<DetailGatheringType> => {
     const response = await privateServerFetch<DetailGatheringRespose>(`${apiPaths.gathering.getDetail}/${id}`, {
       method: 'GET',
       cache: 'no-store',
       next: { tags: [`gathering-${id}`] },
     });
 
-    if (response?.status === 200) {
-      const res = await apis.serverPlace.getDetail(response.data.meetingLocation.placeId, [
-        'name',
-        'formatted_address',
-      ]);
-      return {
-        ...response.data,
-        meetingLocation: {
-          placeId: response.data.meetingLocation.placeId,
-          placeName: res?.name,
-          placeAddress: res?.formatted_address,
-        },
-      };
+    if (!response || response.status !== 200) {
+      throw new Error('api Error');
     }
-    return null;
+
+    const res = await apis.serverPlace.getDetail(response.data.meetingLocation.placeId, ['name', 'formatted_address']);
+    return {
+      ...response.data,
+      meetingLocation: {
+        placeId: response.data.meetingLocation.placeId,
+        placeName: res?.name ?? '',
+        placeAddress: res?.formatted_address ?? '',
+      },
+    };
   },
 };

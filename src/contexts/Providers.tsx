@@ -12,19 +12,23 @@ export default async function Providers({ children }: StrictPropsWithChildren) {
   const queryClient = new QueryClient();
 
   const accessToken = cookies().get('accessToken')?.value;
-  if (accessToken) {
-    const isValidToken = await verifyToken(accessToken);
-    if (isValidToken) {
-      await queryClient.prefetchQuery({
-        queryKey: ['userData'],
-        queryFn: apis.serverUser.getInfo,
-      });
+  try {
+    if (accessToken) {
+      const isValidToken = await verifyToken(accessToken);
+      if (isValidToken) {
+        await queryClient.prefetchQuery({
+          queryKey: ['userData'],
+          queryFn: apis.serverUser.getInfo,
+        });
 
-      await queryClient.prefetchQuery({
-        queryKey: ['notification'],
-        queryFn: apis.serverNotification.getNotification,
-      });
+        await queryClient.prefetchQuery({
+          queryKey: ['notification'],
+          queryFn: apis.serverNotification.getNotification,
+        });
+      }
     }
+  } catch (error) {
+    console.error(error);
   }
 
   const dehydratedState = dehydrate(queryClient);

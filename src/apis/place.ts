@@ -10,6 +10,7 @@ export const placeApis = {
     try {
       const response = await fetch(`/api/places?placeId=${placeId}&fields=${fieldString}`, {
         method: 'GET',
+        cache: 'force-cache',
         next: { revalidate: 3600 },
       });
       if (!response.ok) {
@@ -73,6 +74,7 @@ export const serverPlaceApis = {
         `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&fields=${fieldString}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY}&language=ko`,
         {
           method: 'GET',
+          cache: 'force-cache',
           next: { revalidate: 3600 },
         }
       );

@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
+import { useState } from 'react';
 import {
   QueryClientProvider as BaseQueryClientProvider,
   HydrationBoundary,
@@ -8,11 +8,7 @@ import {
   QueryClientConfig,
 } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-
-interface QueryClientProviderProps {
-  children: ReactNode;
-  dehydratedState: unknown;
-}
+import { QueryClientProviderProps } from '@/types/common';
 
 const queryClientOption: QueryClientConfig = {
   defaultOptions: {

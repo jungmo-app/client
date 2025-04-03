@@ -1,47 +1,14 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
 import { PlusCircle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import LoadingIcon from '@/components/common/loadingIcon';
 import { Button } from '@/components/ui';
 import { useAppointmentList } from '@/hooks/useQuery/useAppointmentList';
-import { useDateStore } from '@/store/appointmentStore';
-import { GatheringListResponse } from '@/types/gathering';
-import { isSameDay } from '@/utils/date';
 
-interface AppointmentListProps {
-  appointmentData: GatheringListResponse[];
-}
-
-export default function AppointmentList({ appointmentData }: AppointmentListProps) {
-  const [isPending, setIsPending] = useState(false);
-  const [appointments, setAppointments] = useState<GatheringListResponse[]>(appointmentData);
-
-  const date = useDateStore(state => state.date);
-
-  const isInitial = useRef<boolean>(isSameDay(date, new Date()));
-
-  const { refetch } = useAppointmentList(appointmentData);
-
-  useEffect(() => {
-    const fetching = async () => {
-      if (isInitial.current) {
-        isInitial.current = false;
-        return;
-      }
-
-      setIsPending(true);
-      const { data } = await refetch();
-      if (data) {
-        setAppointments(data);
-      }
-      setIsPending(false);
-    };
-
-    fetching();
-  }, [date, refetch]);
+export default function AppointmentList() {
+  const { data: appointments, isPending } = useAppointmentList();
 
   return (
     <div className="flex flex-grow flex-col space-y-6 p-4">

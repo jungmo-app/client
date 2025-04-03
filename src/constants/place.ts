@@ -145,3 +145,13 @@ export const GOOGLE_MAP_FIELD = [
   'delivery',
   'takeout',
 ] as const;
+
+export const DEFAULT_PLACE_QUERY = [
+  'name',
+  'formatted_address',
+  'icon_background_color',
+  'geometry',
+  'photo',
+  'type',
+  'place_id',
+] as (typeof GOOGLE_MAP_FIELD)[number][];

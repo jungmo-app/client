@@ -8,6 +8,7 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'picsum.photos' },
       { protocol: 'https', hostname: 'maps.googleapis.com' },
+      { protocol: 'https', hostname: 'jungmobucket.s3.amazonaws.com' },
     ],
   },
   compiler: {
