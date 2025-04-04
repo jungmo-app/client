@@ -1,19 +1,21 @@
 'use client';
 
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { apis } from '@/apis';
 import { Map } from '@/components';
 import { Badge } from '@/components/ui';
 import { placeTypeTranslations } from '@/constants/place';
 import { getCurrentLocation } from '@/libs/map/getCurrentLocation';
-import { Photos, PlaceDataType, Position } from '@/types/map';
+import { ChangePlaceType, Photos, Position } from '@/types/map';
 
 interface EditLocationProps {
-  onChange: (value: PlaceDataType) => Promise<void>;
+  onChange: (value: ChangePlaceType) => Promise<void>;
   isPending?: boolean;
 }
 
 export default function EditLocation({ onChange, isPending }: EditLocationProps) {
+  const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [currentLocation, setCurrentLocation] = useState<Position | null>(null);
 
@@ -31,7 +33,15 @@ export default function EditLocation({ onChange, isPending }: EditLocationProps)
     setIsOpen(false);
     const tags = await Promise.all(
       value.types
-        ? value.types.map(async item => placeTypeTranslations[item] ?? (await apis.place.translatePlaceType(item)))
+        ? value.types.map(
+            async item =>
+              placeTypeTranslations[item] ??
+              (await queryClient.fetchQuery({
+                queryKey: ['translatePlaceType', item],
+                queryFn: () => apis.place.translatePlaceType(item),
+                staleTime: 1000 * 60 * 60,
+              }))
+          )
         : []
     );
     onChange({
@@ -45,6 +55,7 @@ export default function EditLocation({ onChange, isPending }: EditLocationProps)
       address: value.formatted_address ?? '',
       name: value.name ?? '',
       tags: tags,
+      point: value.geometry,
     });
   };
   return (
@@ -55,8 +66,8 @@ export default function EditLocation({ onChange, isPending }: EditLocationProps)
       <Map
         isOpen={isOpen}
         currentLocation={currentLocation}
-        target={['place_id', 'photo', 'formatted_address', 'name', 'type']}
         title="장소 변경하기"
+        target={['name', 'formatted_address', 'icon_background_color', 'geometry', 'photo', 'type', 'place_id']}
         onClose={handleCloseMap}
         onSelect={handleSelectLocation}
       />

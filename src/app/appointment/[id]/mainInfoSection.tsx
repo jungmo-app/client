@@ -3,40 +3,42 @@
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Calendar, LucideFileTerminal, PenLine, Settings } from 'lucide-react';
+import { useParams } from 'next/navigation';
 import { DatePickerSheet, TimePickerSheet } from '@/components';
 import AttendeeSelectModal from '@/components/modals/attendeeSelectModal';
 import { Avatar, AvatarImage, Badge, Input, Textarea } from '@/components/ui';
 import { useEditAppointment } from '@/hooks/useMutate/useEditAppointment';
 import { useAppointment } from '@/hooks/useQuery/useAppointment';
-import { DetailGatheringType } from '@/types/gathering';
 import { UserDataResponse } from '@/types/user';
 
-type MainInfoSectionProps = {
-  appointment: DetailGatheringType;
-  isEditable?: boolean;
-};
-
-export default function MainInfoSection({ appointment, isEditable }: MainInfoSectionProps) {
-  const appointmentDate = new Date(appointment.startDate);
+export default function MainInfoSection() {
+  const params = useParams();
+  const id = Number(params.id);
 
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [isOpenSelectModal, setIsOpenSelectModal] = useState(false);
 
-  const { data: appointmentData } = useAppointment(appointment);
+  const { data: appointment } = useAppointment(id);
 
-  const { mutate: editAppointment, isPending } = useEditAppointment(appointment.id, appointmentDate, () => {
+  const { mutate: editAppointment, isPending } = useEditAppointment(id, new Date(appointment?.startDate ?? ''), () => {
     setIsEditMode(false);
   });
 
   const { control, getValues, reset, setValue } = useForm({
     defaultValues: {
-      title: appointmentData?.title ?? '',
-      startDate: appointmentData?.startDate ?? '',
-      startTime: appointmentData?.startTime ?? '',
-      description: appointmentData?.memo ?? '',
-      userList: appointmentData?.gatheringUsers ?? [],
+      title: appointment?.title ?? '',
+      startDate: appointment?.startDate ?? '',
+      startTime: appointment?.startTime ?? '',
+      description: appointment?.memo ?? '',
+      userList: appointment?.gatheringUsers ?? [],
     },
   });
+
+  if (!appointment) {
+    return;
+  }
+
+  const isEditable = appointment.authority === 'WRITE';
 
   const visibleParticipants = getValues('userList').slice(0, 3);
   const remainingCount = getValues('userList').length - 3;
@@ -47,8 +49,8 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
 
   const handleClickCancleButton = () => {
     setIsEditMode(false);
-    if (appointmentData) {
-      reset(appointmentData);
+    if (appointment) {
+      reset(appointment);
     }
   };
 
@@ -76,12 +78,16 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
   };
 
   const handleClickSaveButton = async () => {
+    if (!appointment) {
+      return;
+    }
+
     const payload = {
       title: getValues('title'),
       startDate: getValues('startDate'),
-      endDate: appointment.endDate,
+      endDate: getValues('startDate'),
       startTime: getValues('startTime'),
-      meetingLocation: appointment.meetingLocation,
+      meetingLocation: appointment?.meetingLocation,
       memo: getValues('description'),
       userIds: getValues('userList').map(user => user.userId),
     };
@@ -102,7 +108,7 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
                 render={({ field }) => <Input className="h-7 rounded-sm px-3 text-base font-semibold" {...field} />}
               />
             ) : (
-              <h2 className="truncate font-semibold">{appointmentData?.title}</h2>
+              <h2 className="truncate font-semibold">{appointment.title}</h2>
             )}
           </div>
 
@@ -165,7 +171,7 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
               />
             </div>
           ) : (
-            <span>{`${appointmentData?.startDate} ${appointmentData?.startTime}`}</span>
+            <span>{`${appointment.startDate} ${appointment.startTime}`}</span>
           )}
         </div>
         <div className="flex text-sm text-gray-500">
@@ -184,7 +190,7 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
                 )}
               />
             ) : (
-              <div className="flex-shrink whitespace-pre-line break-all">{appointmentData?.memo}</div>
+              <div className="flex-shrink whitespace-pre-line break-all">{appointment.memo}</div>
             )}
           </div>
         </div>

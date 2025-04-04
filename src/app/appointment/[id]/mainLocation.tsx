@@ -1,36 +1,41 @@
 'use client';
 
 import { MapPin } from 'lucide-react';
+import { useParams } from 'next/navigation';
 import { useEditAppointment } from '@/hooks/useMutate/useEditAppointment';
 import { useAppointment } from '@/hooks/useQuery/useAppointment';
-import { DetailGatheringType } from '@/types/gathering';
-import { PlaceDataType } from '@/types/map';
+import { ChangePlaceType } from '@/types/map';
 import EditLocation from './editLocation';
 
-type MainLocationProps = {
-  appointment: DetailGatheringType;
-  isEditable?: boolean;
-};
+export default function MainLocation() {
+  const params = useParams();
+  const id = Number(params.id);
 
-export default function MainLocation({ appointment, isEditable }: MainLocationProps) {
-  const appointmentDate = new Date(appointment.startDate);
+  const { data: appointment } = useAppointment(id);
 
-  const { data: appointmentData } = useAppointment(appointment);
+  const { mutate: editAppointment, isPending } = useEditAppointment(id, new Date(appointment?.startDate ?? ''));
 
-  const { mutate: editAppointment, isPending } = useEditAppointment(appointment.id, appointmentDate);
+  if (!appointment) {
+    return;
+  }
 
-  const handleChangeLocation = async (value: PlaceDataType) => {
+  const isEditable = appointment.authority === 'WRITE';
+
+  const handleChangeLocation = async (value: ChangePlaceType) => {
+    const { title, startDate, endDate, startTime, memo, gatheringUsers } = appointment;
     const payload = {
-      title: appointmentData?.title ?? '',
-      startDate: appointmentData?.startDate ?? '',
-      endDate: appointmentData?.endDate ?? '',
-      startTime: appointmentData?.startTime ?? '',
+      title,
+      startDate,
+      endDate,
+      startTime,
+      memo,
       meetingLocation: {
         placeId: value.placeId,
         placeName: value.name,
+        placeAddress: value.address,
+        point: value.point,
       },
-      memo: appointmentData?.memo ?? '',
-      userIds: appointmentData?.gatheringUsers.map(user => user.userId) ?? [],
+      userIds: gatheringUsers.map(user => user.userId) ?? [],
     };
 
     editAppointment(payload);
@@ -43,11 +48,11 @@ export default function MainLocation({ appointment, isEditable }: MainLocationPr
         <div className="flex-1 overflow-hidden">
           <div className="flex flex-1 items-center gap-2 overflow-hidden">
             <h3 className="flex-1 truncate font-medium">
-              {appointmentData?.meetingLocation.placeName ?? '위치를 불러올 수 없습니다'}
+              {appointment.meetingLocation.placeName ?? '위치를 불러올 수 없습니다'}
             </h3>
             {isEditable && <EditLocation isPending={isPending} onChange={handleChangeLocation} />}
           </div>
-          <p className="mt-1 truncate text-sm text-gray-500">{appointmentData?.meetingLocation.placeAddress}</p>
+          <p className="mt-1 truncate text-sm text-gray-500">{appointment.meetingLocation.placeAddress}</p>
         </div>
       </div>
 

@@ -1,42 +1,36 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { PopoverTrigger } from '@radix-ui/react-popover';
 import { MapPin, MoreVertical } from 'lucide-react';
 import Image from 'next/image';
+import { useParams } from 'next/navigation';
 import { apis } from '@/apis';
 import LocationSettingModal from '@/components/modals/locationSettingModal';
 import { Badge, Button, Popover, PopoverContent } from '@/components/ui';
 import { placeTypeTranslations } from '@/constants/place';
-import { VisitLocationDataType } from '@/types/gathering';
+import { useAppointment } from '@/hooks/useQuery/useAppointment';
+import { DetailGatheringType } from '@/types/gathering';
 import { Photos } from '@/types/map';
 import { getDistance } from '@/utils/getDistance';
 
 interface VisitPlaceProps {
-  point: number[] | null;
-  visitPlace: VisitLocationDataType;
-  isEditable: boolean;
-  onDeleteLoation: (placeId: number) => Promise<void>;
+  place: google.maps.places.PlaceResult & { id: number };
 }
 
-export default function VisitPlace({ visitPlace, point, onDeleteLoation, isEditable }: VisitPlaceProps) {
+export default function VisitPlace({ place }: VisitPlaceProps) {
+  const params = useParams();
+  const id = Number(params.id);
+  const queryClient = useQueryClient();
+
   const popOverRef = useRef<HTMLDivElement>(null);
-  const locationData = visitPlace.place;
-  const [tag, setTag] = useState<string>(
-    placeTypeTranslations[locationData.types ? locationData.types[0] : 'none'] ?? ''
-  );
+
+  const [tag, setTag] = useState<string>(placeTypeTranslations[place.types ? place.types[0] : 'none'] ?? '');
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [isOpenSetting, setIsOpenSetting] = useState<boolean>(false);
 
-  const distance =
-    point && locationData?.geometry?.location
-      ? getDistance(
-          point[0],
-          point[1],
-          locationData.geometry.location.lat as unknown as number,
-          locationData.geometry.location.lng as unknown as number
-        )
-      : null;
+  const { data: appointment } = useAppointment(id);
 
   const handleClickWrapper = (e: React.MouseEvent) => {
     if (popOverRef.current?.contains(e.target as Node)) {
@@ -55,21 +49,45 @@ export default function VisitPlace({ visitPlace, point, onDeleteLoation, isEdita
 
   const handleDeleteLocation = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!place.id) {
+      return;
+    }
     setIsOpenSetting(false);
-    await onDeleteLoation(visitPlace.id);
+    try {
+      await apis.gathering.deleteLocation(id, place.id);
+      queryClient.setQueryData<DetailGatheringType>(['appointment', id], prev =>
+        prev ? { ...prev, locations: prev.locations.filter(item => item?.id !== place.id) } : undefined
+      );
+    } catch (error) {
+      alert('삭제할 수 없습니다.');
+    }
   };
 
   useEffect(() => {
     const getTag = async () => {
-      if (!locationData.types || placeTypeTranslations[locationData.types[0]]) {
+      if (!place?.types || placeTypeTranslations[place.types[0]]) {
         return;
       }
 
-      const tagData = (await apis.place.translatePlaceType(locationData.types[0])) ?? '';
+      const tagData = (await apis.place.translatePlaceType(place.types[0])) ?? '';
       setTag(tagData);
     };
     getTag();
-  }, [locationData]);
+  }, [place]);
+
+  if (!appointment) {
+    return;
+  }
+
+  const distance = getDistance(
+    appointment.meetingLocation.point?.location?.lat as unknown as number,
+    appointment.meetingLocation.point?.location?.lng as unknown as number,
+    place.geometry?.location?.lat as unknown as number,
+    place.geometry?.location?.lng as unknown as number
+  );
+
+  console.log(place.geometry?.location);
+  const isEditable = appointment.authority === 'WRITE';
 
   return (
     <>
@@ -77,18 +95,18 @@ export default function VisitPlace({ visitPlace, point, onDeleteLoation, isEdita
         <div className="flex items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
             <div
-              className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${locationData?.icon_background_color}`}
+              className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${place.icon_background_color}`}
             >
               <MapPin className="h-5 w-5" />
             </div>
             <div className="min-w-0">
               <div className="mb-1 flex items-center gap-2">
-                <div className="truncate font-medium">{locationData?.name ?? ''}</div>
+                <div className="truncate font-medium">{place.name ?? ''}</div>
                 {tag && <Badge variant="secondary">{tag}</Badge>}
               </div>
               <div className="text-sm text-gray-500">
                 <span className="block truncate">
-                  {distance && `${distance[0]} ${distance[1]} • `} {locationData?.formatted_address ?? ''}
+                  {distance && `${distance[0]} ${distance[1]} • `} {place.formatted_address ?? ''}
                 </span>
               </div>
             </div>
@@ -114,7 +132,7 @@ export default function VisitPlace({ visitPlace, point, onDeleteLoation, isEdita
           )}
         </div>
         <div className="mt-3 grid grid-cols-3 gap-2">
-          {locationData.photos?.slice(0, 3).map(photo => {
+          {place.photos?.slice(0, 3).map(photo => {
             const typedPhoto = photo as Photos;
 
             return (
@@ -134,8 +152,8 @@ export default function VisitPlace({ visitPlace, point, onDeleteLoation, isEdita
       </div>
       <LocationSettingModal
         isOpen={isOpenModal}
-        placeId={locationData.place_id ?? null}
-        locationData={locationData}
+        placeId={place.place_id ?? null}
+        locationData={place}
         onClose={handleClosePlaceModal}
       />
     </>

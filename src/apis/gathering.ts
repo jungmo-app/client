@@ -1,4 +1,6 @@
+import { QueryClient } from '@tanstack/react-query';
 import { apiPaths } from '@/constants/apis';
+import { GOOGLE_MAP_FIELD } from '@/constants/place';
 import { privateClientFetch, privateServerFetch } from '@/libs/interceptor';
 import { apis } from '.';
 import type {
@@ -7,6 +9,16 @@ import type {
   DetailGatheringType,
   GatheringListResponse,
 } from '@/types/gathering';
+
+const locationQuery = [
+  'name',
+  'formatted_address',
+  'icon_background_color',
+  'geometry',
+  'photo',
+  'type',
+  'place_id',
+] as (typeof GOOGLE_MAP_FIELD)[number][];
 
 export const gatheringApis = {
   create: async (payload: CreateGatheringRequest) => {
@@ -17,7 +29,7 @@ export const gatheringApis = {
     return response;
   },
 
-  getList: async (date: Date) => {
+  getList: async (date: Date, queryClient: QueryClient) => {
     const currentDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
     try {
       const response = await privateClientFetch<GatheringListResponse[]>(
@@ -33,7 +45,10 @@ export const gatheringApis = {
 
       const appointmentList = await Promise.all(
         response.data.map(async item => {
-          const place = await apis.place.getDetail(item.meetingLocation, ['name']);
+          const place = await queryClient.fetchQuery({
+            queryKey: ['location', item.meetingLocation, 'name'],
+            queryFn: () => apis.place.getDetail(item.meetingLocation, ['name']),
+          });
           return { ...item, meetingLocation: place?.name ?? '' };
         })
       );
@@ -63,7 +78,7 @@ export const gatheringApis = {
     }
   },
 
-  getDetail: async (id: number): Promise<DetailGatheringType> => {
+  getDetail: async (id: number, queryClient: QueryClient): Promise<DetailGatheringType> => {
     const response = await privateClientFetch<DetailGatheringRespose>(`${apiPaths.gathering.getDetail}/${id}`, {
       method: 'GET',
       cache: 'no-store',
@@ -73,19 +88,37 @@ export const gatheringApis = {
       throw new Error('api error');
     }
 
-    const res = await apis.place.getDetail(String(id), ['name', 'formatted_address']);
+    const meetingLocation = await queryClient.fetchQuery({
+      queryKey: ['location', response.data.meetingLocation.placeId, 'name', 'formatted_address', 'geometry'],
+      queryFn: () =>
+        apis.place.getDetail(response.data.meetingLocation.placeId, ['name', 'formatted_address', 'geometry']),
+    });
+
+    const locations = await Promise.all(
+      response.data.locations.map(place =>
+        queryClient.fetchQuery({
+          queryKey: ['location', place.placeId, ...locationQuery],
+          queryFn: async () => {
+            const data = await apis.place.getDetail(place.placeId, locationQuery);
+            return { ...data, id: place.id };
+          },
+        })
+      )
+    );
 
     return {
       ...response.data,
       meetingLocation: {
         placeId: response.data.meetingLocation.placeId,
-        placeName: res?.name ?? '',
-        placeAddress: res?.formatted_address ?? '',
+        placeName: meetingLocation?.name,
+        placeAddress: meetingLocation?.formatted_address,
+        point: meetingLocation?.geometry,
       },
+      locations,
     };
   },
 
-  deleteLocation: async (gatheringId: number, locationId: number) => {
+  deleteLocation: async (gatheringId: number, locationId: string) => {
     try {
       const response = await privateClientFetch(
         `${apiPaths.gathering.deleteLocation}/${gatheringId}/locations/${locationId}`,
@@ -119,7 +152,7 @@ export const gatheringApis = {
 };
 
 export const serverGatheringApis = {
-  getList: async (date: Date) => {
+  getList: async (date: Date, queryClient: QueryClient) => {
     const currentDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
 
     const response = await privateServerFetch<GatheringListResponse[]>(
@@ -136,13 +169,16 @@ export const serverGatheringApis = {
 
     const appointmentList = await Promise.all(
       response.data.map(async item => {
-        const place = await apis.serverPlace.getDetail(item.meetingLocation, ['name']);
+        const place = await queryClient.fetchQuery({
+          queryKey: ['location', item.meetingLocation, 'name'],
+          queryFn: () => apis.serverPlace.getDetail(item.meetingLocation, ['name']),
+        });
         return { ...item, meetingLocation: place?.name ?? '' };
       })
     );
     return appointmentList as GatheringListResponse[];
   },
-  getDetail: async (id: number): Promise<DetailGatheringType> => {
+  getDetail: async (id: number, queryClient: QueryClient) => {
     const response = await privateServerFetch<DetailGatheringRespose>(`${apiPaths.gathering.getDetail}/${id}`, {
       method: 'GET',
       cache: 'no-store',
@@ -153,14 +189,33 @@ export const serverGatheringApis = {
       throw new Error('api Error');
     }
 
-    const res = await apis.serverPlace.getDetail(response.data.meetingLocation.placeId, ['name', 'formatted_address']);
+    const meetingLocation = await queryClient.fetchQuery({
+      queryKey: ['location', response.data.meetingLocation.placeId, 'name', 'formatted_address', 'geometry'],
+      queryFn: () =>
+        apis.serverPlace.getDetail(response.data.meetingLocation.placeId, ['name', 'formatted_address', 'geometry']),
+    });
+
+    const locations = await Promise.all(
+      response.data.locations.map(place =>
+        queryClient.fetchQuery({
+          queryKey: ['location', place.placeId, ...locationQuery],
+          queryFn: async () => {
+            const data = await apis.serverPlace.getDetail(place.placeId, locationQuery);
+            return { ...data, id: place.id };
+          },
+        })
+      )
+    );
+
     return {
       ...response.data,
       meetingLocation: {
         placeId: response.data.meetingLocation.placeId,
-        placeName: res?.name ?? '',
-        placeAddress: res?.formatted_address ?? '',
+        placeName: meetingLocation?.name,
+        placeAddress: meetingLocation?.formatted_address,
+        point: meetingLocation?.geometry,
       },
-    };
+      locations,
+    } as DetailGatheringType;
   },
 };

@@ -19,7 +19,7 @@ export default async function Layout({ children }: PropsWithChildren) {
   try {
     await queryClient.fetchQuery<GatheringListResponse[]>({
       queryKey: ['appointments', date.getFullYear(), date.getMonth() + 1, date.getDate()],
-      queryFn: () => apis.serverGathering.getList(date),
+      queryFn: () => apis.serverGathering.getList(date, queryClient),
     });
   } catch {
     redirect(`/login?refer=/&date=${Date.now()}`);

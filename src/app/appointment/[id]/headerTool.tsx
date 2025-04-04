@@ -2,21 +2,22 @@
 
 import { useState } from 'react';
 import { MoreVertical, Share2 } from 'lucide-react';
+import { useParams } from 'next/navigation';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
 import { Button } from '@/components/ui/button';
 import { useDeleteAppointment } from '@/hooks/useMutate/useDeleteAppointment';
+import { useAppointment } from '@/hooks/useQuery/useAppointment';
 
-interface HeaderToolProps {
-  id: number;
-  appointmentDate: Date;
-}
+export default function HeaderTool() {
+  const params = useParams();
+  const id = Number(params.id);
 
-export default function HeaderTool({ id, appointmentDate }: HeaderToolProps) {
+  const { data: appointment } = useAppointment(id);
   const [isOpenPopOver, setIsOpenPopover] = useState(false);
 
   const { mutate: deleteAppointment, isPending } = useDeleteAppointment(
     id,
-    appointmentDate,
+    new Date(appointment?.startDate ?? ''),
     () => {},
     () => {
       setIsOpenPopover(false);

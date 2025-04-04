@@ -1,18 +1,20 @@
 'use client';
 
 import { useCallback, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useParams } from 'next/navigation';
 import { apis } from '@/apis';
 import Map from '@/components/map';
 import { Button } from '@/components/ui';
 import { getCurrentLocation } from '@/libs/map/getCurrentLocation';
+import { DetailGatheringType } from '@/types/gathering';
 import { Position } from '@/types/map';
 
-interface FooterProps {
-  id: number;
-  onAddLocation: (id: number, value: google.maps.places.PlaceResult) => void;
-}
+export default function Footer() {
+  const params = useParams();
+  const id = Number(params.id);
+  const queryClient = useQueryClient();
 
-export default function Footer({ id, onAddLocation }: FooterProps) {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [currentLocation, setCurrentLocation] = useState<Position | null>(null);
 
@@ -36,14 +38,14 @@ export default function Footer({ id, onAddLocation }: FooterProps) {
       return;
     }
     try {
-      const result = await apis.gathering.addLocation(id, value.place_id);
-      if (!result) {
-        alert('장소 추가에 실패하였습니다');
-        return;
+      const response = await apis.gathering.addLocation(id, value.place_id);
+      if (response) {
+        queryClient.setQueryData<DetailGatheringType>(['appointment', id], prev =>
+          prev ? { ...prev, locations: [...prev.locations, { ...value, id: response }] } : undefined
+        );
       }
-      onAddLocation(result, value);
     } catch {
-      alert('장소 추가에 실패하였습니다');
+      alert('장소를 추가할 수 없습니다');
     }
   };
   return (
