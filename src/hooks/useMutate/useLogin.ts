@@ -1,0 +1,48 @@
+'use client';
+
+import { useContext } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { apis } from '@/apis';
+import { SessionContext } from '@/contexts/SessionProvider';
+import { ApiError } from '@/types/apis';
+import { LoginRequest } from '@/types/auth';
+
+interface LoginProps {
+  onError?: (error: ApiError) => void;
+  onSuccess?: () => void;
+}
+
+export const useLogin = ({ onSuccess, onError }: LoginProps = {}) => {
+  const router = useRouter();
+  const params = useSearchParams();
+
+  const { openSession, closeSession } = useContext(SessionContext);
+
+  return useMutation<unknown, ApiError, LoginRequest>({
+    mutationFn: payload => apis.auth.login(payload),
+    onSuccess: async () => {
+      if (onSuccess) {
+        onSuccess();
+      }
+      console.log('aaa');
+      try {
+        await openSession();
+        const refer = params.get('refer');
+        router.push(`/${refer ?? ''}`);
+        router.refresh();
+      } catch {
+        closeSession();
+        if (onError) {
+          const error = { status: 400, message: '세션 연결 실패', code: '' } as ApiError;
+          onError(error);
+        }
+      }
+    },
+    onError: error => {
+      if (onError) {
+        onError(error);
+      }
+    },
+  });
+};

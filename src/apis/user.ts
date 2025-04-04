@@ -1,6 +1,7 @@
 import { apiPaths } from '@/constants/apis';
 import { privateClientFetch, privateServerFetch } from '@/libs/interceptor';
 import { UserDataResponse, UserInfoResponse } from '@/types/user';
+import { throwError } from '@/utils/apis';
 
 export const userApis = {
   search: async (userCode: string) => {
@@ -25,10 +26,8 @@ export const userApis = {
       cache: 'no-store',
       next: { tags: ['userInfo'] },
     });
-    if (!response || response?.status !== 200) {
-      throw new Error('api error');
-    }
-    return response.data;
+    console.log(response);
+    return throwError(response);
   },
   deleteAccount: async () => {
     const response = await fetch('/api/deleteAccount', {

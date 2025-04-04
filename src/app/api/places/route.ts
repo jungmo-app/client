@@ -4,7 +4,7 @@ const responseData = <T>(value: T, status: number, message?: string) => {
   return {
     data: value,
     message: message ?? '',
-    code: 1,
+    code: 'C005',
     status,
   } as ApiResponse<T>;
 };

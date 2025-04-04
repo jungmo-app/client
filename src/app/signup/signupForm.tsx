@@ -1,17 +1,12 @@
 'use client';
-import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
-import { apis } from '@/apis';
 import { Button, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from '@/components/ui';
-import { SessionContext } from '@/contexts/SessionProvider';
+import { useRegister } from '@/hooks/useMutate/useRegister';
 import { signupSchema } from '@/schemas/auth';
 import { SignupFormValues } from '@/types/auth';
 
 export default function SignupForm() {
-  const router = useRouter();
-  const [isPending, setIsPending] = useState(false);
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -21,24 +16,11 @@ export default function SignupForm() {
     },
     mode: 'onChange',
   });
-  const { openSession } = useContext(SessionContext);
+
+  const { mutate: register, isPending } = useRegister();
 
   const onSubmit = async (data: SignupFormValues) => {
-    setIsPending(true);
-    try {
-      const response = await apis.auth.register(data);
-      if (response?.status === 200) {
-        await openSession();
-        router.push('/');
-        return;
-      }
-      throw new Error('api error');
-    } catch (error) {
-      console.error(error);
-      alert('회원가입에 실패하였습니다');
-    } finally {
-      setIsPending(false);
-    }
+    register(data);
   };
   return (
     <Form {...form}>

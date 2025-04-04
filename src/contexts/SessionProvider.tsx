@@ -82,7 +82,12 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
   }, [closeSSE, queryClient]);
 
   const openSession = useCallback(async () => {
-    await connectSSE();
+    try {
+      await connectSSE();
+    } catch {
+      console.log('sse error');
+    }
+
     try {
       /* await connectSSE(); */
       await Promise.all([
@@ -92,7 +97,8 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
 
       queryClient.invalidateQueries({ queryKey: ['appointment'] });
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
-    } catch {
+    } catch (error) {
+      console.log(error);
       closeSSE();
       throw new Error('로그인 오류');
     }

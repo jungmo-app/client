@@ -7,6 +7,7 @@ import {
   SetPasswordFormValues,
   SignupFormValues,
 } from '@/types/auth';
+import { throwError } from '@/utils/apis';
 
 export const authApis = {
   login: async (payload: LoginRequest) => {
@@ -15,7 +16,9 @@ export const authApis = {
       body: JSON.stringify(payload),
     });
 
-    return response;
+    console.log(response);
+
+    return throwError(response);
   },
   logout: async () => {
     const response = await fetch('/api/logout', {
@@ -47,29 +50,21 @@ export const authApis = {
     }
   },
   setPassword: async (payload: SetPasswordFormValues) => {
-    try {
-      const response = await customFetch(apiPaths.auth.setPassword, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      });
-      return response;
-    } catch {
-      return undefined;
-    }
+    const response = await customFetch(apiPaths.auth.setPassword, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    return throwError(response);
   },
   resetPassword: async (payload: ResetPasswordPayload) => {
-    try {
-      const response = await customFetch(apiPaths.auth.resetPassword, {
-        method: 'PATCH',
-        headers: {
-          Accept: 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-      return response;
-    } catch {
-      return undefined;
-    }
+    const response = await customFetch(apiPaths.auth.resetPassword, {
+      method: 'PATCH',
+      headers: {
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+    return throwError(response);
   },
   refreshToken: async (accessToken: string, refreshToken: string) => {
     try {

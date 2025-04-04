@@ -1,22 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-import { apis } from '@/apis';
+import { useRequestEmail } from '@/hooks/useMutate/useRequestEmail';
 import { SetPasswordFormValues } from '@/types/auth';
 import EmailForm from './emailForm';
 import RequestInfo from './requestInfo';
 
 export default function ResetRequest() {
-  const [isSubmit, setIsSubmit] = useState(false);
+  const { mutate: requestEmail, isSuccess, isPending } = useRequestEmail();
 
   const handleSubmit = async (data: SetPasswordFormValues) => {
-    const response = await apis.auth.setPassword(data);
-    if (response?.status === 200) {
-      setIsSubmit(true);
-      return;
-    }
-    alert(response?.message ?? 'api 요청 오류');
+    requestEmail(data);
   };
 
-  return <>{isSubmit ? <RequestInfo /> : <EmailForm onSubmit={handleSubmit} />}</>;
+  return <>{isSuccess ? <RequestInfo /> : <EmailForm isPending={isPending} onSubmit={handleSubmit} />}</>;
 }

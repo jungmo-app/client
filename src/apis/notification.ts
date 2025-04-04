@@ -8,10 +8,8 @@ export const notificationApis = {
       method: 'GET',
       cache: 'no-store',
     });
-    if (!response || response.status !== 200) {
-      throw new Error('api error');
-    }
-    return response.data;
+    console.log(response);
+    return response;
   },
   deleteNotification: async (notificationIds: number[]) => {
     const response = await privateClientFetch(apiPaths.notification.deleteNotification, {

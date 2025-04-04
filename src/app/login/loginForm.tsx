@@ -1,23 +1,16 @@
 'use client';
 
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { apis } from '@/apis';
 import { Button, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from '@/components/ui';
 import { SessionContext } from '@/contexts/SessionProvider';
+import { useLogin } from '@/hooks/useMutate/useLogin';
 import { loginSchema } from '@/schemas/auth';
+import { ApiError } from '@/types/apis';
 import { LoginRequest } from '@/types/auth';
 
 export default function LoginForm() {
-  const router = useRouter();
-  const params = useSearchParams();
-
-  const [isPending, setIsPending] = useState(false);
-
-  const { openSession, closeSession } = useContext(SessionContext);
-
   const form = useForm<LoginRequest>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -27,33 +20,20 @@ export default function LoginForm() {
     mode: 'onSubmit',
   });
 
-  const onSubmit = async (data: LoginRequest) => {
-    setIsPending(true);
-    try {
-      const response = await apis.auth.login(data);
-      if (response?.status === 400) {
-        form.setError('email', { message: '이메일 또는 비밀번호가 잘못되었습니다.' });
-        form.setError('password', { message: '이메일 또는 비밀번호가 잘못되었습니다.' });
-        return;
-      }
-      if (response?.status === 200) {
-        try {
-          await openSession();
-        } catch (error) {
-          console.error(error);
-        }
-
-        const refer = params.get('refer');
-        router.push(`/${refer ?? ''}`);
-        router.refresh();
-        return;
-      }
-      throw new Error('api Error');
-    } catch {
-      alert('로그인을 할 수 없습니다.');
-    } finally {
-      setIsPending(false);
+  const handleLoginError = (error: ApiError) => {
+    if (error.status === 400) {
+      form.setError('email', { message: '이메일 또는 비밀번호가 잘못되었습니다.' });
+      form.setError('password', { message: '이메일 또는 비밀번호가 잘못되었습니다.' });
+      return;
     }
+    alert('로그인에 실패하였습니다');
+  };
+  const { mutate: login, isPending } = useLogin({ onError: handleLoginError });
+
+  const { closeSession } = useContext(SessionContext);
+
+  const onSubmit = async (data: LoginRequest) => {
+    login(data);
   };
 
   useEffect(() => {

@@ -1,11 +1,9 @@
 'use client';
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
-import { apis } from '@/apis';
 import { Button, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from '@/components/ui';
+import { usePasswordReset } from '@/hooks/useMutate/usePasswordReset';
 import { resetPasswordSchema } from '@/schemas/auth';
 import { ResetPasswordFormValues } from '@/types/auth';
 
@@ -14,8 +12,6 @@ interface ResetConfirmProps {
 }
 
 export default function ResetConfirm({ token }: ResetConfirmProps) {
-  const router = useRouter();
-  const [isClicked, setIsClicked] = useState(false);
   const form = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
@@ -25,27 +21,12 @@ export default function ResetConfirm({ token }: ResetConfirmProps) {
     mode: 'onChange',
   });
 
+  const { mutate: resetPassword, isPending } = usePasswordReset();
+
   const handleSubmit = async (data: ResetPasswordFormValues) => {
-    setIsClicked(true);
-    const response = await apis.auth.resetPassword({
-      token,
-      newPassword: data.newPassword,
-    });
-    if (response?.status === 200) {
-      alert('비밀번호가 변경되었습니다');
-      router.push('/');
-      return;
-    }
-
-    if (response?.status === 401) {
-      alert('만료된 url입니다');
-      router.push('/login');
-      return;
-    }
-    alert('비밀번호 초기화에 실패하였습니다');
-
-    setIsClicked(false);
+    resetPassword({ token, ...data });
   };
+
   return (
     <div style={{ marginTop: '8px' }}>
       <p className="text-gray-500">새로 변경할 비밀번호를 입력해주세요.</p>
@@ -89,7 +70,7 @@ export default function ResetConfirm({ token }: ResetConfirmProps) {
           />
           <Button
             type="submit"
-            disabled={isClicked}
+            disabled={isPending}
             className="h-12 w-full rounded-full bg-blue-500 font-semibold hover:bg-blue-600"
             style={{ marginTop: '42px' }}
             aria-label="비밀번호 변경"
