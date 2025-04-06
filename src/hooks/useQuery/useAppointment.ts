@@ -10,6 +10,5 @@ export const useAppointment = (id: number) => {
   return useQuery<DetailGatheringType | null | undefined>({
     queryKey: ['appointment', id],
     queryFn: () => apis.gathering.getDetail(id, queryClient),
-    enabled: false,
   });
 };

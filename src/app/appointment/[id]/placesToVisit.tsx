@@ -20,8 +20,6 @@ export default function PlacesToVisit() {
   });
   const isEditable = appointment.authority === 'WRITE';
 
-  console.log(locations);
-
   return (
     <div className="flex flex-grow flex-col space-y-4">
       <h3 className="text-lg font-semibold">방문할 장소</h3>
