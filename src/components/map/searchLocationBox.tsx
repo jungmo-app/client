@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import debounce from 'lodash.debounce';
 import { Search } from 'lucide-react';
-import { apis } from '@/apis';
 import { Input } from '@/components/ui';
 import useOutsideClick from '@/hooks/useOutsideClick';
+import { useSearchKeyword } from '@/hooks/useQuery/useSearchKeyword';
 
 interface SearchLocationBoxProps {
   onSubmit: () => void;
@@ -13,7 +13,8 @@ interface SearchLocationBoxProps {
 export default function SearchLocationBox({ onSubmit }: SearchLocationBoxProps) {
   const { register, setValue, handleSubmit } = useFormContext();
   const [isViewSuggestion, setIsViewSuggestion] = useState<boolean>(false);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [debouncedKeyword, setDeboundedKeyword] = useState<string>('');
+  const { data: suggestions } = useSearchKeyword(debouncedKeyword);
 
   const { targetRef } = useOutsideClick<HTMLFormElement>(() => setIsViewSuggestion(false));
 
@@ -30,13 +31,11 @@ export default function SearchLocationBox({ onSubmit }: SearchLocationBoxProps) 
 
   const getSuggestion = debounce(async (keyword: string) => {
     if (!keyword) {
-      setSuggestions([]);
       return;
     }
 
-    const response = await apis.place.getSearchKeyword(keyword);
+    setDeboundedKeyword(keyword);
     setIsViewSuggestion(true);
-    setSuggestions(response ?? []);
   }, 500);
 
   return (
@@ -52,7 +51,7 @@ export default function SearchLocationBox({ onSubmit }: SearchLocationBoxProps) 
             },
           })}
         />
-        {suggestions.length > 0 && isViewSuggestion && (
+        {suggestions && suggestions.length > 0 && isViewSuggestion && (
           <div className="absolute top-full z-[60] w-full rounded-md bg-background py-2">
             {suggestions.slice(0, 6).map(item => (
               <div

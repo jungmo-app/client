@@ -32,17 +32,13 @@ export const placeApis = {
     return data;
   },
   getSearchKeyword: async (keyword: string) => {
-    try {
-      const response = await customFetch<string[]>(`${apiPaths.place.autoComplete}?input=${keyword}`, {
-        next: { revalidate: 3600 },
-      });
-      if (response?.status === 200) {
-        return response.data;
-      }
-      throw new Error('api error');
-    } catch {
-      return null;
+    const response = await customFetch<string[]>(`${apiPaths.place.autoComplete}?input=${keyword}`, {
+      next: { revalidate: 3600 },
+    });
+    if (response?.status === 200) {
+      return response.data;
     }
+    throw new Error('api error');
   },
 
   translatePlaceType: async (payload: string) => {

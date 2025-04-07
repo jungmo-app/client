@@ -24,7 +24,7 @@ export const useLogin = ({ onSuccess, onError }: LoginProps = {}) => {
   const mutation = useMutation<unknown, ApiError, LoginRequest>({
     mutationFn: async payload => {
       setIsPending(true);
-      await apis.auth.login(payload);
+      return () => apis.auth.login(payload);
     },
     onSuccess: async () => {
       onSuccess?.();

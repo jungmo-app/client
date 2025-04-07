@@ -24,7 +24,7 @@ export const useEditAccount = () => {
         formData.append('profileImage', profileImage);
       }
 
-      await apis.user.editInfo(formData);
+      return () => apis.user.editInfo(formData);
     },
     onSuccess: (_, variable) => {
       alert('수정하였습니다');
