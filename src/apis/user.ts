@@ -5,20 +5,16 @@ import { throwError } from '@/utils/apis';
 
 export const userApis = {
   search: async (userCode: string) => {
-    try {
-      const respone = await privateClientFetch<UserDataResponse[]>(`${apiPaths.user.search}?userCode=${userCode}`, {
-        method: 'GET',
-        cache: 'no-store',
-        next: { tags: ['info'] },
-      });
+    const response = await privateClientFetch<UserDataResponse[]>(`${apiPaths.user.search}?userCode=${userCode}`, {
+      method: 'GET',
+      cache: 'no-store',
+      next: { tags: ['info'] },
+    });
 
-      if (respone?.status === 200) {
-        return respone.data;
-      }
+    if (!response || response.status !== 200) {
       throw new Error('api error');
-    } catch {
-      return null;
     }
+    return response.data;
   },
   getInfo: async () => {
     const response = await privateClientFetch<UserInfoResponse>(apiPaths.user.userInfo, {

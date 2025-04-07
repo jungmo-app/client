@@ -3,11 +3,12 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { apis } from '@/apis';
 
-export const useSearchLocationKeyword = (keyword: string) => {
+export const useSearchUserKeyword = (keyword: string) => {
   return useQuery({
-    queryKey: ['searchLocation', keyword],
-    queryFn: () => apis.place.getSearchKeyword(keyword),
+    queryKey: ['searchUser', keyword],
+    queryFn: () => apis.user.search(keyword),
     placeholderData: keepPreviousData,
     enabled: !!keyword,
+    staleTime: 1000 * 60,
   });
 };
