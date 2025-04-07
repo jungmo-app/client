@@ -4,7 +4,7 @@ import debounce from 'lodash.debounce';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui';
 import useOutsideClick from '@/hooks/useOutsideClick';
-import { useSearchKeyword } from '@/hooks/useQuery/useSearchKeyword';
+import { useSearchLocationKeyword } from '@/hooks/useQuery/useSearchLocationKeyword';
 
 interface SearchLocationBoxProps {
   onSubmit: () => void;
@@ -14,7 +14,7 @@ export default function SearchLocationBox({ onSubmit }: SearchLocationBoxProps) 
   const { register, setValue, handleSubmit } = useFormContext();
   const [isViewSuggestion, setIsViewSuggestion] = useState<boolean>(false);
   const [debouncedKeyword, setDeboundedKeyword] = useState<string>('');
-  const { data: suggestions } = useSearchKeyword(debouncedKeyword);
+  const { data: suggestions } = useSearchLocationKeyword(debouncedKeyword);
 
   const { targetRef } = useOutsideClick<HTMLFormElement>(() => setIsViewSuggestion(false));
 
