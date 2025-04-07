@@ -1,83 +1,45 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { apis } from '@/apis';
 import { Button, Input, Label, ScrollArea, Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui';
-import { GOOGLE_MAP_FIELD, placeTypeTranslations } from '@/constants/place';
+import { GOOGLE_MAP_FIELD } from '@/constants/place';
+import { useLocation } from '@/hooks/useQuery/useLocation';
 import { Photos } from '@/types/map';
 
 interface LocationSettingModalProps {
   isOpen: boolean;
   placeId: null | string;
   target?: (typeof GOOGLE_MAP_FIELD)[number][];
-  locationData?: google.maps.places.PlaceResult;
   onClose: (entireClose?: boolean) => void;
   onSelect?: (value: google.maps.places.PlaceResult) => Promise<void> | void;
 }
 
 export default function LocationSettingModal({
   isOpen,
-  locationData,
   placeId,
   target,
   onClose,
   onSelect,
 }: LocationSettingModalProps) {
-  const [data, setData] = useState<google.maps.places.PlaceResult | null>(null);
-  const [tags, setTags] = useState<string[]>([]);
-
-  const [isLoaded, setIsLoaded] = useState(Boolean(locationData));
+  const { data: location, isPending } = useLocation(placeId ?? '', [
+    'name',
+    'formatted_address',
+    'photo',
+    'type',
+    'place_id',
+    ...(target ?? []),
+  ]);
 
   const handleClickButton = async () => {
     if (!placeId) {
       return;
     }
-    if (onSelect && data) {
-      await onSelect(data);
+    if (onSelect && location) {
+      await onSelect(location);
     }
 
     onClose(true);
   };
-
-  useEffect(() => {
-    if (locationData) {
-      setData(locationData);
-      return;
-    }
-
-    if (!placeId) {
-      return;
-    }
-
-    const getData = async () => {
-      setIsLoaded(false);
-
-      const detailData = await apis.place.getDetail(
-        placeId,
-        Array.from(
-          new Set(['name', 'formatted_address', 'photo', 'type', 'place_id', ...(target ?? [])])
-        ) as (typeof GOOGLE_MAP_FIELD)[number][]
-      );
-
-      if (!detailData) {
-        alert('장소 정보를 가져올 수 없습니다');
-        onClose();
-        return;
-      }
-      const locationTags = detailData.types
-        ? await Promise.all(
-            detailData.types.map(
-              async item => placeTypeTranslations[item] ?? (await apis.place.translatePlaceType(item))
-            )
-          )
-        : [];
-      setTags(locationTags);
-      setData(detailData);
-      setIsLoaded(true);
-    };
-    getData();
-  }, [placeId, onClose, locationData, target /*  getCache, setCache */]);
 
   return (
     <Sheet open={isOpen} onOpenChange={() => onClose(false)}>
@@ -85,30 +47,30 @@ export default function LocationSettingModal({
         <SheetHeader>
           <SheetTitle>장소 정보</SheetTitle>
         </SheetHeader>
-        {!isLoaded ? (
+        {isPending ? (
           <div className="flex flex-grow items-center justify-center">
             <p>장소 데이터 가져오는 중...</p>
           </div>
-        ) : (
+        ) : location ? (
           <>
             <ScrollArea className="flex-grow px-2">
               <div className="mb-5 flex flex-col gap-3 pt-2">
                 <div>
                   <Label className="text-neutral-400">주소</Label>
                   <div className="mt-1 p-1">
-                    <Input readOnly value={data?.formatted_address} className="border-none bg-neutral-100" />
+                    <Input readOnly value={location.formatted_address} className="border-none bg-neutral-100" />
                   </div>
                 </div>
                 <div>
                   <Label className="text-neutral-400">장소명</Label>
                   <div className="mt-1 p-1">
-                    <Input readOnly value={data?.name} />
+                    <Input readOnly value={location.name} />
                   </div>
                 </div>
                 <div>
                   <Label className="text-neutral-400">카테고리 태그</Label>
                   <div className="mt-1 flex flex-wrap items-center gap-2 p-1">
-                    {tags.map((item, index) => (
+                    {location.types?.map((item, index) => (
                       <Button
                         key={index}
                         className="cursor-default"
@@ -123,10 +85,10 @@ export default function LocationSettingModal({
                 <div>
                   <Label className="text-neutral-400">이미지</Label>
                   <div className="mt-1 flex flex-wrap gap-2 p-1">
-                    {data?.photos?.length === 0 || data?.photos === undefined ? (
+                    {location.photos?.length === 0 || location.photos === undefined ? (
                       <div className="mt-2">이미지가 없습니다</div>
                     ) : (
-                      data.photos.map((photo, index) => {
+                      location.photos.map((photo, index) => {
                         const typedPhoto = photo as Photos;
                         return (
                           <div
@@ -163,6 +125,8 @@ export default function LocationSettingModal({
               </div>
             )}
           </>
+        ) : (
+          <div className="flex flex-1 items-center justify-center">장소 정보를 가져올 수 없습니다</div>
         )}
       </SheetContent>
     </Sheet>

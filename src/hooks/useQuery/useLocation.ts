@@ -1,21 +1,14 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { apis } from '@/apis';
 import { GOOGLE_MAP_FIELD } from '@/constants/place';
 
-export const useLocation = (id: string) => {
-  const query = [
-    'name',
-    'formatted_address',
-    'icon_background_color',
-    'geometry',
-    'photo',
-    'type',
-    'place_id',
-  ] as (typeof GOOGLE_MAP_FIELD)[number][];
-  return useQuery({
+export const useLocation = (id: string, LocationQuery?: (typeof GOOGLE_MAP_FIELD)[number][]) => {
+  const queryClient = useQueryClient();
+  const query = Array.from(new Set([...(LocationQuery ?? [])])) as (typeof GOOGLE_MAP_FIELD)[number][];
+  return useQuery<google.maps.places.PlaceResult | null>({
     queryKey: ['location', id, ...query],
-    queryFn: () => apis.serverPlace.getDetail(String(id), query),
+    queryFn: () => apis.place.getDetail(String(id), query, queryClient),
   });
 };

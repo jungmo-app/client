@@ -1,14 +1,12 @@
 'use client';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { PopoverTrigger } from '@radix-ui/react-popover';
 import { MapPin, MoreVertical } from 'lucide-react';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
-import { apis } from '@/apis';
 import LocationSettingModal from '@/components/modals/locationSettingModal';
 import { Badge, Button, Popover, PopoverContent } from '@/components/ui';
-import { placeTypeTranslations } from '@/constants/place';
 import { useDeleteLocation } from '@/hooks/useMutate/useDeleteLocation';
 import { useAppointment } from '@/hooks/useQuery/useAppointment';
 import { Photos } from '@/types/map';
@@ -24,7 +22,6 @@ export default function VisitPlace({ place }: VisitPlaceProps) {
 
   const popOverRef = useRef<HTMLDivElement>(null);
 
-  const [tag, setTag] = useState<string>(placeTypeTranslations[place.types ? place.types[0] : 'none'] ?? '');
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [isOpenSetting, setIsOpenSetting] = useState<boolean>(false);
 
@@ -55,18 +52,6 @@ export default function VisitPlace({ place }: VisitPlaceProps) {
     deleteLocation(place.id);
   };
 
-  useEffect(() => {
-    const getTag = async () => {
-      if (!place?.types || placeTypeTranslations[place.types[0]]) {
-        return;
-      }
-
-      const tagData = (await apis.place.translatePlaceType(place.types[0])) ?? '';
-      setTag(tagData);
-    };
-    getTag();
-  }, [place]);
-
   if (!appointment) {
     return;
   }
@@ -93,7 +78,7 @@ export default function VisitPlace({ place }: VisitPlaceProps) {
             <div className="min-w-0">
               <div className="mb-1 flex items-center gap-2">
                 <div className="truncate font-medium">{place.name ?? ''}</div>
-                {tag && <Badge variant="secondary">{tag}</Badge>}
+                {place.types && <Badge variant="secondary">{place?.types[0]}</Badge>}
               </div>
               <div className="text-sm text-gray-500">
                 <span className="block truncate">
@@ -146,12 +131,9 @@ export default function VisitPlace({ place }: VisitPlaceProps) {
           })}
         </div>
       </div>
-      <LocationSettingModal
-        isOpen={isOpenModal}
-        placeId={place.place_id ?? null}
-        locationData={place}
-        onClose={handleClosePlaceModal}
-      />
+      {place.place_id && (
+        <LocationSettingModal isOpen={isOpenModal} placeId={place.place_id} onClose={handleClosePlaceModal} />
+      )}
     </>
   );
 }

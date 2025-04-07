@@ -47,7 +47,7 @@ export const gatheringApis = {
         response.data.map(async item => {
           const place = await queryClient.fetchQuery({
             queryKey: ['location', item.meetingLocation, 'name'],
-            queryFn: () => apis.place.getDetail(item.meetingLocation, ['name']),
+            queryFn: () => apis.place.getDetail(item.meetingLocation, ['name'], queryClient),
           });
           return { ...item, meetingLocation: place?.name ?? '' };
         })
@@ -91,7 +91,11 @@ export const gatheringApis = {
     const meetingLocation = await queryClient.fetchQuery({
       queryKey: ['location', response.data.meetingLocation.placeId, 'name', 'formatted_address', 'geometry'],
       queryFn: () =>
-        apis.place.getDetail(response.data.meetingLocation.placeId, ['name', 'formatted_address', 'geometry']),
+        apis.place.getDetail(
+          response.data.meetingLocation.placeId,
+          ['name', 'formatted_address', 'geometry'],
+          queryClient
+        ),
     });
 
     const locations = await Promise.all(
@@ -99,7 +103,7 @@ export const gatheringApis = {
         queryClient.fetchQuery({
           queryKey: ['location', place.placeId, ...locationQuery],
           queryFn: async () => {
-            const data = await apis.place.getDetail(place.placeId, locationQuery);
+            const data = await apis.place.getDetail(place.placeId, locationQuery, queryClient);
             return { ...data, id: place.id };
           },
         })
@@ -168,7 +172,7 @@ export const serverGatheringApis = {
       response.data.map(async item => {
         const place = await queryClient.fetchQuery({
           queryKey: ['location', item.meetingLocation, 'name'],
-          queryFn: () => apis.serverPlace.getDetail(item.meetingLocation, ['name']),
+          queryFn: () => apis.serverPlace.getDetail(item.meetingLocation, ['name'], queryClient),
         });
         return { ...item, meetingLocation: place?.name ?? '' };
       })
@@ -189,7 +193,11 @@ export const serverGatheringApis = {
     const meetingLocation = await queryClient.fetchQuery({
       queryKey: ['location', response.data.meetingLocation.placeId, 'name', 'formatted_address', 'geometry'],
       queryFn: () =>
-        apis.serverPlace.getDetail(response.data.meetingLocation.placeId, ['name', 'formatted_address', 'geometry']),
+        apis.serverPlace.getDetail(
+          response.data.meetingLocation.placeId,
+          ['name', 'formatted_address', 'geometry'],
+          queryClient
+        ),
     });
 
     const locations = await Promise.all(
@@ -197,7 +205,7 @@ export const serverGatheringApis = {
         queryClient.fetchQuery({
           queryKey: ['location', place.placeId, ...locationQuery],
           queryFn: async () => {
-            const data = await apis.serverPlace.getDetail(place.placeId, locationQuery);
+            const data = await apis.serverPlace.getDetail(place.placeId, locationQuery, queryClient);
             return { ...data, id: place.id };
           },
         })
