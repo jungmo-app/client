@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apis } from '@/apis';
@@ -17,14 +17,17 @@ export const useLogin = ({ onSuccess, onError }: LoginProps = {}) => {
   const router = useRouter();
   const params = useSearchParams();
 
+  const [isPending, setIsPending] = useState<boolean>(false);
+
   const { openSession, closeSession } = useContext(SessionContext);
 
-  return useMutation<unknown, ApiError, LoginRequest>({
-    mutationFn: payload => apis.auth.login(payload),
+  const mutation = useMutation<unknown, ApiError, LoginRequest>({
+    mutationFn: async payload => {
+      setIsPending(true);
+      await apis.auth.login(payload);
+    },
     onSuccess: async () => {
-      if (onSuccess) {
-        onSuccess();
-      }
+      onSuccess?.();
       console.log('aaa');
       try {
         await openSession();
@@ -37,12 +40,17 @@ export const useLogin = ({ onSuccess, onError }: LoginProps = {}) => {
           const error = { status: 400, message: '세션 연결 실패', code: '' } as ApiError;
           onError(error);
         }
+      } finally {
+        setIsPending(false);
       }
     },
     onError: error => {
-      if (onError) {
-        onError(error);
-      }
+      onError?.(error);
     },
   });
+
+  return {
+    ...mutation,
+    isPending,
+  };
 };

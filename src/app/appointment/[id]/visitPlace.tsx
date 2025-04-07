@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { PopoverTrigger } from '@radix-ui/react-popover';
 import { MapPin, MoreVertical } from 'lucide-react';
 import Image from 'next/image';
@@ -10,8 +9,8 @@ import { apis } from '@/apis';
 import LocationSettingModal from '@/components/modals/locationSettingModal';
 import { Badge, Button, Popover, PopoverContent } from '@/components/ui';
 import { placeTypeTranslations } from '@/constants/place';
+import { useDeleteLocation } from '@/hooks/useMutate/useDeleteLocation';
 import { useAppointment } from '@/hooks/useQuery/useAppointment';
-import { DetailGatheringType } from '@/types/gathering';
 import { Photos } from '@/types/map';
 import { getDistance } from '@/utils/getDistance';
 
@@ -22,7 +21,6 @@ interface VisitPlaceProps {
 export default function VisitPlace({ place }: VisitPlaceProps) {
   const params = useParams();
   const id = Number(params.id);
-  const queryClient = useQueryClient();
 
   const popOverRef = useRef<HTMLDivElement>(null);
 
@@ -31,6 +29,7 @@ export default function VisitPlace({ place }: VisitPlaceProps) {
   const [isOpenSetting, setIsOpenSetting] = useState<boolean>(false);
 
   const { data: appointment } = useAppointment(id);
+  const { mutate: deleteLocation, isPending: isPendingDeleteLocation } = useDeleteLocation(id);
 
   const handleClickWrapper = (e: React.MouseEvent) => {
     if (popOverRef.current?.contains(e.target as Node)) {
@@ -53,14 +52,7 @@ export default function VisitPlace({ place }: VisitPlaceProps) {
       return;
     }
     setIsOpenSetting(false);
-    try {
-      await apis.gathering.deleteLocation(id, place.id);
-      queryClient.setQueryData<DetailGatheringType>(['appointment', id], prev =>
-        prev ? { ...prev, locations: prev.locations.filter(item => item?.id !== place.id) } : undefined
-      );
-    } catch (error) {
-      alert('삭제할 수 없습니다.');
-    }
+    deleteLocation(place.id);
   };
 
   useEffect(() => {
@@ -86,7 +78,6 @@ export default function VisitPlace({ place }: VisitPlaceProps) {
     place.geometry?.location?.lng as unknown as number
   );
 
-  console.log(place.geometry?.location);
   const isEditable = appointment.authority === 'WRITE';
 
   return (
@@ -123,7 +114,12 @@ export default function VisitPlace({ place }: VisitPlaceProps) {
                   className="flex -translate-x-8 items-center justify-center p-0 text-sm"
                   style={{ width: '88px', height: '48px' }}
                 >
-                  <Button variant="ghost" aria-label="삭제" onClick={handleDeleteLocation}>
+                  <Button
+                    variant="ghost"
+                    aria-label="삭제"
+                    disabled={isPendingDeleteLocation}
+                    onClick={handleDeleteLocation}
+                  >
                     삭제하기
                   </Button>
                 </PopoverContent>

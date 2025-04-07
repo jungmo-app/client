@@ -1,16 +1,22 @@
-/* 'use client';
+'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apis } from '@/apis';
 import { ApiError } from '@/types/apis';
+import { DetailGatheringType } from '@/types/gathering';
 
 export const useAddLocation = (id: number) => {
   const queryClient = useQueryClient();
-  return useMutation<unknown, ApiError, google.maps.places.PlaceResult>({
+
+  return useMutation<number, ApiError, google.maps.places.PlaceResult>({
     mutationFn: value => apis.gathering.addLocation(id, value.place_id ?? ''),
-    onSuccess: () => {
-      queryClient.setQueryData(['appointment', id], prev => );
+    onSuccess: (placeId, variable) => {
+      queryClient.setQueryData<DetailGatheringType>(['appointment', id], prev =>
+        prev ? { ...prev, locations: [...prev.locations, { ...variable, id: placeId }] } : undefined
+      );
+    },
+    onError: () => {
+      alert('장소를 추가할 수 없습니다');
     },
   });
 };
- */

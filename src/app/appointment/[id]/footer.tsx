@@ -1,19 +1,18 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
-import { apis } from '@/apis';
 import Map from '@/components/map';
 import { Button } from '@/components/ui';
+import { useAddLocation } from '@/hooks/useMutate/useAddLocation';
 import { getCurrentLocation } from '@/libs/map/getCurrentLocation';
-import { DetailGatheringType } from '@/types/gathering';
 import { Position } from '@/types/map';
 
 export default function Footer() {
   const params = useParams();
   const id = Number(params.id);
-  const queryClient = useQueryClient();
+
+  const { mutate: addLocation, isPending } = useAddLocation(id);
 
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [currentLocation, setCurrentLocation] = useState<Position | null>(null);
@@ -37,22 +36,19 @@ export default function Footer() {
     if (!value.place_id) {
       return;
     }
-    try {
-      const response = await apis.gathering.addLocation(id, value.place_id);
-      if (response) {
-        queryClient.setQueryData<DetailGatheringType>(['appointment', id], prev =>
-          prev ? { ...prev, locations: [...prev.locations, { ...value, id: response }] } : undefined
-        );
-      }
-    } catch {
-      alert('장소를 추가할 수 없습니다');
-    }
+    addLocation(value);
   };
   return (
     <>
       <div className="z-10 border-t bg-background fixed-mobile-bottom">
         <div className="bg-background p-4">
-          <Button className="w-full rounded-xl" size="lg" aria-label="장소 추가" onClick={handleClickButton}>
+          <Button
+            className="w-full rounded-xl"
+            size="lg"
+            aria-label="장소 추가"
+            disabled={isPending}
+            onClick={handleClickButton}
+          >
             장소 추가하기
           </Button>
         </div>

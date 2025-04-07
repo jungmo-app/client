@@ -118,7 +118,7 @@ export const gatheringApis = {
     };
   },
 
-  deleteLocation: async (gatheringId: number, locationId: string) => {
+  deleteLocation: async (gatheringId: number, locationId: number) => {
     try {
       const response = await privateClientFetch(
         `${apiPaths.gathering.deleteLocation}/${gatheringId}/locations/${locationId}`,
@@ -136,18 +136,15 @@ export const gatheringApis = {
   },
 
   addLocation: async (gatheringId: number, placeId: string) => {
-    try {
-      const response = await privateClientFetch<number>(`${apiPaths.gathering.addLocation}/${gatheringId}/locations`, {
-        method: 'POST',
-        body: JSON.stringify({ placeId }),
-      });
-      if (response?.status === 200) {
-        return response.data;
-      }
+    const response = await privateClientFetch<number>(`${apiPaths.gathering.addLocation}/${gatheringId}/locations`, {
+      method: 'POST',
+      body: JSON.stringify({ placeId }),
+    });
+    if (!response || response.status !== 200) {
       throw new Error('api error');
-    } catch {
-      return false;
     }
+
+    return response.data;
   },
 };
 

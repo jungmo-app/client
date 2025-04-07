@@ -28,7 +28,7 @@ export default function LoginForm() {
     }
     alert('로그인에 실패하였습니다');
   };
-  const { mutate: login, isPending } = useLogin({ onError: handleLoginError });
+  const { mutate: login, isPending, isSuccess } = useLogin({ onError: handleLoginError });
 
   const { closeSession } = useContext(SessionContext);
 
@@ -86,7 +86,7 @@ export default function LoginForm() {
           type="submit"
           className="h-12 w-full rounded-full bg-blue-500 font-semibold text-white hover:bg-blue-600 dark:bg-gray-500 dark:hover:bg-gray-700"
           style={{ marginTop: '24px' }}
-          disabled={isPending}
+          disabled={isPending || isSuccess}
           aria-label="로그인"
         >
           로그인

@@ -94,9 +94,6 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
         queryClient.fetchQuery({ queryKey: ['userData'], queryFn: apis.user.getInfo }),
         queryClient.fetchQuery({ queryKey: ['notification'], queryFn: apis.notification.getNotification }),
       ]);
-
-      queryClient.invalidateQueries({ queryKey: ['appointment'] });
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
     } catch (error) {
       console.log(error);
       closeSSE();
