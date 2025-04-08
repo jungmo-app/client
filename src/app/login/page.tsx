@@ -1,7 +1,6 @@
 import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { Button } from '@/components/ui';
 import LoginForm from './loginForm';
 
 interface LoginPageProps {
@@ -23,24 +22,6 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
           <p className="text-gray-500">계정 정보를 입력해주세요</p>
         </div>
         <LoginForm />
-        <div className="relative" style={{ marginTop: '16px', marginBottom: '12px' }}>
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">Or</span>
-          </div>
-        </div>
-
-        <Link href="https://jungmoserver.shop/oauth2/authorization/kakao">
-          <Button
-            variant="outline"
-            aria-label="카카오톡 로그인"
-            className="h-12 w-full rounded-full border-2 border-yellow-400 bg-yellow-400 font-semibold text-black hover:bg-yellow-500 dark:hover:border-yellow-600 dark:hover:bg-yellow-600 dark:hover:text-black"
-          >
-            카카오로 로그인하기
-          </Button>
-        </Link>
 
         <div className="flex h-fit items-center justify-center gap-2">
           <Link href="/reset-password" className="text-sm text-blue-500 hover:underline">
