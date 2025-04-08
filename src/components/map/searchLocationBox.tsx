@@ -43,6 +43,7 @@ export default function SearchLocationBox({ onSubmit }: SearchLocationBoxProps) 
       <form className="relative" ref={targetRef} onSubmit={handleSubmit(handleSubmitKeyword)}>
         <Search className="absolute left-2 top-3 h-4 w-4 text-muted-foreground" />
         <Input
+          autoComplete="on"
           placeholder="장소를 검색해주세요"
           className="bg-background pl-8 outline-none"
           {...register('inputValue', {

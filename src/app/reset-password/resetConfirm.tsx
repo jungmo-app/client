@@ -41,6 +41,7 @@ export default function ResetConfirm({ token }: ResetConfirmProps) {
                 <FormControl>
                   <Input
                     type="password"
+                    autoComplete="new-password"
                     className="h-12 rounded-full px-4"
                     {...field}
                     placeholder="새 비밀번호를 입력해주세요"
@@ -59,6 +60,7 @@ export default function ResetConfirm({ token }: ResetConfirmProps) {
                 <FormControl>
                   <Input
                     type="password"
+                    autoComplete="new-password"
                     className="h-12 rounded-full px-4"
                     {...field}
                     placeholder="새 비밀번호를 다시 입력해주세요"

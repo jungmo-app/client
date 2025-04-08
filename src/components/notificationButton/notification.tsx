@@ -41,7 +41,7 @@ export default function Notification({ notification, isEdit }: NotificationProps
     <div className="relative w-full cursor-pointer" onClick={handleClickNotification}>
       {isEdit && (
         <button
-          className="absolute right-2 top-2 z-10 flex items-center justify-center rounded-full p-[2px] hover:bg-gray-100"
+          className="absolute right-2 top-2 z-10 flex select-none items-center justify-center rounded-full p-[2px] hover:bg-gray-100"
           disabled={isPending}
           onClick={handleClickDeleteButton}
         >

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui';
+import { Button, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui';
 import { cn } from '@/utils/styles';
 
 interface TimePickerSheetProps {
@@ -35,6 +35,7 @@ export default function TimePickerSheet({ value, onSelect, classNames }: TimePic
       <SheetContent side="bottom" className="h-[300px]">
         <SheetHeader>
           <SheetTitle className="text-center">시간 선택</SheetTitle>
+          <SheetDescription>시간 선택 시트</SheetDescription>
         </SheetHeader>
         <div className="mt-4 flex items-center justify-center gap-4">
           <div className="scrollbar-hide h-[200px] w-[80px] snap-y snap-mandatory overflow-auto">

@@ -99,17 +99,17 @@ export default function InfoForm() {
         <form className="space-y-6 p-4" onSubmit={form.handleSubmit(onSubmit)}>
           {isEditMode ? (
             <div className="absolute right-3 top-3 flex items-center gap-2">
-              <button type="submit" className="group" aria-label="저장" disabled={isPending}>
+              <button type="submit" className="group select-none" aria-label="저장" disabled={isPending}>
                 <Save className="size-5 stroke-neutral-400 group-hover:stroke-neutral-500" />
               </button>
-              <button className="group" type="button" aria-label="취소" onClick={handleClickCancelButton}>
+              <button className="group select-none" type="button" aria-label="취소" onClick={handleClickCancelButton}>
                 <X className="size-5 stroke-neutral-400 group-hover:stroke-neutral-500" />
               </button>
             </div>
           ) : (
             <button
               type="button"
-              className="group absolute right-3 top-3"
+              className="group absolute right-3 top-3 select-none"
               aria-label="편집"
               onClick={handleClickEditButton}
             >
@@ -133,7 +133,7 @@ export default function InfoForm() {
               />
               {isEditMode && (
                 <button
-                  className="absolute left-0 top-0 size-32 rounded-full bg-shadow-30 text-white hover:bg-shadow-50"
+                  className="absolute left-0 top-0 size-32 select-none rounded-full bg-shadow-30 text-white hover:bg-shadow-50"
                   type="button"
                   aria-label="변경"
                   onClick={() => document.getElementById('profile-image')?.click()}
