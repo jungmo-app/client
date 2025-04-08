@@ -67,7 +67,7 @@ export default function VisitPlace({ place }: VisitPlaceProps) {
 
   return (
     <>
-      <div className="cursor-pointer rounded-2xl bg-[#f8f8f8] p-4" onClick={handleClickWrapper}>
+      <div className="cursor-pointer rounded-2xl p-4 dark:border dark:border-gray-500" onClick={handleClickWrapper}>
         <div className="flex items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
             <div
