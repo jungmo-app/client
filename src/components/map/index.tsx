@@ -8,6 +8,7 @@ import { GOOGLE_MAP_FIELD } from '@/constants/place';
 import { getRadius } from '@/libs/map/calculateDistance';
 import { MarkerType, Position, SearchStatusType } from '@/types/map';
 import GoogleMapLoader from './googleMapLoader';
+import './map.css';
 import SearchLocationBox from './searchLocationBox';
 
 interface MapProps {
@@ -112,7 +113,7 @@ export default function Map({ isOpen, currentLocation, title, target, onSelect, 
   return (
     <>
       {isOpen && (
-        <div className="fixed left-0 top-0 z-[100] h-screen w-screen bg-white">
+        <div className="fixed left-0 top-0 z-[100] h-screen w-screen bg-background">
           <div className="flex h-screen flex-col fixed-mobile-top">
             <FormProvider {...methods}>
               <Header title={title ?? '장소 추가하기'} style={{ position: 'relative' }} onClose={handleClose} />

@@ -1,14 +1,23 @@
 'use client';
 
-import { useContext } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { Calendar } from '@/components';
-import { DateContext } from '@/contexts/DateProvider';
+import { useDateStore } from '@/store/appointmentStore';
+import { isSameDay } from '@/utils/date';
 
 export default function AppointmentCalendar() {
-  const { date, updateDate } = useContext(DateContext);
+  const { date, setDate } = useDateStore(
+    useShallow(state => ({
+      date: state.date,
+      setDate: state.setDate,
+    }))
+  );
 
   const handleClickDay = (value: Date) => {
-    updateDate(value);
+    if (isSameDay(date, value)) {
+      return;
+    }
+    setDate(value);
   };
 
   return (

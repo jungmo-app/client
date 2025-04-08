@@ -13,7 +13,7 @@ export default function DescriptionInput() {
           name="memo"
           control={control}
           render={({ field }) => (
-            <Textarea placeholder="일정에 대한 설명을 입력해주세요" className="bg-white" {...field} />
+            <Textarea placeholder="일정에 대한 설명을 입력해주세요" className="bg-background" {...field} />
           )}
         />
       </div>

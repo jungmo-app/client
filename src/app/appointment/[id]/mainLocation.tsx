@@ -1,72 +1,62 @@
 'use client';
 
-import { useState } from 'react';
 import { MapPin } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { gatheringApis } from '@/apis/gathering';
-import { badgeVariants } from '@/components/ui';
-import { revalidatePage } from '@/libs/serverAction';
-import { DetailGatheringRespose, LocationDataType } from '@/types/gathering';
-import { PlaceDataType } from '@/types/map';
-import { cn } from '@/utils/styles';
+import { useParams } from 'next/navigation';
+import { useEditAppointment } from '@/hooks/useMutate/useEditAppointment';
+import { useAppointment } from '@/hooks/useQuery/useAppointment';
+import { ChangePlaceType } from '@/types/map';
 import EditLocation from './editLocation';
 
-type MainLocationProps = {
-  appointment: DetailGatheringRespose;
-  location: google.maps.places.PlaceResult | null;
-  tags: string[];
-  isEditable?: boolean;
-};
+export default function MainLocation() {
+  const params = useParams();
+  const id = Number(params.id);
 
-export default function MainLocation({ appointment, location, tags, isEditable }: MainLocationProps) {
-  const router = useRouter();
-  const [locationData, setLocationData] = useState<LocationDataType | null>(
-    location
-      ? {
-          name: location?.name ?? '',
-          address: location?.formatted_address ?? '',
-        }
-      : null
-  );
+  const { data: appointment } = useAppointment(id);
 
-  const handleChangeLocation = async (value: PlaceDataType) => {
+  const { mutate: editAppointment, isPending } = useEditAppointment(id, new Date(appointment?.startDate ?? ''));
+
+  if (!appointment) {
+    return;
+  }
+
+  const isEditable = appointment.authority === 'WRITE';
+
+  const handleChangeLocation = async (value: ChangePlaceType) => {
+    const { title, startDate, endDate, startTime, memo, gatheringUsers } = appointment;
     const payload = {
-      title: appointment.title,
-      startDate: appointment.startDate,
-      endDate: appointment.endDate,
-      startTime: appointment.startTime,
+      title,
+      startDate,
+      endDate,
+      startTime,
+      memo,
       meetingLocation: {
         placeId: value.placeId,
+        placeName: value.name,
+        placeAddress: value.address,
+        point: value.point,
       },
-      memo: appointment.memo,
-      userIds: appointment.gatheringUsers.map(user => user.userId),
+      userIds: gatheringUsers.map(user => user.userId) ?? [],
     };
 
-    const response = await gatheringApis.edit(appointment.id, payload);
-    if (!response) {
-      alert('수정에 실패하였습니다');
-      router.refresh();
-      return;
-    }
-    setLocationData({ name: value.name, address: value.address });
-    revalidatePage('/appointment');
+    editAppointment(payload);
   };
 
   return (
     <div className="rounded-2xl pb-5">
-      <div className="flex items-center gap-2 rounded-2xl bg-[#f8f8f8] p-4">
+      <div className="flex items-center gap-2 rounded-2xl bg-[#f8f8f8] p-4 dark:bg-[#0f0f0f]">
         <MapPin className="h-5 w-5 flex-shrink-0 text-primary" />
         <div className="flex-1 overflow-hidden">
           <div className="flex flex-1 items-center gap-2 overflow-hidden">
-            <h3 className="flex-1 truncate font-medium">{locationData?.name ?? '위치를 불러올 수 없습니다'}</h3>
-            {isEditable && <EditLocation onChange={handleChangeLocation} />}
+            <h3 className="flex-1 truncate font-medium">
+              {appointment.meetingLocation.placeName ?? '위치를 불러올 수 없습니다'}
+            </h3>
+            {isEditable && <EditLocation isPending={isPending} onChange={handleChangeLocation} />}
           </div>
-          <p className="mt-1 truncate text-sm text-gray-500">{locationData?.address}</p>
+          <p className="mt-1 truncate text-sm text-gray-500">{appointment.meetingLocation.placeAddress}</p>
         </div>
       </div>
 
-      <div className="mt-4 flex gap-2 px-4">
+      {/*       <div className="mt-4 flex gap-2 px-4">
         {tags.map(tag => (
           <Link
             key={tag}
@@ -76,7 +66,7 @@ export default function MainLocation({ appointment, location, tags, isEditable }
             + {tag}
           </Link>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 }

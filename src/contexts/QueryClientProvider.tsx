@@ -1,9 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { QueryClientProvider as BaseQueryClientProvider, QueryClient, QueryClientConfig } from '@tanstack/react-query';
+import {
+  QueryClientProvider as BaseQueryClientProvider,
+  HydrationBoundary,
+  QueryClient,
+  QueryClientConfig,
+} from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { StrictPropsWithChildren } from '@/types/common';
+import { QueryClientProviderProps } from '@/types/common';
 
 const queryClientOption: QueryClientConfig = {
   defaultOptions: {
@@ -19,12 +24,13 @@ const queryClientOption: QueryClientConfig = {
   },
 };
 
-const QueryClientProvider = ({ children }: StrictPropsWithChildren) => {
+const QueryClientProvider = ({ children, dehydratedState }: QueryClientProviderProps) => {
   const [queryClient] = useState(() => new QueryClient(queryClientOption));
 
   return (
     <BaseQueryClientProvider client={queryClient}>
-      {children}
+      <HydrationBoundary state={dehydratedState}>{children}</HydrationBoundary>
+
       <ReactQueryDevtools initialIsOpen={false} />
     </BaseQueryClientProvider>
   );

@@ -1,44 +1,44 @@
 'use client';
 
 import { useState } from 'react';
-import { Map, MoreVertical, Share2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { apis } from '@/apis';
+import { MoreVertical, Share2 } from 'lucide-react';
+import { useParams } from 'next/navigation';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
 import { Button } from '@/components/ui/button';
+import { useDeleteAppointment } from '@/hooks/useMutate/useDeleteAppointment';
+import { useAppointment } from '@/hooks/useQuery/useAppointment';
 
-interface HeaderToolProps {
-  id: number;
-}
+export default function HeaderTool() {
+  const params = useParams();
+  const id = Number(params.id);
 
-export default function HeaderTool({ id }: HeaderToolProps) {
-  const router = useRouter();
+  const { data: appointment } = useAppointment(id);
   const [isOpenPopOver, setIsOpenPopover] = useState(false);
+
+  const { mutate: deleteAppointment, isPending } = useDeleteAppointment(
+    id,
+    new Date(appointment?.startDate ?? ''),
+    () => {},
+    () => {
+      setIsOpenPopover(false);
+    }
+  );
 
   const handleOpenPopover = (value: boolean) => {
     setIsOpenPopover(value);
   };
 
   const handleDeleteAppointment = async () => {
-    const result = await apis.gathering.delete(id);
-    if (!result) {
-      setIsOpenPopover(false);
-      alert('삭제에 실패하였습니다');
-      return;
-    }
-    router.push('/');
+    deleteAppointment();
   };
   return (
     <div className="flex items-center gap-2">
-      <Button variant="ghost" size="icon">
+      <Button variant="ghost" size="icon" aria-label="공유 버튼">
         <Share2 className="h-5 w-5" />
-      </Button>
-      <Button variant="ghost" size="icon">
-        <Map className="h-5 w-5" />
       </Button>
       <Popover open={isOpenPopOver} onOpenChange={handleOpenPopover}>
         <PopoverTrigger asChild>
-          <Button variant="ghost" size="icon" className="flex-shrink-0 self-start">
+          <Button variant="ghost" size="icon" className="flex-shrink-0 self-start" aria-label="더보기">
             <MoreVertical className="h-5 w-5" />
           </Button>
         </PopoverTrigger>
@@ -46,7 +46,7 @@ export default function HeaderTool({ id }: HeaderToolProps) {
           className="flex -translate-x-8 items-center justify-center p-0 text-sm"
           style={{ width: '88px', height: '48px' }}
         >
-          <Button variant="ghost" onClick={handleDeleteAppointment}>
+          <Button variant="ghost" aria-label="삭제" disabled={isPending} onClick={handleDeleteAppointment}>
             삭제하기
           </Button>
         </PopoverContent>

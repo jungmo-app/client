@@ -1,10 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronRight } from 'lucide-react';
-import { apis } from '@/apis';
 import {
   Button,
   Form,
@@ -21,11 +20,15 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui';
+import { ButtonContext } from '@/contexts/ButtonClickProvider';
+import { useChangePassword } from '@/hooks/useMutate/useChangePassword';
 import { changePasswordSchema } from '@/schemas/auth';
 import { ChangePasswordFormValues } from '@/types/auth';
 
 export default function ChangePasswordSheet() {
   const [isOpen, setIsOpen] = useState(false);
+  const { isClicked, changeClick } = useContext(ButtonContext);
+
   const form = useForm<ChangePasswordFormValues>({
     resolver: zodResolver(changePasswordSchema),
     defaultValues: {
@@ -36,27 +39,34 @@ export default function ChangePasswordSheet() {
     mode: 'onChange',
   });
 
-  const handleChangePassword = async (value: ChangePasswordFormValues) => {
-    const response = await apis.auth.changePassword({
-      oldPassword: value.oldPassword,
-      newPassword: value.newPassword,
-    });
+  const handleSuccess = () => {
+    setIsOpen(false);
+    changeClick(false);
+    form.reset();
+  };
 
-    if (response) {
-      alert('비밀번호를 변경하였습니다');
-      setIsOpen(false);
-      return;
-    }
-    if (response === null) {
-      form.setError('oldPassword', { message: '비밀번호가 잘못되었습니다' });
-    }
-    alert('비밀번호 변경에 실패하였습니다.');
+  const handleError = () => {
+    changeClick(false);
+    form.setError('oldPassword', { message: '비밀번호가 잘못되었습니다' });
+  };
+
+  const { mutate: changePassword } = useChangePassword(handleSuccess, handleError);
+
+  const handleChangePassword = async (value: ChangePasswordFormValues) => {
+    changeClick(true);
+    const { oldPassword, newPassword } = value;
+    changePassword({ oldPassword, newPassword });
   };
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" className="flex w-full justify-between px-0 text-gray-500 hover:bg-transparent">
+        <Button
+          variant="ghost"
+          className="flex w-full justify-between px-0 text-gray-500 hover:bg-transparent"
+          aria-label="비밀번호 변경"
+          disabled={isClicked}
+        >
           <span>비밀번호 변경하기</span>
           <ChevronRight className="h-5 w-5 text-muted-foreground" />
         </Button>
@@ -74,7 +84,20 @@ export default function ChangePasswordSheet() {
                 <FormItem>
                   <FormLabel>현재 비밀번호</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} placeholder="현재 비밀번호를 입력해주세요" />
+                    <Input
+                      type="password"
+                      {...field}
+                      placeholder="현재 비밀번호를 입력해주세요"
+                      onChange={e => {
+                        field.onChange(e.target.value);
+                        if (
+                          e.target.value &&
+                          (e.target.value === form.getValues('newPassword') || form.formState.errors.newPassword)
+                        ) {
+                          form.trigger('newPassword');
+                        }
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -115,7 +138,7 @@ export default function ChangePasswordSheet() {
               )}
             />
 
-            <Button type="submit" className="w-full" disabled={!form.formState.isValid}>
+            <Button type="submit" className="w-full" disabled={!form.formState.isValid || isClicked} aria-label="변경">
               변경하기
             </Button>
           </form>

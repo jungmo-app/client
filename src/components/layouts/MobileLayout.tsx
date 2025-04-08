@@ -7,7 +7,7 @@ type MobileLayoutProps = StrictPropsWithChildren<{
 
 const MobileLayout = ({ children, className }: MobileLayoutProps) => {
   return (
-    <div className="relative mx-auto flex min-h-screen max-w-mobile flex-col bg-white">
+    <div className="relative mx-auto flex min-h-screen max-w-mobile flex-col bg-background">
       <div className={cn('h-full w-full', className)}>{children}</div>
     </div>
   );

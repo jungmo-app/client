@@ -23,7 +23,7 @@ export default function PlaceInput() {
           render={({ field }) => (
             <LocaitionInput
               value={field.value.address}
-              onChange={location => field.onChange({ id: location.id, address: location.address })}
+              onChange={location => field.onChange({ id: location.id, address: location.address, name: location.name })}
             />
           )}
           rules={{

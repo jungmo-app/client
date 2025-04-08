@@ -1,36 +1,24 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { apis } from '@/apis';
-import { VisitLocationDataType } from '@/types/gathering';
+import { useParams } from 'next/navigation';
+import { useAppointment } from '@/hooks/useQuery/useAppointment';
 import Footer from './footer';
 import VisitPlace from './visitPlace';
 
-type PlacesToVisitProps = {
-  appointmentId: number;
-  point: number[] | null;
-  visitPlaces: VisitLocationDataType[];
-  isEditable: boolean;
-};
+export default function PlacesToVisit() {
+  const params = useParams();
+  const id = Number(params.id);
 
-export default function PlacesToVisit({ appointmentId, point, visitPlaces, isEditable }: PlacesToVisitProps) {
-  const router = useRouter();
-  const [locations, setLocations] = useState<VisitLocationDataType[]>(visitPlaces);
+  const { data: appointment } = useAppointment(id);
 
-  const handleDeleteLocation = async (placeId: number) => {
-    try {
-      await apis.gathering.deleteLocation(appointmentId, placeId);
-      setLocations(prev => prev.filter(place => place.id !== placeId));
-    } catch (error) {
-      alert('삭제할 수 없습니다.');
-      router.refresh();
-    }
-  };
+  if (!appointment) {
+    return;
+  }
 
-  const handleAddLocation = (id: number, value: google.maps.places.PlaceResult) => {
-    setLocations(prev => [...prev, { id, place: value }]);
-  };
+  const locations = appointment.locations.filter((item): item is google.maps.places.PlaceResult & { id: number } => {
+    return 'place_id' in item;
+  });
+  const isEditable = appointment.authority === 'WRITE';
 
   return (
     <div className="flex flex-grow flex-col space-y-4">
@@ -38,22 +26,14 @@ export default function PlacesToVisit({ appointmentId, point, visitPlaces, isEdi
 
       <div className="flex flex-grow flex-col space-y-6">
         {locations.length > 0 ? (
-          locations.map(location => (
-            <VisitPlace
-              key={location.id}
-              visitPlace={location}
-              point={point}
-              isEditable={isEditable}
-              onDeleteLoation={handleDeleteLocation}
-            />
-          ))
+          locations.map(location => <VisitPlace key={location.id} place={location} />)
         ) : (
           <div className="flex min-h-32 w-full flex-grow items-center justify-center text-sm text-gray-400">
             방문할 장소가 없습니다
           </div>
         )}
       </div>
-      {isEditable && <Footer id={appointmentId} onAddLocation={handleAddLocation} />}
+      {isEditable && <Footer />}
     </div>
   );
 }

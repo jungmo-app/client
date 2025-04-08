@@ -18,6 +18,10 @@ export interface PlaceDataType {
   tags: string[];
 }
 
+export interface ChangePlaceType extends PlaceDataType {
+  point: google.maps.places.PlaceGeometry | undefined;
+}
+
 export interface SearchStatusType {
   center: google.maps.LatLng;
   bounds: google.maps.LatLngBounds;

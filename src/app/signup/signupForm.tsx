@@ -1,14 +1,12 @@
 'use client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
-import { apis } from '@/apis';
 import { Button, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from '@/components/ui';
+import { useRegister } from '@/hooks/useMutate/useRegister';
 import { signupSchema } from '@/schemas/auth';
 import { SignupFormValues } from '@/types/auth';
 
 export default function SignupForm() {
-  const router = useRouter();
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -19,19 +17,10 @@ export default function SignupForm() {
     mode: 'onChange',
   });
 
+  const { mutate: register, isPending } = useRegister();
+
   const onSubmit = async (data: SignupFormValues) => {
-    console.log(data);
-    try {
-      const response = await apis.auth.register(data);
-      if (response?.status === 200) {
-        router.push('/');
-        return;
-      }
-      throw new Error('api error');
-    } catch (error) {
-      console.error(error);
-      alert('회원가입에 실패하였습니다');
-    }
+    register(data);
   };
   return (
     <Form {...form}>
@@ -93,6 +82,8 @@ export default function SignupForm() {
           type="submit"
           className="h-12 w-full rounded-full bg-blue-500 font-semibold text-white hover:bg-blue-600"
           style={{ marginTop: '42px' }}
+          disabled={isPending}
+          aria-label="회원가입"
         >
           회원가입
         </Button>

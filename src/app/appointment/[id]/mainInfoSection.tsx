@@ -3,40 +3,43 @@
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Calendar, LucideFileTerminal, PenLine, Settings } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { gatheringApis } from '@/apis/gathering';
+import { useParams } from 'next/navigation';
 import { DatePickerSheet, TimePickerSheet } from '@/components';
 import AttendeeSelectModal from '@/components/modals/attendeeSelectModal';
-import { Avatar, AvatarImage, Badge, Textarea } from '@/components/ui';
-import { revalidatePage } from '@/libs/serverAction';
-import { DetailGatheringRespose } from '@/types/gathering';
+import { Avatar, AvatarImage, Badge, Input, Textarea } from '@/components/ui';
+import { useEditAppointment } from '@/hooks/useMutate/useEditAppointment';
+import { useAppointment } from '@/hooks/useQuery/useAppointment';
 import { UserDataResponse } from '@/types/user';
 
-type MainInfoSectionProps = {
-  appointment: DetailGatheringRespose;
-  isEditable?: boolean;
-};
+export default function MainInfoSection() {
+  const params = useParams();
+  const id = Number(params.id);
 
-export default function MainInfoSection({ appointment, isEditable }: MainInfoSectionProps) {
-  const router = useRouter();
-  const [data, setData] = useState({
-    title: appointment.title,
-    startDate: appointment.startDate,
-    startTime: appointment.startTime,
-    description: appointment.memo,
-    userList: appointment.gatheringUsers,
-  });
-  const { control, getValues, reset, setValue } = useForm({
-    defaultValues: {
-      title: appointment.title,
-      startDate: appointment.startDate,
-      startTime: appointment.startTime,
-      description: appointment.memo,
-      userList: appointment.gatheringUsers,
-    },
-  });
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [isOpenSelectModal, setIsOpenSelectModal] = useState(false);
+
+  const { data: appointment } = useAppointment(id);
+
+  const { mutate: editAppointment, isPending } = useEditAppointment(id, new Date(appointment?.startDate ?? ''), () => {
+    setIsEditMode(false);
+  });
+
+  const { control, getValues, reset, setValue } = useForm({
+    defaultValues: {
+      title: appointment?.title ?? '',
+      startDate: appointment?.startDate ?? '',
+      startTime: appointment?.startTime ?? '',
+      description: appointment?.memo ?? '',
+      userList: appointment?.gatheringUsers ?? [],
+    },
+  });
+
+  if (!appointment) {
+    return;
+  }
+
+  const isEditable = appointment.authority === 'WRITE';
+
   const visibleParticipants = getValues('userList').slice(0, 3);
   const remainingCount = getValues('userList').length - 3;
 
@@ -46,7 +49,9 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
 
   const handleClickCancleButton = () => {
     setIsEditMode(false);
-    reset(data);
+    if (appointment) {
+      reset(appointment);
+    }
   };
 
   const handleChangeAttendee = (attendees: UserDataResponse[]) => {
@@ -73,28 +78,21 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
   };
 
   const handleClickSaveButton = async () => {
+    if (!appointment) {
+      return;
+    }
+
     const payload = {
       title: getValues('title'),
       startDate: getValues('startDate'),
-      endDate: appointment.endDate,
+      endDate: getValues('startDate'),
       startTime: getValues('startTime'),
-      meetingLocation: {
-        placeId: appointment.meetingLocation.placeId,
-      },
+      meetingLocation: appointment?.meetingLocation,
       memo: getValues('description'),
       userIds: getValues('userList').map(user => user.userId),
     };
 
-    try {
-      await gatheringApis.edit(appointment.id, payload);
-      setData(getValues());
-      setIsEditMode(false);
-      revalidatePage('/appointment');
-    } catch (error) {
-      alert('수정에 실패하였습니다');
-      router.refresh();
-      /* revalidate로 변경? => fetch 사용 */
-    }
+    editAppointment(payload);
   };
 
   return (
@@ -107,15 +105,10 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
               <Controller
                 name="title"
                 control={control}
-                render={({ field }) => (
-                  <input
-                    className="rounded-sm border border-input px-3 text-base font-semibold text-[#6b7280]"
-                    {...field}
-                  />
-                )}
+                render={({ field }) => <Input className="h-7 rounded-sm px-3 text-base font-semibold" {...field} />}
               />
             ) : (
-              <h2 className="truncate font-semibold">{data.title}</h2>
+              <h2 className="truncate font-semibold">{appointment.title}</h2>
             )}
           </div>
 
@@ -123,7 +116,12 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
             <div className="flex flex-shrink-0 items-center gap-2">
               {isEditMode ? (
                 <>
-                  <button className="flex h-[22px] w-[44px] items-center justify-center">
+                  <button
+                    className="flex h-[22px] w-[44px] items-center justify-center"
+                    aria-label="저장"
+                    type="button"
+                    disabled={isPending}
+                  >
                     <Badge
                       variant="destructive"
                       className="rounded-full bg-green-500 text-white hover:bg-green-600"
@@ -132,7 +130,12 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
                       저장
                     </Badge>
                   </button>
-                  <button className="flex h-[22px] w-[44px] items-center justify-center">
+                  <button
+                    className="flex h-[22px] w-[44px] items-center justify-center"
+                    aria-label="취소"
+                    type="button"
+                    disabled={isPending}
+                  >
                     <Badge
                       variant="destructive"
                       className="rounded-full bg-red-500 text-white hover:bg-red-600"
@@ -143,7 +146,7 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
                   </button>
                 </>
               ) : (
-                <button onClick={handleClickEditButton}>
+                <button aria-label="편집" type="button" onClick={handleClickEditButton}>
                   <Badge variant="secondary" className="rounded-full">
                     편집
                   </Badge>
@@ -168,7 +171,7 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
               />
             </div>
           ) : (
-            <span>{`${data.startDate} ${data.startTime}`}</span>
+            <span>{`${appointment.startDate} ${appointment.startTime}`}</span>
           )}
         </div>
         <div className="flex text-sm text-gray-500">
@@ -179,11 +182,15 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
                 name="description"
                 control={control}
                 render={({ field }) => (
-                  <Textarea placeholder="일정에 대한 설명을 입력해주세요" className="bg-white text-sm" {...field} />
+                  <Textarea
+                    placeholder="일정에 대한 설명을 입력해주세요"
+                    className="bg-background text-sm"
+                    {...field}
+                  />
                 )}
               />
             ) : (
-              <div className="flex-shrink whitespace-pre-line break-all">{data.description}</div>
+              <div className="flex-shrink whitespace-pre-line break-all">{appointment.memo}</div>
             )}
           </div>
         </div>
@@ -191,26 +198,26 @@ export default function MainInfoSection({ appointment, isEditable }: MainInfoSec
           <div className="flex">
             {visibleParticipants.map(participant => (
               <div key={participant.userId} className="group relative">
-                <Avatar className="relative h-8 w-8 border-2 border-white">
+                <Avatar className="relative h-8 w-8">
                   <AvatarImage src={participant.profileImage} alt={participant.userName} />
                 </Avatar>
                 <Badge
                   variant="outline"
-                  className="invisible absolute left-1/2 top-0 z-[99999] -translate-x-1/2 -translate-y-7 text-nowrap bg-white group-hover:visible"
+                  className="invisible absolute left-1/2 top-0 z-[99999] -translate-x-1/2 -translate-y-7 text-nowrap bg-background group-hover:visible"
                 >
                   {participant.userName}
                 </Badge>
               </div>
             ))}
             {remainingCount > 0 && (
-              <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-gray-100 text-sm text-gray-600">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-background bg-gray-100 text-sm text-gray-600 dark:bg-gray-700 dark:text-gray-100">
                 +{remainingCount}
               </div>
             )}
           </div>
           {isEditMode && (
             <button
-              className="flex size-[34px] items-center justify-center rounded-full border-2 border-white bg-neutral-200 hover:bg-neutral-300"
+              className="flex size-[34px] items-center justify-center rounded-full border-2 border-background bg-neutral-200 hover:bg-neutral-300 dark:bg-neutral-700 dark:hover:bg-neutral-600"
               onClick={handleClickSettingAttendeeButton}
             >
               <Settings className="size-5 stroke-white" />

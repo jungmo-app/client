@@ -4,7 +4,7 @@ const responseData = <T>(value: T, status: number, message?: string) => {
   return {
     data: value,
     message: message ?? '',
-    code: 1,
+    code: 'C005',
     status,
   } as ApiResponse<T>;
 };
@@ -22,7 +22,7 @@ export async function GET(req: Request) {
       `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&fields=${fields}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY}&language=ko`,
       {
         method: 'GET',
-        cache: 'no-cache',
+        next: { revalidate: 60 },
       }
     );
 

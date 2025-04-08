@@ -22,8 +22,51 @@ interface GoogleMapLoaderProps {
 
 const DEFAULT_POSITION = { lat: 37.498095, lng: 127.02761 };
 
+const darkMapStyle = [
+  { elementType: 'geometry', stylers: [{ color: '#212121' }] },
+  { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+  { elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
+  { elementType: 'labels.text.stroke', stylers: [{ color: '#212121' }] },
+  {
+    featureType: 'administrative',
+    elementType: 'geometry',
+    stylers: [{ color: '#757575' }],
+  },
+  {
+    featureType: 'poi',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#757575' }],
+  },
+  {
+    featureType: 'road',
+    elementType: 'geometry',
+    stylers: [{ color: '#2c2c2c' }],
+  },
+  {
+    featureType: 'road',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#8a8a8a' }],
+  },
+  {
+    featureType: 'transit',
+    elementType: 'geometry',
+    stylers: [{ color: '#2f3948' }],
+  },
+  {
+    featureType: 'water',
+    elementType: 'geometry',
+    stylers: [{ color: '#000000' }],
+  },
+  {
+    featureType: 'water',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#3d3d3d' }],
+  },
+];
+
 const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderProps>(
   ({ markers, target, searchStatus, currentLocation, onResearch, onSelect, onClose }, ref) => {
+    const isDarkMode = window?.matchMedia && window?.matchMedia('(prefers-color-scheme: dark)').matches;
     const mapRef = useRef<google.maps.Map | null>(null);
     const [location, setLocation] = useState<Position>(currentLocation ?? DEFAULT_POSITION);
     const [isButtonVisible, setIsButtonVisible] = useState<boolean>(false);
@@ -102,12 +145,13 @@ const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderP
     };
 
     return (
-      <div className="relative flex-grow">
+      <div className="relative flex-grow bg-background">
         <GoogleMap
           center={currentLocation ?? DEFAULT_POSITION}
           zoom={14}
           mapContainerStyle={{ width: '100%', height: '100%' }}
           options={{
+            styles: isDarkMode ? darkMapStyle : [],
             fullscreenControl: false,
             mapTypeControl: false,
             streetViewControl: false,
@@ -130,10 +174,11 @@ const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderP
         </GoogleMap>
         {isButtonVisible && (
           <Button
-            className="absolute bottom-[20%] right-4 bg-white [&_svg]:size-5"
+            className="absolute bottom-[20%] right-4 bg-background [&_svg]:size-5"
             variant="ghost"
             size="icon"
             style={{ borderRadius: '9999px' }}
+            aria-label="현재 위치로 이동"
             onClick={handleClickUpdateCenterButton}
           >
             <LocateFixed />
@@ -142,7 +187,8 @@ const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderP
         {isUpdateVisible && (
           <Button
             variant="ghost"
-            className="absolute bottom-5 left-1/2 -translate-x-1/2 bg-white"
+            className="absolute bottom-5 left-1/2 -translate-x-1/2 bg-background"
+            aria-label="현재 위치에서 검색"
             onClick={handleClickUpdateButton}
           >
             현재 위치에서 검색

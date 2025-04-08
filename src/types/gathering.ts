@@ -40,6 +40,16 @@ export interface DetailGatheringRespose {
   locations: Location[];
 }
 
+export interface DetailGatheringType extends Omit<DetailGatheringRespose, 'meetingLocation' | 'locations'> {
+  meetingLocation: {
+    placeId: string;
+    placeName: string | undefined;
+    placeAddress: string | undefined;
+    point: google.maps.places.PlaceGeometry | undefined;
+  };
+  locations: ((google.maps.places.PlaceResult & { id: number }) | { id: number })[];
+}
+
 export interface LocationDataType {
   name: string;
   address: string;

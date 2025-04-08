@@ -1,18 +1,19 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { apis } from '@/apis';
+import { useParams } from 'next/navigation';
 import Map from '@/components/map';
 import { Button } from '@/components/ui';
+import { useAddLocation } from '@/hooks/useMutate/useAddLocation';
 import { getCurrentLocation } from '@/libs/map/getCurrentLocation';
 import { Position } from '@/types/map';
 
-interface FooterProps {
-  id: number;
-  onAddLocation: (id: number, value: google.maps.places.PlaceResult) => void;
-}
+export default function Footer() {
+  const params = useParams();
+  const id = Number(params.id);
 
-export default function Footer({ id, onAddLocation }: FooterProps) {
+  const { mutate: addLocation, isPending } = useAddLocation(id);
+
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [currentLocation, setCurrentLocation] = useState<Position | null>(null);
 
@@ -35,22 +36,19 @@ export default function Footer({ id, onAddLocation }: FooterProps) {
     if (!value.place_id) {
       return;
     }
-    try {
-      const result = await apis.gathering.addLocation(id, value.place_id);
-      if (!result) {
-        alert('장소 추가에 실패하였습니다');
-        return;
-      }
-      onAddLocation(result, value);
-    } catch {
-      alert('장소 추가에 실패하였습니다');
-    }
+    addLocation(value);
   };
   return (
     <>
-      <div className="z-10 border-t bg-white fixed-mobile-bottom">
-        <div className="p-4">
-          <Button className="w-full rounded-xl" size="lg" onClick={handleClickButton}>
+      <div className="z-10 border-t bg-background fixed-mobile-bottom">
+        <div className="bg-background p-4">
+          <Button
+            className="w-full rounded-xl"
+            size="lg"
+            aria-label="장소 추가"
+            disabled={isPending}
+            onClick={handleClickButton}
+          >
             장소 추가하기
           </Button>
         </div>

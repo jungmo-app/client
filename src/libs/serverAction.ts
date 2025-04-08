@@ -1,5 +1,5 @@
 'use server';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -14,4 +14,8 @@ export const redirectPath = (url: string) => {
 
 export const revalidatePage = (url: string) => {
   revalidatePath(url);
+};
+
+export const revalidateData = (tag: string) => {
+  revalidateTag(tag);
 };

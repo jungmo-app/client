@@ -6,10 +6,12 @@ export interface ApiResponse<T = undefined> {
   /** 메시지 (example: SUCCESS) */
   message: string;
   /** HTTP 상태코드 (example: 200) */
-  code: number;
+  code: string;
   /** HTTP 상태 (example: OK) */
   status: number;
 }
+
+export type ApiError = Omit<ApiResponse, 'data'>;
 
 export interface ApiErrorResponse extends Error {
   response: {

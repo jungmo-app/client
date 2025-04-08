@@ -4,7 +4,6 @@ import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import debounce from 'lodash.debounce';
 import { Search, X } from 'lucide-react';
-import { apis } from '@/apis';
 import {
   Avatar,
   AvatarFallback,
@@ -17,6 +16,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui';
+import { useSearchUserKeyword } from '@/hooks/useQuery/useSearchUserKeyword';
 import { UserDataResponse } from '@/types/user';
 
 type AttendeeSelectModalProps = {
@@ -28,24 +28,16 @@ type AttendeeSelectModalProps = {
 
 export default function AttendeeSelectModal({ isOpen, value, onClose, onSelect }: AttendeeSelectModalProps) {
   const { register, getValues } = useForm();
-  const [isError, setIsError] = useState<boolean>(false);
-  const [searchResult, setSearchResult] = useState<UserDataResponse[]>([]);
+
+  const [debouncedKeyword, setDeboundedKeyword] = useState<string>('');
   const [selectedUsers, setSelectedUsers] = useState<UserDataResponse[]>(value ?? []);
+
+  const { data: searchList = [], isError } = useSearchUserKeyword(debouncedKeyword);
 
   const handleSearchUser = useCallback((value: string) => {
     const debouncedFetchData = debounce(async (value: string) => {
-      const response = await apis.user.search(value);
-      if (!response) {
-        setIsError(true);
-        return;
-      }
-      setSearchResult(response);
-    }, 500);
-    setIsError(false);
-    if (!value) {
-      setSearchResult([]);
-      return;
-    }
+      setDeboundedKeyword(value);
+    });
     debouncedFetchData(value);
   }, []);
 
@@ -66,8 +58,6 @@ export default function AttendeeSelectModal({ isOpen, value, onClose, onSelect }
     setSelectedUsers(value ?? []);
     onClose();
   };
-
-  const searchList = searchResult.filter(user => !selectedUsers.some(item => user.userId === item.userId));
 
   return (
     <Sheet open={isOpen} onOpenChange={handleClose}>
@@ -92,6 +82,7 @@ export default function AttendeeSelectModal({ isOpen, value, onClose, onSelect }
                       variant="ghost"
                       size="icon"
                       className="h-4 w-4 p-0"
+                      aria-label="닫기"
                       onClick={() => handleUserRemove(user.userId)}
                     >
                       <X className="h-3 w-3" />
@@ -106,10 +97,9 @@ export default function AttendeeSelectModal({ isOpen, value, onClose, onSelect }
           <div className="relative">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              {...register('searchValue')}
+              {...register('searchValue', { onChange: e => handleSearchUser(e.target.value) })}
               placeholder="사용자 코드로 검색"
               className="pl-8"
-              onChange={e => handleSearchUser(e.target.value)}
             />
           </div>
 
@@ -127,6 +117,7 @@ export default function AttendeeSelectModal({ isOpen, value, onClose, onSelect }
                     variant="ghost"
                     className="w-full gap-2"
                     style={{ justifyContent: 'flex-start' }}
+                    aria-label="사용자 선택"
                     onClick={() => handleUserSelect(user)}
                   >
                     <Avatar className="h-8 w-8">
@@ -142,13 +133,13 @@ export default function AttendeeSelectModal({ isOpen, value, onClose, onSelect }
             </ScrollArea>
           ) : (
             <div className="mt-4 flex w-full flex-1 items-center justify-center">
-              {getValues('inputValue') ? '검색 결과 없습니다.' : '검색어를 입력해주세요'}
+              {getValues('searchValue') ? '검색 결과 없습니다.' : '검색어를 입력해주세요'}
             </div>
           )}
 
           {/* 하단 버튼 */}
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" aria-label="취소" onClick={onClose}>
               취소
             </Button>
             <Button onClick={handleConfirm}>확인</Button>

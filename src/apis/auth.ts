@@ -1,4 +1,5 @@
 import { apiPaths } from '@/constants/apis';
+import { privateAxios } from '@/libs/baseAxios';
 import { customFetch, privateClientFetch } from '@/libs/interceptor';
 import {
   ChangePasswordPayload,
@@ -7,6 +8,7 @@ import {
   SetPasswordFormValues,
   SignupFormValues,
 } from '@/types/auth';
+import { throwError } from '@/utils/apis';
 
 export const authApis = {
   login: async (payload: LoginRequest) => {
@@ -15,19 +17,16 @@ export const authApis = {
       body: JSON.stringify(payload),
     });
 
-    return response;
+    console.log(response);
+
+    return throwError(response);
   },
   logout: async () => {
-    try {
-      const response = await fetch('/api/logout', {
-        method: 'POST',
-      });
-      if (!response.ok) {
-        throw new Error('로그아웃 실패');
-      }
-      return true;
-    } catch {
-      return false;
+    const response = await fetch('/api/logout', {
+      method: 'POST',
+    });
+    if (!response.ok) {
+      throw new Error('로그아웃 실패');
     }
   },
   register: async (payload: SignupFormValues) => {
@@ -39,56 +38,47 @@ export const authApis = {
     return response;
   },
   changePassword: async (payload: ChangePasswordPayload) => {
-    try {
-      const response = await privateClientFetch(apiPaths.auth.changePassword, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(payload),
-      });
-      if (response?.status === 200) {
-        return true;
-      }
+    const response = await privateClientFetch(apiPaths.auth.changePassword, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(payload),
+    });
+    if (response?.status !== 200) {
       throw new Error('api error');
-    } catch {
-      return false;
     }
   },
   setPassword: async (payload: SetPasswordFormValues) => {
-    try {
-      const response = await customFetch(apiPaths.auth.setPassword, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      });
-      return response;
-    } catch {
-      return undefined;
-    }
+    const response = await customFetch(apiPaths.auth.setPassword, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    return throwError(response);
   },
   resetPassword: async (payload: ResetPasswordPayload) => {
-    try {
-      const response = await customFetch(apiPaths.auth.setPassword, {
-        method: 'PATCH',
-        body: JSON.stringify(payload),
-      });
-      return response;
-    } catch {
-      return undefined;
-    }
+    const response = await customFetch(apiPaths.auth.resetPassword, {
+      method: 'PATCH',
+      headers: {
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+    return throwError(response);
   },
-  refreshToken: async (accessToken: string, refreshToken: string) => {
+  refreshToken: async (refreshToken: string) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.refreshToken.slice(1)}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        credentials: 'include',
-        body: JSON.stringify({ refreshToken }),
-      });
-      if (!response.ok) {
-        throw new Error('failed refresh token');
-      }
+      const response = await privateAxios.post(
+        apiPaths.auth.refreshToken,
+        {},
+        {
+          headers: {
+            Cookie: `refreshToken=${refreshToken}`,
+          },
+        }
+      );
+
       return response;
     } catch {
       return undefined;
@@ -104,6 +94,16 @@ export const authApis = {
       throw new Error('api error');
     } catch {
       return false;
+    }
+  },
+  deleteCookie: async () => {
+    const refer = window.location.pathname;
+    const response = await fetch(`/api/cookie?refer=${refer}`, {
+      method: 'POST',
+    });
+
+    if (response.redirected) {
+      window.location.href = response.url;
     }
   },
 } as const;

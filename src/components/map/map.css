@@ -1,0 +1,11 @@
+@tailwind base;
+
+@layer base {
+  html.dark .gm-control-active {
+    background-color: #020916 !important;
+  }
+
+  html.dark .gm-control-active img {
+    filter: brightness(0) invert(1);
+  }
+}

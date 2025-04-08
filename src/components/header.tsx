@@ -23,14 +23,13 @@ export default function Header({ title, className, children, onClose, routeUrl, 
       router.push(routeUrl);
       return;
     }
-    router.back();
   };
 
   return (
-    <header className={cn('sticky top-0 z-10 bg-white', className)} {...props}>
+    <header className={cn('sticky top-0 z-10 bg-background', className)} {...props}>
       <div className="flex h-14 items-center justify-between">
         <div className="flex items-center">
-          <Button variant="ghost" size="icon" className="mr-2" onClick={handleBack}>
+          <Button variant="ghost" size="icon" className="mr-2" aria-label="뒤로 가기" onClick={handleBack}>
             <ChevronLeft className="h-5 w-5" />
           </Button>
           <h1 className="font-medium">{title}</h1>
