@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apis } from '@/apis';
+import { ApiError } from '@/types/apis';
 import { UserDataResponse } from '@/types/user';
 
 interface PayloadType {
@@ -13,8 +14,8 @@ interface PayloadType {
 export const useEditAccount = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (payload: PayloadType) => {
+  return useMutation<unknown, ApiError, PayloadType>({
+    mutationFn: payload => {
       const { userName, profileImage } = payload;
 
       const formData = new FormData();
@@ -24,7 +25,7 @@ export const useEditAccount = () => {
         formData.append('profileImage', profileImage);
       }
 
-      return () => apis.user.editInfo(formData);
+      return apis.user.editInfo(formData);
     },
     onSuccess: (_, variable) => {
       alert('수정하였습니다');

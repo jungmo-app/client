@@ -41,10 +41,9 @@ export const userApis = {
       },
       body: payload,
     });
-    if (response?.status === 200) {
-      return true;
+    if (!response || response.status !== 200) {
+      throw new Error('api error');
     }
-    throw new Error('api error');
   },
 };
 
