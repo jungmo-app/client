@@ -32,7 +32,7 @@ export const useLogin = ({ onSuccess, onError }: LoginProps = {}) => {
       try {
         await openSession();
         const refer = params.get('refer');
-        router.push(`/${refer ?? ''}`);
+        router.push(`${refer ?? '/'}`);
         router.refresh();
       } catch {
         closeSession();

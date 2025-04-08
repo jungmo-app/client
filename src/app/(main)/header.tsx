@@ -42,7 +42,7 @@ export default function Header() {
         </Button>
         <Popover>
           <PopoverTrigger asChild>
-            <button className="flex items-center gap-2 text-nowrap" type="button" aria-label="날짜">
+            <button className="flex select-none items-center gap-2 text-nowrap" type="button" aria-label="날짜">
               <h1 className="text-xl font-semibold">
                 {date.getFullYear()}. {(date.getMonth() + 1).toString().padStart(2, '0')}
               </h1>

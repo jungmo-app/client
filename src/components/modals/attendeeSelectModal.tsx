@@ -13,6 +13,7 @@ import {
   ScrollArea,
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
 } from '@/components/ui';
@@ -64,6 +65,7 @@ export default function AttendeeSelectModal({ isOpen, value, onClose, onSelect }
       <SheetContent side="bottom" className="flex w-full flex-col">
         <SheetHeader>
           <SheetTitle>참석자 추가</SheetTitle>
+          <SheetDescription>참석자 추가 시트</SheetDescription>
         </SheetHeader>
 
         <div className="mt-2 flex h-[60vh] flex-col gap-4">
@@ -97,6 +99,7 @@ export default function AttendeeSelectModal({ isOpen, value, onClose, onSelect }
           <div className="relative">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
+              autoComplete="on"
               {...register('searchValue', { onChange: e => handleSearchUser(e.target.value) })}
               placeholder="사용자 코드로 검색"
               className="pl-8"

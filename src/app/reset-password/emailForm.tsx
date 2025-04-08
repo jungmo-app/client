@@ -39,12 +39,7 @@ export default function EmailForm({ isPending, onSubmit }: EmailFormProps) {
               <FormItem>
                 <FormLabel>이메일</FormLabel>
                 <FormControl>
-                  <Input
-                    type="email"
-                    className="h-12 rounded-full px-4"
-                    {...field}
-                    placeholder="이메일을 입력해주세요"
-                  />
+                  <Input type="on" className="h-12 rounded-full px-4" {...field} placeholder="이메일을 입력해주세요" />
                 </FormControl>
                 <FormMessage />
               </FormItem>

@@ -55,8 +55,7 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
         const err = error as Event & { status: number };
         if (err.status === 401) {
           console.log('sse error');
-          const refreshToken = await getCookie('refreshToken');
-          const response = await apis.auth.refreshToken(refreshToken ?? '');
+          const response = await apis.auth.refreshToken();
           if (response) {
             await connectSSE(retry - 1);
           }

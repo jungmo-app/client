@@ -33,6 +33,7 @@ export default function SignupForm() {
               <FormLabel>이름</FormLabel>
               <FormControl>
                 <Input
+                  autoComplete="on"
                   {...field}
                   placeholder="이름을 입력해주세요"
                   className="h-12 rounded-full border-gray-300 bg-gray-100 px-4"
@@ -50,6 +51,7 @@ export default function SignupForm() {
               <FormLabel>이메일</FormLabel>
               <FormControl>
                 <Input
+                  autoComplete="on"
                   {...field}
                   type="email"
                   placeholder="이메일을 입력해주세요"
@@ -68,6 +70,7 @@ export default function SignupForm() {
               <FormLabel>비밀번호</FormLabel>
               <FormControl>
                 <Input
+                  autoComplete="new-password"
                   {...field}
                   type="password"
                   placeholder="비밀번호를 입력해주세요"

@@ -60,7 +60,13 @@ export default function EditLocation({ onChange, isPending }: EditLocationProps)
   };
   return (
     <>
-      <button type="button" aria-label="편집" disabled={isPending} onClick={handleClickEditButton}>
+      <button
+        type="button"
+        aria-label="편집"
+        disabled={isPending}
+        className="select-none"
+        onClick={handleClickEditButton}
+      >
         <Badge>편집</Badge>
       </button>
       <Map

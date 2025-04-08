@@ -35,9 +35,6 @@ const fetchApi = async (url: string, init?: RequestInit, token?: string) => {
 export const privateServerFetch = async <T>(url: string, init?: RequestInit) => {
   const accessToken = await getCookie('accessToken');
   const response = await fetchApi(url, init, accessToken);
-  if (response.status === 401) {
-    return null;
-  }
 
   const res: ApiResponse<T> = await response.json();
   return res;
@@ -45,27 +42,22 @@ export const privateServerFetch = async <T>(url: string, init?: RequestInit) => 
 
 export const privateClientFetch = async <T>(url: string, init?: RequestInit) => {
   const accessToken = await getCookie('accessToken');
-  console.log('accssToken:', accessToken);
 
   try {
     const response = await fetchApi(url, init, accessToken);
 
     if (response.status === 401) {
-      const refreshToken = await getCookie('refreshToken');
-
-      if (refreshToken) {
-        const res = await apis.auth.refreshToken(refreshToken);
-        if (!res) {
-          throw new Error('unauthorization');
-        }
-
-        const newToken = await getCookie('accessToken');
-        const retrypResponse = await fetchApi(url, init, newToken);
-        const restryRes = (await retrypResponse.json()) as ApiResponse<T>;
-        return restryRes;
-      } else {
+      const res = await apis.auth.refreshToken();
+      if (!res) {
         throw new Error('unauthorization');
       }
+
+      console.log('refresh');
+
+      const newToken = await getCookie('accessToken');
+      const retrypResponse = await fetchApi(url, init, newToken);
+      const restryRes = (await retrypResponse.json()) as ApiResponse<T>;
+      return restryRes;
     }
     const res = (await response.json()) as ApiResponse<T>;
     return res;

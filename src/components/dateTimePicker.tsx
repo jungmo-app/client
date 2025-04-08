@@ -10,6 +10,7 @@ import {
   SelectValue,
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -78,6 +79,7 @@ export default function DateTimePicker({ onSelect }: { onSelect: (date: Date) =>
       <SheetContent side="bottom">
         <SheetHeader>
           <SheetTitle>날짜 및 시간 선택</SheetTitle>
+          <SheetDescription>시간 선택 시트</SheetDescription>
         </SheetHeader>
         <div className="grid grid-cols-5 gap-4 py-4">
           <Select defaultValue={date.getFullYear().toString()} onValueChange={value => handleSelect(value, 'year')}>

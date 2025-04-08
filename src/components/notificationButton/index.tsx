@@ -49,7 +49,7 @@ export default function NotificationButton() {
               <span className="text-sm font-medium">{`알림 ${notification.length}개`}</span>
               {notification.length > 0 && (
                 <button
-                  className="text-xs text-gray-500 outline-none transition hover:text-gray-800"
+                  className="select-none text-xs text-gray-500 outline-none transition hover:text-gray-800"
                   onClick={handleClickEditButton}
                 >
                   {isEdit ? '끝내기' : '편집하기'}
@@ -76,7 +76,10 @@ export default function NotificationButton() {
             )}
 
             {isEdit && (
-              <button className="absolute bottom-2 right-5 text-xs text-gray-400" onClick={handleClickDeleteAllButton}>
+              <button
+                className="absolute bottom-2 right-5 select-none text-xs text-gray-400"
+                onClick={handleClickDeleteAllButton}
+              >
                 전체 지우기
               </button>
             )}

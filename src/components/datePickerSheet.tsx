@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui';
+import { Button, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui';
 import { cn } from '@/utils/styles';
 
 interface DatePickerSheetProps {
@@ -92,6 +92,7 @@ export default function DatePickerSheet({ value, onSelect, classNames }: DatePic
       <SheetContent side="bottom" className="h-[600px]">
         <SheetHeader>
           <SheetTitle>날짜 선택</SheetTitle>
+          <SheetDescription>날짜 선택 시트</SheetDescription>
         </SheetHeader>
         <div className="mt-4 h-full overflow-auto" onScroll={handleScroll}>
           <div key={months[0].toISOString()}>
@@ -115,7 +116,7 @@ export default function DatePickerSheet({ value, onSelect, classNames }: DatePic
                           type="button"
                           aria-label={`${month}월 ${i}일`}
                           className={cn(
-                            'flex h-full w-full items-center justify-center rounded-full text-sm',
+                            'flex h-full w-full select-none items-center justify-center rounded-full text-sm',
                             date.getDate() === selectedDate.getDate() &&
                               date.getMonth() === selectedDate.getMonth() &&
                               date.getFullYear() === selectedDate.getFullYear()

@@ -16,6 +16,7 @@ import {
   Input,
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -74,9 +75,11 @@ export default function ChangePasswordSheet() {
       <SheetContent side="bottom">
         <SheetHeader>
           <SheetTitle>비밀번호 변경</SheetTitle>
+          <SheetDescription>비밀번호 변경 시트</SheetDescription>
         </SheetHeader>
         <Form {...form}>
           <form className="mt-6 space-y-6" onSubmit={form.handleSubmit(handleChangePassword)}>
+            <Input type="text" autoComplete="username" className="hidden" tabIndex={-1} aria-hidden="true" />
             <FormField
               control={form.control}
               name="oldPassword"
@@ -86,6 +89,7 @@ export default function ChangePasswordSheet() {
                   <FormControl>
                     <Input
                       type="password"
+                      autoComplete="current-password"
                       {...field}
                       placeholder="현재 비밀번호를 입력해주세요"
                       onChange={e => {
@@ -111,7 +115,12 @@ export default function ChangePasswordSheet() {
                 <FormItem>
                   <FormLabel>새 비밀번호</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} placeholder="새 비밀번호를 입력해주세요" />
+                    <Input
+                      type="password"
+                      autoComplete="new-password"
+                      {...field}
+                      placeholder="새 비밀번호를 입력해주세요"
+                    />
                   </FormControl>
                   <FormDescription className="text-xs">
                     영문, 숫자, 특수문자를 포함하여 8자 이상 입력해주세요
@@ -128,7 +137,12 @@ export default function ChangePasswordSheet() {
                 <FormItem>
                   <FormLabel>새 비밀번호 확인</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} placeholder="새 비밀번호를 다시 입력해주세요" />
+                    <Input
+                      autoComplete="new-password"
+                      type="password"
+                      {...field}
+                      placeholder="새 비밀번호를 다시 입력해주세요"
+                    />
                   </FormControl>
                   <FormDescription className="text-xs">
                     위에서 입력한 새 비밀번호와 동일하게 입력해주세요

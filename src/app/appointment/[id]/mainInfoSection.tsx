@@ -105,7 +105,9 @@ export default function MainInfoSection() {
               <Controller
                 name="title"
                 control={control}
-                render={({ field }) => <Input className="h-7 rounded-sm px-3 text-base font-semibold" {...field} />}
+                render={({ field }) => (
+                  <Input autoComplete="on" className="h-7 rounded-sm px-3 text-base font-semibold" {...field} />
+                )}
               />
             ) : (
               <h2 className="truncate font-semibold">{appointment.title}</h2>
@@ -117,7 +119,7 @@ export default function MainInfoSection() {
               {isEditMode ? (
                 <>
                   <button
-                    className="flex h-[22px] w-[44px] items-center justify-center"
+                    className="flex h-[22px] w-[44px] select-none items-center justify-center"
                     aria-label="저장"
                     type="button"
                     disabled={isPending}
@@ -131,7 +133,7 @@ export default function MainInfoSection() {
                     </Badge>
                   </button>
                   <button
-                    className="flex h-[22px] w-[44px] items-center justify-center"
+                    className="flex h-[22px] w-[44px] select-none items-center justify-center"
                     aria-label="취소"
                     type="button"
                     disabled={isPending}
@@ -146,7 +148,7 @@ export default function MainInfoSection() {
                   </button>
                 </>
               ) : (
-                <button aria-label="편집" type="button" onClick={handleClickEditButton}>
+                <button aria-label="편집" type="button" className="select-none" onClick={handleClickEditButton}>
                   <Badge variant="secondary" className="rounded-full">
                     편집
                   </Badge>
@@ -217,7 +219,7 @@ export default function MainInfoSection() {
           </div>
           {isEditMode && (
             <button
-              className="flex size-[34px] items-center justify-center rounded-full border-2 border-background bg-neutral-200 hover:bg-neutral-300 dark:bg-neutral-700 dark:hover:bg-neutral-600"
+              className="flex size-[34px] select-none items-center justify-center rounded-full border-2 border-background bg-neutral-200 hover:bg-neutral-300 dark:bg-neutral-700 dark:hover:bg-neutral-600"
               onClick={handleClickSettingAttendeeButton}
             >
               <Settings className="size-5 stroke-white" />

@@ -44,6 +44,7 @@ export default function VerificationInput({ value, onChange, maxLength = 6 }: Ve
       {Array.from({ length: maxLength }).map((_, index) => (
         <input
           key={index}
+          autoComplete="off"
           ref={el => (inputRefs.current[index] = el)}
           type="text"
           inputMode="numeric"

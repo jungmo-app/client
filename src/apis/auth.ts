@@ -1,6 +1,7 @@
+import axios from 'axios';
 import { apiPaths } from '@/constants/apis';
-import { privateAxios } from '@/libs/baseAxios';
 import { customFetch, privateClientFetch } from '@/libs/interceptor';
+import { getCookie } from '@/libs/serverAction';
 import {
   ChangePasswordPayload,
   LoginRequest,
@@ -67,20 +68,27 @@ export const authApis = {
     });
     return throwError(response);
   },
-  refreshToken: async (refreshToken: string) => {
+  refreshToken: async () => {
+    const accessToken = await getCookie('accessToken');
+    const refreshToken = await getCookie('refreshToken');
+    console.log(refreshToken);
     try {
-      const response = await privateAxios.post(
-        apiPaths.auth.refreshToken,
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.refreshToken.slice(1)}`,
         {},
         {
+          method: 'POST',
           headers: {
+            Authorization: `Bearer ${accessToken}`,
             Cookie: `refreshToken=${refreshToken}`,
           },
+          withCredentials: true,
         }
       );
-
+      console.log(response);
       return response;
-    } catch {
+    } catch (error) {
+      console.log(error);
       return undefined;
     }
   },

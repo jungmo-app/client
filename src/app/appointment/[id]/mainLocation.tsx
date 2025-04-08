@@ -43,7 +43,7 @@ export default function MainLocation() {
 
   return (
     <div className="rounded-2xl pb-5">
-      <div className="flex items-center gap-2 rounded-2xl bg-[#f8f8f8] p-4 dark:bg-[#0f0f0f]">
+      <div className="flex items-center gap-2 rounded-2xl bg-[#f8f8f8] p-4 dark:bg-gray-800">
         <MapPin className="h-5 w-5 flex-shrink-0 text-primary" />
         <div className="flex-1 overflow-hidden">
           <div className="flex flex-1 items-center gap-2 overflow-hidden">
