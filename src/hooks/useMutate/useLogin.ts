@@ -22,9 +22,9 @@ export const useLogin = ({ onSuccess, onError }: LoginProps = {}) => {
   const { openSession, closeSession } = useContext(SessionContext);
 
   const mutation = useMutation<unknown, ApiError, LoginRequest>({
-    mutationFn: async payload => {
+    mutationFn: payload => {
       setIsPending(true);
-      return () => apis.auth.login(payload);
+      return apis.auth.login(payload);
     },
     onSuccess: async () => {
       onSuccess?.();
@@ -46,6 +46,7 @@ export const useLogin = ({ onSuccess, onError }: LoginProps = {}) => {
     },
     onError: error => {
       onError?.(error);
+      setIsPending(false);
     },
   });
 

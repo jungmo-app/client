@@ -8,14 +8,21 @@ export const notificationApis = {
       method: 'GET',
       cache: 'no-store',
     });
-    console.log(response);
-    return response;
+
+    if (!response || response.status !== 200) {
+      throw new Error('api ERROR');
+    }
+
+    return response.data;
   },
   deleteNotification: async (notificationIds: number[]) => {
     const response = await privateClientFetch(apiPaths.notification.deleteNotification, {
       method: 'DELETE',
       body: JSON.stringify({ notificationIds }),
     });
+    if (!response || response.status !== 200) {
+      throw new Error('api error');
+    }
     return response;
   },
   readNotification: async (notificationIds: number[]) => {
@@ -23,6 +30,10 @@ export const notificationApis = {
       method: 'PATCH',
       body: JSON.stringify({ notificationIds }),
     });
+
+    if (!response || response.status !== 200) {
+      throw new Error('api error');
+    }
     return response;
   },
 };

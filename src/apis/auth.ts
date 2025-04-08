@@ -1,4 +1,5 @@
 import { apiPaths } from '@/constants/apis';
+import { privateAxios } from '@/libs/baseAxios';
 import { customFetch, privateClientFetch } from '@/libs/interceptor';
 import {
   ChangePasswordPayload,
@@ -66,17 +67,18 @@ export const authApis = {
     });
     return throwError(response);
   },
-  refreshToken: async (accessToken: string, refreshToken: string) => {
+  refreshToken: async (refreshToken: string) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.refreshToken.slice(1)}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        credentials: 'include',
-        body: JSON.stringify({ refreshToken }),
-      });
-      if (!response.ok) {
-        throw new Error('failed refresh token');
-      }
+      const response = await privateAxios.post(
+        apiPaths.auth.refreshToken,
+        {},
+        {
+          headers: {
+            Cookie: `refreshToken=${refreshToken}`,
+          },
+        }
+      );
+
       return response;
     } catch {
       return undefined;

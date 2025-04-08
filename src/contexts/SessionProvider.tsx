@@ -56,7 +56,7 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
         if (err.status === 401) {
           console.log('sse error');
           const refreshToken = await getCookie('refreshToken');
-          const response = await apis.auth.refreshToken(accessToken, refreshToken ?? '');
+          const response = await apis.auth.refreshToken(refreshToken ?? '');
           if (response) {
             await connectSSE(retry - 1);
           }
@@ -82,6 +82,7 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
   }, [closeSSE, queryClient]);
 
   const openSession = useCallback(async () => {
+    console.log('session open');
     try {
       await connectSSE();
     } catch {

@@ -24,14 +24,13 @@ export const middleware = async (request: NextRequest) => {
     return response;
   }
 
-  const api = await apis.auth.refreshToken(accessToken, refreshToken);
+  const api = await apis.auth.refreshToken(refreshToken);
   if (!api) {
     logout(response);
     return response;
   }
 
-  const cookies = (api.headers as unknown as Headers & { getSetCookie: () => string[] }).getSetCookie();
-  cookies.forEach(cookie => {
+  api.headers['set-cookie']?.forEach(cookie => {
     const { name, value, options } = parseSetCookie(cookie);
     response.cookies.set(name, value, options);
   });

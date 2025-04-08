@@ -24,6 +24,7 @@ export default function AppointmentList() {
               <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg">
                 <Image
                   fill
+                  sizes="64px"
                   src={appointment.profileImage ?? '/sample.jpg'}
                   alt={appointment.title}
                   className="object-cover"
