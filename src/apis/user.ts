@@ -2,6 +2,7 @@ import { apiPaths } from '@/constants/apis';
 import { privateClientFetch, privateServerFetch } from '@/libs/interceptor';
 import { UserDataResponse, UserInfoResponse } from '@/types/user';
 import { throwError } from '@/utils/apis';
+import { ApiError } from '@/utils/error';
 
 export const userApis = {
   search: async (userCode: string) => {
@@ -54,8 +55,10 @@ export const serverUserApis = {
       cache: 'no-store',
       next: { tags: ['userInfo'] },
     });
-    if (!response || response.status !== 200) {
-      throw new Error('api error');
+
+    if (response.status !== 200) {
+      const { status, code, message } = response;
+      throw new ApiError(status, code, message);
     }
     return response.data;
   },

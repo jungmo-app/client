@@ -2,6 +2,7 @@ import { QueryClient } from '@tanstack/react-query';
 import { apiPaths } from '@/constants/apis';
 import { GOOGLE_MAP_FIELD } from '@/constants/place';
 import { privateClientFetch, privateServerFetch } from '@/libs/interceptor';
+import { ApiError } from '@/utils/error';
 import { apis } from '.';
 import type {
   CreateGatheringRequest,
@@ -164,20 +165,26 @@ export const serverGatheringApis = {
       }
     );
 
-    if (!response || response.status !== 200) {
-      throw new Error('api error');
+    if (response.status !== 200) {
+      const { status, code, message } = response;
+      throw new ApiError(status, code, message);
     }
 
-    const appointmentList = await Promise.all(
-      response.data.map(async item => {
-        const place = await queryClient.fetchQuery({
-          queryKey: ['location', item.meetingLocation, 'name'],
-          queryFn: () => apis.serverPlace.getDetail(item.meetingLocation, ['name'], queryClient),
-        });
-        return { ...item, meetingLocation: place?.name ?? '' };
-      })
-    );
-    return appointmentList as GatheringListResponse[];
+    try {
+      const appointmentList = await Promise.all(
+        response.data.map(async item => {
+          const place = await queryClient.fetchQuery({
+            queryKey: ['location', item.meetingLocation, 'name'],
+            queryFn: () => apis.serverPlace.getDetail(item.meetingLocation, ['name'], queryClient),
+          });
+          return { ...item, meetingLocation: place?.name ?? '' };
+        })
+      );
+
+      return appointmentList as GatheringListResponse[];
+    } catch {
+      throw new ApiError(400, 'M001', '위치 데이터를 가져올 수 없습니다');
+    }
   },
   getDetail: async (id: number, queryClient: QueryClient) => {
     const response = await privateServerFetch<DetailGatheringRespose>(`${apiPaths.gathering.getDetail}/${id}`, {
@@ -186,41 +193,46 @@ export const serverGatheringApis = {
       next: { tags: [`gathering-${id}`] },
     });
 
-    if (!response || response.status !== 200) {
-      throw new Error('api Error');
+    if (response.status !== 200) {
+      const { status, code, message } = response;
+      throw new ApiError(status, code, message);
     }
 
-    const meetingLocation = await queryClient.fetchQuery({
-      queryKey: ['location', response.data.meetingLocation.placeId, 'name', 'formatted_address', 'geometry'],
-      queryFn: () =>
-        apis.serverPlace.getDetail(
-          response.data.meetingLocation.placeId,
-          ['name', 'formatted_address', 'geometry'],
-          queryClient
-        ),
-    });
+    try {
+      const meetingLocation = await queryClient.fetchQuery({
+        queryKey: ['location', response.data.meetingLocation.placeId, 'name', 'formatted_address', 'geometry'],
+        queryFn: () =>
+          apis.serverPlace.getDetail(
+            response.data.meetingLocation.placeId,
+            ['name', 'formatted_address', 'geometry'],
+            queryClient
+          ),
+      });
 
-    const locations = await Promise.all(
-      response.data.locations.map(place =>
-        queryClient.fetchQuery({
-          queryKey: ['location', place.placeId, ...locationQuery],
-          queryFn: async () => {
-            const data = await apis.serverPlace.getDetail(place.placeId, locationQuery, queryClient);
-            return { ...data, id: place.id };
-          },
-        })
-      )
-    );
+      const locations = await Promise.all(
+        response.data.locations.map(place =>
+          queryClient.fetchQuery({
+            queryKey: ['location', place.placeId, ...locationQuery],
+            queryFn: async () => {
+              const data = await apis.serverPlace.getDetail(place.placeId, locationQuery, queryClient);
+              return { ...data, id: place.id };
+            },
+          })
+        )
+      );
 
-    return {
-      ...response.data,
-      meetingLocation: {
-        placeId: response.data.meetingLocation.placeId,
-        placeName: meetingLocation?.name,
-        placeAddress: meetingLocation?.formatted_address,
-        point: meetingLocation?.geometry,
-      },
-      locations,
-    } as DetailGatheringType;
+      return {
+        ...response.data,
+        meetingLocation: {
+          placeId: response.data.meetingLocation.placeId,
+          placeName: meetingLocation?.name,
+          placeAddress: meetingLocation?.formatted_address,
+          point: meetingLocation?.geometry,
+        },
+        locations,
+      } as DetailGatheringType;
+    } catch {
+      throw new ApiError(400, 'M001', '위치 데이터를 가져올 수 없습니다');
+    }
   },
 };

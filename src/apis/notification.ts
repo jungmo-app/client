@@ -1,6 +1,7 @@
 import { apiPaths } from '@/constants/apis';
 import { privateClientFetch, privateServerFetch } from '@/libs/interceptor';
 import { NotificationType } from '@/types/notification';
+import { ApiError } from '@/utils/error';
 
 export const notificationApis = {
   getNotification: async () => {
@@ -44,8 +45,9 @@ export const serverNotificationApis = {
       method: 'GET',
       cache: 'no-store',
     });
-    if (!response || response?.status !== 200) {
-      throw new Error('api error');
+    if (response.status !== 200) {
+      const { status, code, message } = response;
+      throw new ApiError(status, code, message);
     }
     return response.data;
   },

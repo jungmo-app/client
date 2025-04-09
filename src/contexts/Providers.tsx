@@ -1,8 +1,10 @@
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { apis } from '@/apis';
 import GlobalErrorBoundary from '@/components/ErrorBoundary/GlobalErrorBoundary';
 import { verifyToken } from '@/libs/auth/jwt';
+import { ApiError } from '@/types/apis';
 import { StrictPropsWithChildren } from '@/types/common';
 import { QueryClientProvider } from './QueryClientProvider';
 import { SessionContextProvider } from './SessionProvider';
@@ -12,10 +14,11 @@ export default async function Providers({ children }: StrictPropsWithChildren) {
   const queryClient = new QueryClient();
 
   const accessToken = cookies().get('accessToken')?.value;
-  try {
-    if (accessToken) {
-      const isValidToken = await verifyToken(accessToken);
-      if (isValidToken) {
+
+  if (accessToken) {
+    const isValidToken = await verifyToken(accessToken);
+    if (isValidToken) {
+      try {
         await queryClient.prefetchQuery({
           queryKey: ['userData'],
           queryFn: apis.serverUser.getInfo,
@@ -25,10 +28,15 @@ export default async function Providers({ children }: StrictPropsWithChildren) {
           queryKey: ['notification'],
           queryFn: apis.serverNotification.getNotification,
         });
+      } catch (error) {
+        const apiError = error as ApiError;
+        if (apiError.status === 401 && apiError.code.startsWith('T')) {
+          redirect(`/login?date=${Date.now()}`);
+        }
+        console.error(error);
       }
+      return;
     }
-  } catch (error) {
-    console.error(error);
   }
 
   const dehydratedState = dehydrate(queryClient);

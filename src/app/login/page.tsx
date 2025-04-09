@@ -1,19 +1,7 @@
-import { cookies } from 'next/headers';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 import LoginForm from './loginForm';
 
-interface LoginPageProps {
-  searchParams: Record<string, string | undefined>;
-}
-
-export default function LoginPage({ searchParams }: LoginPageProps) {
-  const accessToken = cookies().get('accessToken')?.value;
-  const { refer } = searchParams;
-  if (accessToken) {
-    redirect(refer ? `${refer}?date=${Date.now()}` : '/');
-  }
-
+export default function LoginPage() {
   return (
     <div className="flex min-h-screen flex-col justify-center bg-background p-4">
       <div className="mx-auto w-full max-w-md space-y-6">

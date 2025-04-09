@@ -1,5 +1,6 @@
 import { apis } from '@/apis';
 import { ApiResponse } from '@/types/apis';
+import { ApiError } from '@/utils/error';
 import { getCookie } from './serverAction';
 
 const setHeaders = (init?: RequestInit, token?: string) => {
@@ -33,11 +34,15 @@ const fetchApi = async (url: string, init?: RequestInit, token?: string) => {
   });
 };
 export const privateServerFetch = async <T>(url: string, init?: RequestInit) => {
-  const accessToken = await getCookie('accessToken');
-  const response = await fetchApi(url, init, accessToken);
+  try {
+    const accessToken = await getCookie('accessToken');
+    const response = await fetchApi(url, init, accessToken);
 
-  const res: ApiResponse<T> = await response.json();
-  return res;
+    const res: ApiResponse<T> = await response.json();
+    return res;
+  } catch (error: unknown) {
+    throw new ApiError(500, 'F001', '내부 fetch 오류');
+  }
 };
 
 export const privateClientFetch = async <T>(url: string, init?: RequestInit) => {
@@ -49,7 +54,7 @@ export const privateClientFetch = async <T>(url: string, init?: RequestInit) => 
     if (response.status === 401) {
       const res = await apis.auth.refreshToken();
       if (!res) {
-        throw new Error('unauthorization');
+        throw new ApiError(401, 'T999', '토큰 재발급 실패');
       }
 
       console.log('refresh');
