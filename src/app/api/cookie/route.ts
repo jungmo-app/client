@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { logout } from '@/utils/cookie';
+import { logout } from '@/libs/serverAction';
 
 export async function POST(request: Request) {
   const { searchParams } = new URL(request.url);

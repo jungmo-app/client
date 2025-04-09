@@ -2,7 +2,7 @@ import { NextURL } from 'next/dist/server/web/next-url';
 import { NextRequest, NextResponse } from 'next/server';
 import { apis } from './apis';
 import { verifyToken } from './libs/auth/jwt';
-import { logout } from './utils/cookie';
+import { logout } from './libs/serverAction';
 import { parseSetCookie } from './utils/formatText';
 
 const setResponseCookies = (response: NextResponse, setCookieHeader: string[] | string | undefined) => {

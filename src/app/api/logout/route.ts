@@ -2,7 +2,7 @@ import axios from 'axios';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { apiPaths } from '@/constants/apis';
-import { resetCookie } from '@/utils/cookie';
+import { resetCookie } from '@/libs/serverAction';
 
 export async function POST() {
   const accessToken = cookies().get('accessToken')?.value;

@@ -4,7 +4,7 @@ import { useFormContext } from 'react-hook-form';
 import { Calendar } from 'lucide-react';
 import { DatePickerSheet, TimePickerSheet } from '@/components';
 import { Card, Label } from '@/components/ui';
-import { formattedDate } from '@/libs/date';
+import { formattedDate } from '@/utils/date';
 
 export default function DateInput() {
   const { getValues, setValue } = useFormContext();
