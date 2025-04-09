@@ -1,7 +1,6 @@
 import { apiPaths } from '@/constants/apis';
 import { privateClientFetch, privateServerFetch } from '@/libs/interceptor';
 import { NotificationType } from '@/types/notification';
-import { ApiError } from '@/utils/error';
 
 export const notificationApis = {
   getNotification: async () => {
@@ -10,10 +9,6 @@ export const notificationApis = {
       cache: 'no-store',
     });
 
-    if (!response || response.status !== 200) {
-      throw new Error('api ERROR');
-    }
-
     return response.data;
   },
   deleteNotification: async (notificationIds: number[]) => {
@@ -21,10 +16,8 @@ export const notificationApis = {
       method: 'DELETE',
       body: JSON.stringify({ notificationIds }),
     });
-    if (!response || response.status !== 200) {
-      throw new Error('api error');
-    }
-    return response;
+
+    return response.data;
   },
   readNotification: async (notificationIds: number[]) => {
     const response = await privateClientFetch(apiPaths.notification.readNotification, {
@@ -32,10 +25,7 @@ export const notificationApis = {
       body: JSON.stringify({ notificationIds }),
     });
 
-    if (!response || response.status !== 200) {
-      throw new Error('api error');
-    }
-    return response;
+    return response.data;
   },
 };
 
@@ -45,10 +35,7 @@ export const serverNotificationApis = {
       method: 'GET',
       cache: 'no-store',
     });
-    if (response.status !== 200) {
-      const { status, code, message } = response;
-      throw new ApiError(status, code, message);
-    }
+
     return response.data;
   },
 };

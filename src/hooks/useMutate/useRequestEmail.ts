@@ -2,8 +2,8 @@
 
 import { useMutation } from '@tanstack/react-query';
 import { apis } from '@/apis';
-import { ApiError } from '@/types/apis';
 import { SetPasswordFormValues } from '@/types/auth';
+import { ApiError } from '@/utils/error';
 
 interface RequestEmailProps {
   onSuccess?: () => void;

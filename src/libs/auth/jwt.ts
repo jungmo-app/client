@@ -2,7 +2,6 @@
 
 import { jwtVerify } from 'jose';
 import { JWTExpired } from 'jose/errors';
-import { apis } from '@/apis';
 
 const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
 
@@ -14,17 +13,9 @@ export const verifyToken = async (accessToken: string) => {
     await jwtVerify(accessToken, encodedKey, {
       algorithms: ['HS256'],
     });
-    const isBlacklist = await apis.auth.checkBlacklist(accessToken);
-    if (isBlacklist) {
-      return undefined;
-    }
     return true;
   } catch (error) {
     if (error instanceof JWTExpired) {
-      const isBlacklist = await apis.auth.checkBlacklist(accessToken);
-      if (isBlacklist) {
-        return undefined;
-      }
       return false;
     }
     /* console.log('* 검증 실패'); */

@@ -3,8 +3,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
-import { ApiError } from '@/types/apis';
 import { ResetPasswordPayload } from '@/types/auth';
+import { ApiError } from '@/utils/error';
 
 export const usePasswordReset = () => {
   const router = useRouter();

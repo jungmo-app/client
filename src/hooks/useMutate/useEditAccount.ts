@@ -2,8 +2,8 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apis } from '@/apis';
-import { ApiError } from '@/types/apis';
 import { UserDataResponse } from '@/types/user';
+import { ApiError } from '@/utils/error';
 
 interface PayloadType {
   userName: string;

@@ -8,8 +8,8 @@ import { Button, Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
 import { SessionContext } from '@/contexts/SessionProvider';
 import { useLogin } from '@/hooks/useMutate/useLogin';
 import { loginSchema } from '@/schemas/auth';
-import { ApiError } from '@/types/apis';
 import { LoginRequest } from '@/types/auth';
+import { ApiError } from '@/utils/error';
 
 export default function LoginForm() {
   const form = useForm<LoginRequest>({

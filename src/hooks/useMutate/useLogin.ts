@@ -5,8 +5,8 @@ import { useMutation } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apis } from '@/apis';
 import { SessionContext } from '@/contexts/SessionProvider';
-import { ApiError } from '@/types/apis';
 import { LoginRequest } from '@/types/auth';
+import { ApiError } from '@/utils/error';
 
 interface LoginProps {
   onError?: (error: ApiError) => void;
@@ -28,17 +28,19 @@ export const useLogin = ({ onSuccess, onError }: LoginProps = {}) => {
     },
     onSuccess: async () => {
       onSuccess?.();
-      console.log('aaa');
       try {
         await openSession();
         const refer = params.get('refer');
         router.push(`${refer ?? '/'}`);
         router.refresh();
-      } catch {
+      } catch (error) {
         closeSession();
         if (onError) {
-          const error = { status: 400, message: '세션 연결 실패', code: '' } as ApiError;
-          onError(error);
+          if (error instanceof ApiError) {
+            onError(error);
+          } else {
+            onError(new ApiError(500, 'F001'));
+          }
         }
       } finally {
         setIsPending(false);

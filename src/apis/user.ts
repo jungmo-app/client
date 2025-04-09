@@ -1,7 +1,6 @@
 import { apiPaths } from '@/constants/apis';
 import { privateClientFetch, privateServerFetch } from '@/libs/interceptor';
 import { UserDataResponse, UserInfoResponse } from '@/types/user';
-import { throwError } from '@/utils/apis';
 import { ApiError } from '@/utils/error';
 
 export const userApis = {
@@ -12,9 +11,6 @@ export const userApis = {
       next: { tags: ['info'] },
     });
 
-    if (!response || response.status !== 200) {
-      throw new Error('api error');
-    }
     return response.data;
   },
   getInfo: async () => {
@@ -23,15 +19,23 @@ export const userApis = {
       cache: 'no-store',
       next: { tags: ['userInfo'] },
     });
-    console.log(response);
-    return throwError(response);
+
+    return response.data;
   },
   deleteAccount: async () => {
-    const response = await fetch('/api/deleteAccount', {
-      method: 'POST',
-    });
-    if (!response.ok) {
-      throw new Error('계정 삭제 실패');
+    try {
+      const response = await fetch('/api/deleteAccount', {
+        method: 'POST',
+      });
+
+      if (response.status !== 200) {
+        throw new ApiError(response.status, 'DA001', '계정 삭제에 실패하였습니다.');
+      }
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw error;
+      }
+      throw new ApiError(500, 'F001');
     }
   },
   editInfo: async (payload: FormData) => {
@@ -42,9 +46,8 @@ export const userApis = {
       },
       body: payload,
     });
-    if (!response || response.status !== 200) {
-      throw new Error('api error');
-    }
+
+    return response.data;
   },
 };
 
@@ -56,10 +59,6 @@ export const serverUserApis = {
       next: { tags: ['userInfo'] },
     });
 
-    if (response.status !== 200) {
-      const { status, code, message } = response;
-      throw new ApiError(status, code, message);
-    }
     return response.data;
   },
 };

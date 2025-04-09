@@ -4,8 +4,8 @@ import { redirect } from 'next/navigation';
 import { apis } from '@/apis';
 import GlobalErrorBoundary from '@/components/ErrorBoundary/GlobalErrorBoundary';
 import { verifyToken } from '@/libs/auth/jwt';
-import { ApiError } from '@/types/apis';
 import { StrictPropsWithChildren } from '@/types/common';
+import { ApiError } from '@/utils/error';
 import { QueryClientProvider } from './QueryClientProvider';
 import { SessionContextProvider } from './SessionProvider';
 import { ThemeProvider } from './ThemeProvider';
@@ -29,13 +29,11 @@ export default async function Providers({ children }: StrictPropsWithChildren) {
           queryFn: apis.serverNotification.getNotification,
         });
       } catch (error) {
-        const apiError = error as ApiError;
-        if (apiError.status === 401 && apiError.code.startsWith('T')) {
+        if (error instanceof ApiError && error.status === 401 && error.code.startsWith('T')) {
           redirect(`/login?date=${Date.now()}`);
         }
         console.error(error);
       }
-      return;
     }
   }
 

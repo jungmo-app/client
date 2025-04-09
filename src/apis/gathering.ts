@@ -27,23 +27,21 @@ export const gatheringApis = {
       method: 'POST',
       body: JSON.stringify(payload),
     });
-    return response;
+
+    return response.data;
   },
 
   getList: async (date: Date, queryClient: QueryClient) => {
     const currentDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-    try {
-      const response = await privateClientFetch<GatheringListResponse[]>(
-        `${apiPaths.gathering.getList}?currentDate=${currentDate}`,
-        {
-          method: 'GET',
-          cache: 'no-store',
-        }
-      );
-      if (!response || response.status !== 200) {
-        throw new Error('api error');
+    const response = await privateClientFetch<GatheringListResponse[]>(
+      `${apiPaths.gathering.getList}?currentDate=${currentDate}`,
+      {
+        method: 'GET',
+        cache: 'no-store',
       }
+    );
 
+    try {
       const appointmentList = await Promise.all(
         response.data.map(async item => {
           const place = await queryClient.fetchQuery({
@@ -55,7 +53,7 @@ export const gatheringApis = {
       );
       return appointmentList as GatheringListResponse[];
     } catch {
-      return null;
+      throw new ApiError(400, 'M001');
     }
   },
 
@@ -64,19 +62,16 @@ export const gatheringApis = {
       method: 'PUT',
       body: JSON.stringify(payload),
     });
-    if (response?.status !== 200) {
-      throw new Error('api error');
-    }
+
+    return response.data;
   },
 
   delete: async (id: number) => {
     const response = await privateClientFetch(`${apiPaths.gathering.delete}/${id}`, {
       method: 'DELETE',
     });
-    console.log(response?.status);
-    if (response?.status !== 200) {
-      throw new Error('api error');
-    }
+
+    return response.data;
   },
 
   getDetail: async (id: number, queryClient: QueryClient): Promise<DetailGatheringType> => {
@@ -85,59 +80,53 @@ export const gatheringApis = {
       cache: 'no-store',
       next: { tags: [`gathering-${id}`] },
     });
-    if (!response || response.status !== 200) {
-      throw new Error('api error');
+
+    try {
+      const meetingLocation = await queryClient.fetchQuery({
+        queryKey: ['location', response.data.meetingLocation.placeId, 'name', 'formatted_address', 'geometry'],
+        queryFn: () =>
+          apis.place.getDetail(
+            response.data.meetingLocation.placeId,
+            ['name', 'formatted_address', 'geometry'],
+            queryClient
+          ),
+      });
+
+      const locations = await Promise.all(
+        response.data.locations.map(place =>
+          queryClient.fetchQuery({
+            queryKey: ['location', place.placeId, ...locationQuery],
+            queryFn: async () => {
+              const data = await apis.place.getDetail(place.placeId, locationQuery, queryClient);
+              return { ...data, id: place.id };
+            },
+          })
+        )
+      );
+      return {
+        ...response.data,
+        meetingLocation: {
+          placeId: response.data.meetingLocation.placeId,
+          placeName: meetingLocation?.name,
+          placeAddress: meetingLocation?.formatted_address,
+          point: meetingLocation?.geometry,
+        },
+        locations,
+      };
+    } catch {
+      throw new ApiError(400, 'M001');
     }
-
-    const meetingLocation = await queryClient.fetchQuery({
-      queryKey: ['location', response.data.meetingLocation.placeId, 'name', 'formatted_address', 'geometry'],
-      queryFn: () =>
-        apis.place.getDetail(
-          response.data.meetingLocation.placeId,
-          ['name', 'formatted_address', 'geometry'],
-          queryClient
-        ),
-    });
-
-    const locations = await Promise.all(
-      response.data.locations.map(place =>
-        queryClient.fetchQuery({
-          queryKey: ['location', place.placeId, ...locationQuery],
-          queryFn: async () => {
-            const data = await apis.place.getDetail(place.placeId, locationQuery, queryClient);
-            return { ...data, id: place.id };
-          },
-        })
-      )
-    );
-
-    return {
-      ...response.data,
-      meetingLocation: {
-        placeId: response.data.meetingLocation.placeId,
-        placeName: meetingLocation?.name,
-        placeAddress: meetingLocation?.formatted_address,
-        point: meetingLocation?.geometry,
-      },
-      locations,
-    };
   },
 
   deleteLocation: async (gatheringId: number, locationId: number) => {
-    try {
-      const response = await privateClientFetch(
-        `${apiPaths.gathering.deleteLocation}/${gatheringId}/locations/${locationId}`,
-        {
-          method: 'DELETE',
-        }
-      );
-      if (response?.status === 200) {
-        return true;
+    const response = await privateClientFetch(
+      `${apiPaths.gathering.deleteLocation}/${gatheringId}/locations/${locationId}`,
+      {
+        method: 'DELETE',
       }
-      throw new Error('api error');
-    } catch {
-      return false;
-    }
+    );
+
+    return response.data;
   },
 
   addLocation: async (gatheringId: number, placeId: string) => {
@@ -145,9 +134,6 @@ export const gatheringApis = {
       method: 'POST',
       body: JSON.stringify({ placeId }),
     });
-    if (!response || response.status !== 200) {
-      throw new Error('api error');
-    }
 
     return response.data;
   },
@@ -156,7 +142,6 @@ export const gatheringApis = {
 export const serverGatheringApis = {
   getList: async (date: Date, queryClient: QueryClient) => {
     const currentDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-
     const response = await privateServerFetch<GatheringListResponse[]>(
       `${apiPaths.gathering.getList}?currentDate=${currentDate}`,
       {
@@ -164,11 +149,6 @@ export const serverGatheringApis = {
         cache: 'no-store',
       }
     );
-
-    if (response.status !== 200) {
-      const { status, code, message } = response;
-      throw new ApiError(status, code, message);
-    }
 
     try {
       const appointmentList = await Promise.all(
@@ -192,11 +172,6 @@ export const serverGatheringApis = {
       cache: 'no-store',
       next: { tags: [`gathering-${id}`] },
     });
-
-    if (response.status !== 200) {
-      const { status, code, message } = response;
-      throw new ApiError(status, code, message);
-    }
 
     try {
       const meetingLocation = await queryClient.fetchQuery({

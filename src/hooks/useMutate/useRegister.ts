@@ -5,8 +5,8 @@ import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
 import { SessionContext } from '@/contexts/SessionProvider';
-import { ApiError } from '@/types/apis';
 import { SignupFormValues } from '@/types/auth';
+import { ApiError } from '@/utils/error';
 
 export const useRegister = () => {
   const router = useRouter();
