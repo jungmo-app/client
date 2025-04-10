@@ -112,24 +112,4 @@ export const authApis = {
       throw new ApiError(500, 'F002');
     }
   },
-
-  deleteCookie: async () => {
-    const refer = window.location.pathname;
-    try {
-      const response = await fetch(`/api/cookie?refer=${refer}`, {
-        method: 'POST',
-      });
-      if (response.status !== 200) {
-        throw new ApiError(400, 'DC001', '쿠기 삭제에 실패하였습니다.');
-      }
-      if (response.redirected) {
-        window.location.href = response.url;
-      }
-    } catch (error) {
-      if (error instanceof ApiError) {
-        throw error;
-      }
-      throw new ApiError(500, 'F001');
-    }
-  },
 } as const;
