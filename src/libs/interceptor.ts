@@ -56,7 +56,6 @@ export const privateServerFetch = async <T>(url: string, init?: RequestInit) => 
 export const privateClientFetch = async <T>(url: string, init?: RequestInit) => {
   try {
     const accessToken = await getCookie('accessToken');
-    console.log(accessToken);
     const response = await fetchApi(url, init, accessToken);
 
     if (response.status === 401) {

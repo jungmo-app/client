@@ -1,14 +1,28 @@
 'use client';
 
+import { useCallback, useEffect, useState } from 'react';
 import { PlusCircle } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import LoadingIcon from '@/components/common/loadingIcon';
 import { Button } from '@/components/ui';
 import { useAppointmentList } from '@/hooks/useQuery/useAppointmentList';
+import AppointmentCard from './appointmentCard';
 
 export default function AppointmentList() {
   const { data: appointments, isPending } = useAppointmentList();
+  const [cardLoad, setCardLoad] = useState<boolean[]>([]);
+
+  useEffect(() => {
+    if (appointments) {
+      setCardLoad(new Array(appointments.length).fill(false));
+    }
+  }, [appointments]);
+
+  const handleCardReady = useCallback((index: number) => {
+    setCardLoad(prev => prev.map((isLoaded, i) => (i === index ? true : isLoaded)));
+  }, []);
+
+  const isLoaded = cardLoad.every(Boolean);
 
   return (
     <div className="flex flex-grow flex-col space-y-6 p-4">
@@ -19,24 +33,13 @@ export default function AppointmentList() {
         </div>
       ) : (
         <>
-          {appointments?.map(appointment => (
-            <Link key={appointment.id} href={`/appointment/${appointment.id}`} className="flex items-center gap-4 p-2">
-              <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg">
-                <Image
-                  fill
-                  sizes="64px"
-                  src={appointment.profileImage ?? '/sample.jpg'}
-                  alt={appointment.title}
-                  className="object-cover"
-                  priority={true}
-                />
-              </div>
-              <div className="flex-1 overflow-hidden">
-                <h3 className="truncate font-medium">{appointment.title}</h3>
-                <p className="truncate text-sm text-muted-foreground">{`${appointment.startDate} ${appointment.startTime}`}</p>
-                <p className="truncate text-sm text-muted-foreground">{appointment.meetingLocation}</p>
-              </div>
-            </Link>
+          {appointments?.map((appointment, i) => (
+            <AppointmentCard
+              key={appointment.id}
+              appointment={appointment}
+              isAllLoaded={!isLoaded}
+              onLoad={() => handleCardReady(i)}
+            />
           ))}
           <div className="mx-2">
             <Button asChild variant="outline" className="h-auto w-full justify-start gap-2 py-4" aria-label="일정 추가">

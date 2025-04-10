@@ -39,7 +39,6 @@ export const logout = (res: NextResponse) => {
 export const redirectLogin = () => {
   const accessToken = cookies().get('accessToken')?.value;
   if (!accessToken) {
-    console.log(accessToken);
     redirect('/login');
   }
 };

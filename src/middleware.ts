@@ -5,20 +5,27 @@ import { verifyToken } from './libs/auth/jwt';
 import { logout } from './libs/serverAction';
 import { parseSetCookie } from './utils/formatText';
 
-const setResponseCookies = (response: NextResponse, setCookieHeader: string[] | string | undefined) => {
-  if (!setCookieHeader) return;
-
-  const cookieArray = Array.isArray(setCookieHeader) ? [...setCookieHeader] : [setCookieHeader];
-  cookieArray.forEach(cookie => {
-    const { name, value, options } = parseSetCookie(cookie);
-    response.cookies.set(name, value, options);
-  });
-};
-
 const redirectTo = (refer: string | null, baseUrl: NextURL) => {
   const safePath = refer ?? '/';
   const finalUrl = `${baseUrl.origin}${safePath}`;
   return NextResponse.redirect(finalUrl);
+};
+
+const refreshAccessToken = async (response: NextResponse, baseUrl: NextURL) => {
+  try {
+    const api = await apis.auth.refreshToken();
+
+    const cookies = (api.headers as unknown as Headers & { getSetCookie: () => string[] }).getSetCookie();
+    cookies.forEach(cookie => {
+      const { name, value, options } = parseSetCookie(cookie);
+      response.cookies.set(name, value, options);
+    });
+    return response;
+  } catch {
+    const res = redirectTo('/login', baseUrl);
+    logout(res);
+    return res;
+  }
 };
 
 export const middleware = async (request: NextRequest) => {
@@ -43,12 +50,8 @@ export const middleware = async (request: NextRequest) => {
       const isValid = await verifyToken(accessToken);
 
       if (isValid === false) {
-        const api = await apis.auth.refreshToken();
-        if (api) {
-          const response = redirectTo(searchParams.get('refer'), request.nextUrl);
-          setResponseCookies(response, api.headers['set-cookie']);
-          return response;
-        }
+        const response = redirectTo(searchParams.get('refer'), request.nextUrl);
+        return await refreshAccessToken(response, request.nextUrl);
       }
 
       if (isValid === true) {
@@ -82,17 +85,8 @@ export const middleware = async (request: NextRequest) => {
     return response;
   }
 
-  const api = await apis.auth.refreshToken();
-  if (!api) {
-    const redirectUrl = new URL(`/login?refer=${pathname}`, request.url);
-    const response = NextResponse.redirect(redirectUrl);
-    logout(response);
-    return response;
-  }
-
   const response = NextResponse.next();
-  setResponseCookies(response, api.headers['set-cookie']);
-  return response;
+  return await refreshAccessToken(response, request.nextUrl);
 };
 
 export const config = {

@@ -31,7 +31,7 @@ export const gatheringApis = {
     return response.data;
   },
 
-  getList: async (date: Date, queryClient: QueryClient) => {
+  getList: async (date: Date) => {
     const currentDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
     const response = await privateClientFetch<GatheringListResponse[]>(
       `${apiPaths.gathering.getList}?currentDate=${currentDate}`,
@@ -41,20 +41,7 @@ export const gatheringApis = {
       }
     );
 
-    try {
-      const appointmentList = await Promise.all(
-        response.data.map(async item => {
-          const place = await queryClient.fetchQuery({
-            queryKey: ['location', item.meetingLocation, 'name'],
-            queryFn: () => apis.place.getDetail(item.meetingLocation, ['name'], queryClient),
-          });
-          return { ...item, meetingLocation: place?.name ?? '' };
-        })
-      );
-      return appointmentList as GatheringListResponse[];
-    } catch {
-      throw new ApiError(400, 'M001');
-    }
+    return response.data;
   },
 
   edit: async (id: number, payload: CreateGatheringRequest) => {
