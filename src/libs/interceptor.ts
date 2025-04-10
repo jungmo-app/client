@@ -4,6 +4,11 @@ import { ApiResponse } from '@/types/apis';
 import { ApiError } from '@/utils/error';
 import { getCookie } from './serverAction';
 
+interface PrivateFetchOptions {
+  isClient?: boolean;
+  requireAuth?: boolean;
+}
+
 const setHeaders = (init?: RequestInit, token?: string) => {
   const headers =
     init?.headers instanceof Headers
@@ -34,83 +39,49 @@ const fetchApi = async (url: string, init?: RequestInit, token?: string) => {
     headers: header,
   });
 };
-export const privateServerFetch = async <T>(url: string, init?: RequestInit) => {
-  try {
-    const accessToken = await getCookie('accessToken');
-    const response = await fetchApi(url, init, accessToken);
 
-    const res: ApiResponse<T> = await response.json();
+const parseResponse = async <T>(response: Response) => {
+  const res: ApiResponse<T> = await response.json();
 
-    if (res.status !== 200) {
-      const { status, code, message } = res;
-      throw new ApiError(status, code, message);
-    }
-    return res;
-  } catch (error) {
-    if (error instanceof ApiError) {
-      throw error;
-    }
-    throw new ApiError(500, 'F001');
+  if (response.status !== 200) {
+    throw new ApiError(res.status, res.code, res.message);
   }
+  return res;
 };
 
-export const privateClientFetch = async <T>(url: string, init?: RequestInit) => {
+const privateFetch = async <T>(url: string, init?: RequestInit, options: PrivateFetchOptions = {}) => {
+  const { isClient = false, requireAuth = true } = options;
   try {
-    const accessToken = await getCookie('accessToken');
+    const accessToken = requireAuth ? await getCookie('accessToken') : undefined;
     const response = await fetchApi(url, init, accessToken);
 
-    if (response.status === 401) {
+    if (response.status === 401 && isClient && requireAuth) {
       try {
         await apis.auth.refreshToken();
         const newToken = await getCookie('accessToken');
-        const retrypResponse = await fetchApi(url, init, newToken);
-        const restryRes = (await retrypResponse.json()) as ApiResponse<T>;
-
-        if (retrypResponse.status !== 200) {
-          const { status, code, message } = restryRes;
-          throw new ApiError(status, code, message);
-        }
-
-        return restryRes;
+        const retryResponse = await fetchApi(url, init, newToken);
+        const res = await parseResponse<T>(retryResponse);
+        return res;
       } catch (error) {
+        alert('세션이 만료되었습니다');
         window.location.replace('/login');
+
         if (error instanceof ApiError) {
-          throw new ApiError(error.status, error.code, error.message);
+          throw error;
         }
 
         if (axios.isAxiosError(error) && error.response) {
-          const status = error.response.status;
-          const code = error.response.data.code as string;
-          const message = error.response.data.message as string;
-
+          const {
+            status,
+            data: { code, message },
+          } = error.response;
           throw new ApiError(status, code, message);
         }
+
         throw new ApiError(500, 'F001');
       }
     }
-
-    const res = (await response.json()) as ApiResponse<T>;
-    if (response.status !== 200) {
-      const { status, code, message } = res;
-      throw new ApiError(status, code, message);
-    }
-    return res;
-  } catch (error) {
-    if (error instanceof ApiError) {
-      throw new ApiError(error.status, error.code, error.message);
-    }
-    throw new ApiError(500, 'F001');
-  }
-};
-
-export const customFetch = async <T>(url: string, init?: RequestInit) => {
-  try {
-    const response = await fetchApi(url, init);
-    const res: ApiResponse<T> = await response.json();
-    if (res.status !== 200) {
-      const { status, code, message } = res;
-      throw new ApiError(status, code, message);
-    }
+    const res = await parseResponse<T>(response);
     return res;
   } catch (error) {
     if (error instanceof ApiError) {
@@ -118,4 +89,16 @@ export const customFetch = async <T>(url: string, init?: RequestInit) => {
     }
     throw new ApiError(500, 'F001');
   }
+};
+
+export const privateServerFetch = <T>(url: string, init?: RequestInit) => {
+  return privateFetch<T>(url, init);
+};
+
+export const privateClientFetch = <T>(url: string, init?: RequestInit) => {
+  return privateFetch<T>(url, init, { isClient: true });
+};
+
+export const customFetch = async <T>(url: string, init?: RequestInit) => {
+  return privateFetch<T>(url, init, { requireAuth: false });
 };

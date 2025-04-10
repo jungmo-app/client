@@ -103,10 +103,10 @@ export const authApis = {
       return response;
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        const status = error.response.status;
-        const code = error.response.data.code as string;
-        const message = error.response.data.message as string;
-
+        const {
+          status,
+          data: { code, message },
+        } = error.response;
         throw new ApiError(status, code, message);
       }
       throw new ApiError(500, 'F002');
