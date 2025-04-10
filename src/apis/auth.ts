@@ -27,7 +27,7 @@ export const authApis = {
       });
       const res: ApiResponse = await response.json();
 
-      if (res.status !== 200) {
+      if (response.status !== 200) {
         const { status, code, message } = res;
         throw new ApiError(status, code, message);
       }
