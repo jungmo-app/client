@@ -14,9 +14,9 @@ const queryClientOption: QueryClientConfig = {
   defaultOptions: {
     queries: {
       retry: false,
-      refetchOnMount: false,
       refetchOnWindowFocus: false,
       networkMode: 'always',
+      staleTime: 0,
     },
     mutations: {
       networkMode: 'always',

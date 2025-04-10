@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { PlusCircle } from 'lucide-react';
 import Link from 'next/link';
 import LoadingIcon from '@/components/common/loadingIcon';
@@ -10,19 +10,13 @@ import AppointmentCard from './appointmentCard';
 
 export default function AppointmentList() {
   const { data: appointments, isPending } = useAppointmentList();
-  const [cardLoad, setCardLoad] = useState<boolean[]>([]);
+  const [cardLoad, setCardLoad] = useState<Set<number>>(new Set());
 
-  useEffect(() => {
-    if (appointments) {
-      setCardLoad(new Array(appointments.length).fill(false));
-    }
-  }, [appointments]);
-
-  const handleCardReady = useCallback((index: number) => {
-    setCardLoad(prev => prev.map((isLoaded, i) => (i === index ? true : isLoaded)));
+  const handleCardReady = useCallback((id: number) => {
+    setCardLoad(prev => new Set(prev).add(id));
   }, []);
 
-  const isLoaded = cardLoad.every(Boolean);
+  const isLoaded = appointments?.every(appointment => cardLoad.has(appointment.id)) ?? true;
 
   return (
     <div className="flex flex-grow flex-col space-y-6 p-4">
@@ -33,12 +27,12 @@ export default function AppointmentList() {
         </div>
       ) : (
         <>
-          {appointments?.map((appointment, i) => (
+          {appointments?.map(appointment => (
             <AppointmentCard
               key={appointment.id}
               appointment={appointment}
-              isAllLoaded={!isLoaded}
-              onLoad={() => handleCardReady(i)}
+              isAllLoaded={isLoaded}
+              onLoad={() => handleCardReady(appointment.id)}
             />
           ))}
           <div className="mx-2">
