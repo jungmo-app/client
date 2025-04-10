@@ -81,11 +81,11 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
 
   const openSession = useCallback(async () => {
     console.log('session open');
-    try {
+    /* try {
       await connectSSE();
     } catch {
       console.log('sse error');
-    }
+    } */
 
     try {
       /* await connectSSE(); */
@@ -95,7 +95,7 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
       closeSSE();
       throw new Error('로그인 오류');
     }
-  }, [connectSSE, closeSSE, queryClient]);
+  }, [/* connectSSE, */ closeSSE, queryClient]);
 
   useEffect(() => {
     const getInitialConnetSession = async () => {

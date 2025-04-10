@@ -3,7 +3,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
-import { revalidatePage } from '@/libs/serverAction';
 import { GatheringListResponse } from '@/types/gathering';
 
 export const useDeleteAppointment = (id: number, date: Date, onSuccess?: () => void, onError?: () => void) => {
@@ -22,7 +21,6 @@ export const useDeleteAppointment = (id: number, date: Date, onSuccess?: () => v
           return prev.filter(item => item.id !== id);
         }
       );
-      revalidatePage(`/appointment/${id}`);
 
       if (onSuccess) {
         onSuccess();

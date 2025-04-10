@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apis } from './apis';
 import { verifyToken } from './libs/auth/jwt';
 import { logout } from './libs/serverAction';
-import { parseSetCookie } from './utils/formatText';
 
 const redirectTo = (refer: string | null, baseUrl: NextURL) => {
   const safePath = refer ?? '/';
@@ -12,16 +11,21 @@ const redirectTo = (refer: string | null, baseUrl: NextURL) => {
 };
 
 const refreshAccessToken = async (response: NextResponse, baseUrl: NextURL) => {
+  console.log('token refresh');
   try {
     const api = await apis.auth.refreshToken();
-
-    const cookies = (api.headers as unknown as Headers & { getSetCookie: () => string[] }).getSetCookie();
+    const setCookieHeader = api.headers['set-cookie'];
+    const cookies = Array.isArray(setCookieHeader) ? setCookieHeader : [setCookieHeader];
+    console.log(api.headers);
     cookies.forEach(cookie => {
-      const { name, value, options } = parseSetCookie(cookie);
-      response.cookies.set(name, value, options);
+      if (!cookie) {
+        return;
+      }
+      response.headers.append('set-cookie', cookie);
     });
     return response;
-  } catch {
+  } catch (error) {
+    console.log(error);
     const res = redirectTo('/login', baseUrl);
     logout(res);
     return res;
