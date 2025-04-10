@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { apis } from '@/apis';
 import { ApiResponse } from '@/types/apis';
 import { ApiError } from '@/utils/error';
@@ -59,24 +60,37 @@ export const privateClientFetch = async <T>(url: string, init?: RequestInit) => 
     const response = await fetchApi(url, init, accessToken);
 
     if (response.status === 401) {
-      const res = await apis.auth.refreshToken();
-      if (!res) {
-        throw new ApiError(401, 'T999', '토큰 재발급 실패');
-      }
+      try {
+        await apis.auth.refreshToken();
+        const newToken = await getCookie('accessToken');
+        const retrypResponse = await fetchApi(url, init, newToken);
+        const restryRes = (await retrypResponse.json()) as ApiResponse<T>;
 
-      const newToken = await getCookie('accessToken');
-      const retrypResponse = await fetchApi(url, init, newToken);
-      const restryRes = (await retrypResponse.json()) as ApiResponse<T>;
+        if (retrypResponse.status !== 200) {
+          const { status, code, message } = restryRes;
+          throw new ApiError(status, code, message);
+        }
 
-      if (retrypResponse.status !== 200) {
-        const { status, code, message } = restryRes;
-        throw new ApiError(status, code, message);
+        return restryRes;
+      } catch (error) {
+        window.location.replace('/login');
+        if (error instanceof ApiError) {
+          throw new ApiError(error.status, error.code, error.message);
+        }
+
+        if (axios.isAxiosError(error) && error.response) {
+          const status = error.response.status;
+          const code = error.response.data.code as string;
+          const message = error.response.data.message as string;
+
+          throw new ApiError(status, code, message);
+        }
+        throw new ApiError(500, 'F001');
       }
-      return restryRes;
     }
 
     const res = (await response.json()) as ApiResponse<T>;
-    if (res.status !== 200) {
+    if (response.status !== 200) {
       const { status, code, message } = res;
       throw new ApiError(status, code, message);
     }
