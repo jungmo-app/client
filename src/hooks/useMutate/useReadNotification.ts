@@ -2,8 +2,8 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apis } from '@/apis';
-import { ApiError } from '@/types/apis';
 import { NotificationType } from '@/types/notification';
+import { ApiError } from '@/utils/error';
 
 interface useDeleteNotificationProps {
   onSuccess?: () => void;

@@ -9,10 +9,6 @@ export const notificationApis = {
       cache: 'no-store',
     });
 
-    if (!response || response.status !== 200) {
-      throw new Error('api ERROR');
-    }
-
     return response.data;
   },
   deleteNotification: async (notificationIds: number[]) => {
@@ -20,10 +16,8 @@ export const notificationApis = {
       method: 'DELETE',
       body: JSON.stringify({ notificationIds }),
     });
-    if (!response || response.status !== 200) {
-      throw new Error('api error');
-    }
-    return response;
+
+    return response.data;
   },
   readNotification: async (notificationIds: number[]) => {
     const response = await privateClientFetch(apiPaths.notification.readNotification, {
@@ -31,10 +25,7 @@ export const notificationApis = {
       body: JSON.stringify({ notificationIds }),
     });
 
-    if (!response || response.status !== 200) {
-      throw new Error('api error');
-    }
-    return response;
+    return response.data;
   },
 };
 
@@ -44,9 +35,7 @@ export const serverNotificationApis = {
       method: 'GET',
       cache: 'no-store',
     });
-    if (!response || response?.status !== 200) {
-      throw new Error('api error');
-    }
+
     return response.data;
   },
 };

@@ -5,8 +5,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useDeleteNotification } from '@/hooks/useMutate/useDeleteNotification';
 import { useReadNotification } from '@/hooks/useMutate/useReadNotification';
-import { getTimeline } from '@/libs/date';
 import { NotificationType } from '@/types/notification';
+import { getTimeline } from '@/utils/date';
 
 interface NotificationProps {
   notification: NotificationType;

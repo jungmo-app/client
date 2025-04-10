@@ -2,8 +2,8 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apis } from '@/apis';
-import { ApiError } from '@/types/apis';
 import { DetailGatheringType } from '@/types/gathering';
+import { ApiError } from '@/utils/error';
 
 export const useAddLocation = (id: number) => {
   const queryClient = useQueryClient();

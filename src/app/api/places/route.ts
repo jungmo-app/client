@@ -1,4 +1,5 @@
 import { ApiResponse } from '@/types/apis';
+import { ApiError } from '@/utils/error';
 
 const responseData = <T>(value: T, status: number, message?: string) => {
   return {
@@ -27,7 +28,7 @@ export async function GET(req: Request) {
     );
 
     if (!response.ok) {
-      throw new Error('api error');
+      throw new ApiError(400, 'M001');
     }
     const { result } = await response.json();
     const res = responseData<google.maps.places.PlaceResult>(result, 200, '장소 가져오기에 성공하였습니다');

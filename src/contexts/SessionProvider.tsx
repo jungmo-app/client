@@ -77,29 +77,25 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
   const closeSession = useCallback(() => {
     closeSSE();
     queryClient.removeQueries({ queryKey: ['notification'] });
-    queryClient.removeQueries({ queryKey: ['userData'] });
   }, [closeSSE, queryClient]);
 
   const openSession = useCallback(async () => {
     console.log('session open');
-    try {
+    /* try {
       await connectSSE();
     } catch {
       console.log('sse error');
-    }
+    } */
 
     try {
       /* await connectSSE(); */
-      await Promise.all([
-        queryClient.fetchQuery({ queryKey: ['userData'], queryFn: apis.user.getInfo }),
-        queryClient.fetchQuery({ queryKey: ['notification'], queryFn: apis.notification.getNotification }),
-      ]);
+      await queryClient.fetchQuery({ queryKey: ['notification'], queryFn: apis.notification.getNotification });
     } catch (error) {
       console.log(error);
       closeSSE();
       throw new Error('로그인 오류');
     }
-  }, [connectSSE, closeSSE, queryClient]);
+  }, [/* connectSSE, */ closeSSE, queryClient]);
 
   useEffect(() => {
     const getInitialConnetSession = async () => {

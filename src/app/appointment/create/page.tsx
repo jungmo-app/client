@@ -6,8 +6,8 @@ import { DateInput, DescriptionInput, PlaceInput, TitleInput } from '@/app/appoi
 import { AttendeeInput, Header } from '@/components';
 import { Button } from '@/components/ui';
 import { useCreateAppointment } from '@/hooks/useMutate/useCreateAppointment';
-import { formattedDate } from '@/libs/date';
 import { UserDataResponse } from '@/types/user';
+import { formattedDate } from '@/utils/date';
 
 type AppointmentFormData = {
   title: string;

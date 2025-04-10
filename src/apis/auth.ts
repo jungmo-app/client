@@ -2,6 +2,7 @@ import axios from 'axios';
 import { apiPaths } from '@/constants/apis';
 import { customFetch, privateClientFetch } from '@/libs/interceptor';
 import { getCookie } from '@/libs/serverAction';
+import { ApiResponse } from '@/types/apis';
 import {
   ChangePasswordPayload,
   LoginRequest,
@@ -9,7 +10,7 @@ import {
   SetPasswordFormValues,
   SignupFormValues,
 } from '@/types/auth';
-import { throwError } from '@/utils/apis';
+import { ApiError } from '@/utils/error';
 
 export const authApis = {
   login: async (payload: LoginRequest) => {
@@ -17,17 +18,26 @@ export const authApis = {
       method: 'POST',
       body: JSON.stringify(payload),
     });
-
-    console.log(response);
-
-    return throwError(response);
+    return response.data;
   },
   logout: async () => {
-    const response = await fetch('/api/logout', {
-      method: 'POST',
-    });
-    if (!response.ok) {
-      throw new Error('로그아웃 실패');
+    try {
+      const response = await fetch('/api/logout', {
+        method: 'POST',
+      });
+      const res: ApiResponse = await response.json();
+
+      if (response.status !== 200) {
+        const { status, code, message } = res;
+        throw new ApiError(status, code, message);
+      }
+
+      return res.data;
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw error;
+      }
+      throw new ApiError(500, 'F001');
     }
   },
   register: async (payload: SignupFormValues) => {
@@ -36,7 +46,7 @@ export const authApis = {
       body: JSON.stringify(payload),
     });
 
-    return response;
+    return response.data;
   },
   changePassword: async (payload: ChangePasswordPayload) => {
     const response = await privateClientFetch(apiPaths.auth.changePassword, {
@@ -47,16 +57,16 @@ export const authApis = {
       credentials: 'include',
       body: JSON.stringify(payload),
     });
-    if (response?.status !== 200) {
-      throw new Error('api error');
-    }
+
+    return response.data;
   },
   setPassword: async (payload: SetPasswordFormValues) => {
     const response = await customFetch(apiPaths.auth.setPassword, {
       method: 'POST',
       body: JSON.stringify(payload),
     });
-    return throwError(response);
+
+    return response.data;
   },
   resetPassword: async (payload: ResetPasswordPayload) => {
     const response = await customFetch(apiPaths.auth.resetPassword, {
@@ -66,12 +76,15 @@ export const authApis = {
       },
       body: JSON.stringify(payload),
     });
-    return throwError(response);
+
+    return response.data;
   },
   refreshToken: async () => {
     const accessToken = await getCookie('accessToken');
     const refreshToken = await getCookie('refreshToken');
-    console.log(refreshToken);
+
+    const cookieHeader = [`accessToken=${accessToken}`, `refreshToken=${refreshToken}`].join('; ');
+
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.refreshToken.slice(1)}`,
@@ -80,38 +93,42 @@ export const authApis = {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${accessToken}`,
-            Cookie: `refreshToken=${refreshToken}`,
+            Cookie: cookieHeader,
           },
           withCredentials: true,
         }
       );
-      console.log(response);
+
       return response;
     } catch (error) {
-      console.log(error);
-      return undefined;
-    }
-  },
-  checkBlacklist: async (accessToken: string) => {
-    try {
-      const response = await customFetch<boolean>(`${apiPaths.auth.checkBlacklist}?accessToken=${accessToken}`);
-      if (response?.status === 200) {
-        const { data } = response;
-        return data;
+      if (axios.isAxiosError(error) && error.response) {
+        const status = error.response.status;
+        const code = error.response.data.code as string;
+        const message = error.response.data.message as string;
+
+        throw new ApiError(status, code, message);
       }
-      throw new Error('api error');
-    } catch {
-      return false;
+      throw new ApiError(500, 'F002');
     }
   },
+
   deleteCookie: async () => {
     const refer = window.location.pathname;
-    const response = await fetch(`/api/cookie?refer=${refer}`, {
-      method: 'POST',
-    });
-
-    if (response.redirected) {
-      window.location.href = response.url;
+    try {
+      const response = await fetch(`/api/cookie?refer=${refer}`, {
+        method: 'POST',
+      });
+      if (response.status !== 200) {
+        throw new ApiError(400, 'DC001', '쿠기 삭제에 실패하였습니다.');
+      }
+      if (response.redirected) {
+        window.location.href = response.url;
+      }
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw error;
+      }
+      throw new ApiError(500, 'F001');
     }
   },
 } as const;

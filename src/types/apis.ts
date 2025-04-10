@@ -11,8 +11,6 @@ export interface ApiResponse<T = undefined> {
   status: number;
 }
 
-export type ApiError = Omit<ApiResponse, 'data'>;
-
 export interface ApiErrorResponse extends Error {
   response: {
     data: {

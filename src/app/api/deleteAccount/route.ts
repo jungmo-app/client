@@ -1,9 +1,10 @@
+import axios from 'axios';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { apiPaths } from '@/constants/apis';
 import { baseAxios, extractAxiosData } from '@/libs/baseAxios';
+import { resetCookie } from '@/libs/serverAction';
 import { ApiResponse } from '@/types/apis';
-import { resetCookie } from '@/utils/cookie';
 
 export async function POST() {
   const accessToken = cookies().get('accessToken')?.value;
@@ -14,7 +15,7 @@ export async function POST() {
   }
 
   try {
-    const response = await extractAxiosData<ApiResponse>(
+    await extractAxiosData<ApiResponse>(
       baseAxios.delete(apiPaths.user.deleteAccount, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -24,14 +25,17 @@ export async function POST() {
       })
     );
 
-    if (response) {
-      const res = NextResponse.json({ message: '계정이 삭제되었습니다' }, { status: 200 });
-      resetCookie(res, 'accessToken');
-      resetCookie(res, 'refreshToken');
-      return res;
-    }
-    throw new Error('계정 삭제 api 오류');
+    const res = NextResponse.json({ message: '계정이 삭제되었습니다' }, { status: 200 });
+    resetCookie(res, 'accessToken');
+    resetCookie(res, 'refreshToken');
+
+    return res;
   } catch (error) {
-    return NextResponse.json({ message: '계정 삭제에 실패하였습니다' }, { status: 500 });
+    if (axios.isAxiosError(error) && error.response) {
+      const { status } = error.response;
+      const { code, message } = error.response.data;
+      return NextResponse.json({ message, code }, { status });
+    }
+    return NextResponse.json({ message: '계정 삭제 서버 오류류', code: 'DA001' }, { status: 500 });
   }
 }
