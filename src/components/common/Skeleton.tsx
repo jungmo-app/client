@@ -10,7 +10,7 @@ interface SkeletonProps extends RadixSkeletonProps {
 
 const Skeleton = forwardRef<ElementRef<typeof RadixSkeleton>, SkeletonProps>(
   ({ loading = false, delayTime = 0, ...props }, ref) => {
-    const [isPending, setIsPending] = useState(true);
+    const [isPending, setIsPending] = useState(loading);
     const isPassedDelayTime = useRef<boolean>(false);
     const currentLoading = useRef<boolean>(loading);
 

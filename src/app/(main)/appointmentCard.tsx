@@ -31,7 +31,7 @@ export default function AppointmentCard({ appointment, onLoad, isAllLoaded }: Ap
 
   return (
     <Link href={`/appointment/${id}`} className="flex items-center gap-4 p-2">
-      <Skeleton loading={isAllLoaded} delayTime={delayTime}>
+      <Skeleton loading={!isAllLoaded} delayTime={delayTime}>
         <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg">
           <Image
             fill
@@ -47,19 +47,25 @@ export default function AppointmentCard({ appointment, onLoad, isAllLoaded }: Ap
 
       <div className="flex-1 overflow-hidden">
         <h3 className="truncate font-medium">
-          <Skeleton loading={isAllLoaded} delayTime={delayTime}>
+          <Skeleton loading={!isAllLoaded} delayTime={delayTime}>
             {appointment.title}
           </Skeleton>
         </h3>
         <p className="truncate text-sm text-muted-foreground">
           <Skeleton
-            loading={isAllLoaded}
+            loading={!isAllLoaded}
             delayTime={delayTime}
           >{`${appointment.startDate} ${appointment.startTime}`}</Skeleton>
         </p>
 
         <p className="block w-full truncate text-sm text-muted-foreground">
-          <Skeleton loading={isAllLoaded} delayTime={delayTime} width="100%" height="20px" style={{ display: 'block' }}>
+          <Skeleton
+            loading={!isAllLoaded}
+            delayTime={delayTime}
+            width="100%"
+            height="20px"
+            style={{ display: 'block' }}
+          >
             {locationData?.name ?? '장소를 불러올 수 없습니다'}
           </Skeleton>
         </p>

@@ -138,17 +138,16 @@ export const serverGatheringApis = {
     );
 
     try {
-      const appointmentList = await Promise.all(
-        response.data.map(async item => {
-          const place = await queryClient.fetchQuery({
+      await Promise.all(
+        response.data.map(item => {
+          queryClient.fetchQuery({
             queryKey: ['location', item.meetingLocation, 'name'],
             queryFn: () => apis.serverPlace.getDetail(item.meetingLocation, ['name'], queryClient),
           });
-          return { ...item, meetingLocation: place?.name ?? '' };
         })
       );
 
-      return appointmentList as GatheringListResponse[];
+      return response.data as GatheringListResponse[];
     } catch {
       throw new ApiError(400, 'M001', '위치 데이터를 가져올 수 없습니다');
     }

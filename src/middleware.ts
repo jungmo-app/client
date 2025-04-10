@@ -11,12 +11,10 @@ const redirectTo = (refer: string | null, baseUrl: NextURL) => {
 };
 
 const refreshAccessToken = async (response: NextResponse, baseUrl: NextURL) => {
-  console.log('token refresh');
   try {
     const api = await apis.auth.refreshToken();
     const setCookieHeader = api.headers['set-cookie'];
     const cookies = Array.isArray(setCookieHeader) ? setCookieHeader : [setCookieHeader];
-    console.log(api.headers);
     cookies.forEach(cookie => {
       if (!cookie) {
         return;

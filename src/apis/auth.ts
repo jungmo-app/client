@@ -80,6 +80,7 @@ export const authApis = {
     return response.data;
   },
   refreshToken: async () => {
+    console.log('refreshToken');
     const accessToken = await getCookie('accessToken');
     const refreshToken = await getCookie('refreshToken');
 
