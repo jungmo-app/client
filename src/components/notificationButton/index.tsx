@@ -42,14 +42,14 @@ export default function NotificationButton() {
           </Button>
         </div>
       </PopoverTrigger>
-      <PopoverContent style={{ width: '300px', padding: '8px' }} align="end">
+      <PopoverContent style={{ width: '300px', padding: '8px' }} align="end" className="dark:border-gray-500">
         {notification && (
           <>
             <div className="my-2 flex items-center justify-between px-4">
               <span className="text-sm font-medium">{`알림 ${notification.length}개`}</span>
               {notification.length > 0 && (
                 <button
-                  className="select-none text-xs text-gray-500 outline-none transition hover:text-gray-800"
+                  className="select-none text-xs text-gray-500 outline-none transition hover:text-gray-800 dark:text-gray-300 dark:hover:text-white"
                   onClick={handleClickEditButton}
                 >
                   {isEdit ? '끝내기' : '편집하기'}
@@ -60,15 +60,6 @@ export default function NotificationButton() {
               <div className="mb-6 mt-2 flex max-h-80 w-full flex-col items-center gap-2 overflow-auto p-2 pb-2 text-sm">
                 {notification?.map(item => (
                   <Notification key={item.notificationId} notification={item} isEdit={isEdit} />
-                ))}
-                {notification?.map(item => (
-                  <Notification key={item.notificationId + 1} notification={item} isEdit={isEdit} />
-                ))}
-                {notification?.map(item => (
-                  <Notification key={item.notificationId + 2} notification={item} isEdit={isEdit} />
-                ))}
-                {notification?.map(item => (
-                  <Notification key={item.notificationId + 3} notification={item} isEdit={isEdit} />
                 ))}
               </div>
             ) : (

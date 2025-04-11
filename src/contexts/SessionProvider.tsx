@@ -88,14 +88,14 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
     } */
 
     try {
-      /* await connectSSE(); */
       await queryClient.fetchQuery({ queryKey: ['notification'], queryFn: apis.notification.getNotification });
+      await connectSSE();
     } catch (error) {
       console.log(error);
       closeSSE();
       throw new Error('로그인 오류');
     }
-  }, [/* connectSSE, */ closeSSE, queryClient]);
+  }, [connectSSE, closeSSE, queryClient]);
 
   useEffect(() => {
     const getInitialConnetSession = async () => {
