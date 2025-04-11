@@ -2,7 +2,7 @@
 
 import { PropsWithChildren, createContext, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import toast from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import { EventSourcePolyfill } from 'event-source-polyfill';
 import { apis } from '@/apis';
 import { apiPaths } from '@/constants/apis';
@@ -30,7 +30,7 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
 
   const connectSSE = useCallback(
     async (retry = 2) => {
-      if (retry === 0) {
+      if (eventSource.current || retry === 0) {
         return;
       }
 
@@ -95,11 +95,6 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
 
   const openSession = useCallback(async () => {
     console.log('session open');
-    /* try {
-      await connectSSE();
-    } catch {
-      console.log('sse error');
-    } */
 
     try {
       await queryClient.fetchQuery({ queryKey: ['notification'], queryFn: apis.notification.getNotification });
@@ -122,18 +117,12 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
   }, [connectSSE]);
 
   useEffect(() => {
-    const handleBeforeUnload = () => {
-      eventSource.current?.close();
-      eventSource.current = null;
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('beforeunload', closeSSE);
     return () => {
-      eventSource.current?.close();
-      eventSource.current = null;
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      closeSSE();
+      window.removeEventListener('beforeunload', closeSSE);
     };
-  }, []);
+  }, [closeSSE]);
 
   const value = useMemo(
     () => ({

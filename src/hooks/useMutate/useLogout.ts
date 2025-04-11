@@ -2,12 +2,10 @@
 
 import { useContext } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
 import { SessionContext } from '@/contexts/SessionProvider';
 
 export const useLogout = (onSuccess?: () => void, onError?: () => void) => {
-  const router = useRouter();
   const { closeSession } = useContext(SessionContext);
   const queryClient = useQueryClient();
 
@@ -19,9 +17,8 @@ export const useLogout = (onSuccess?: () => void, onError?: () => void) => {
         onSuccess();
       }
       alert('로그아웃 되었습니다');
-      router.push('/login');
       queryClient.clear();
-      router.refresh();
+      window.location.replace('/login');
     },
     onError: () => {
       if (onError) {
