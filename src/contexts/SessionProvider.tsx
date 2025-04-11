@@ -2,6 +2,7 @@
 
 import { PropsWithChildren, createContext, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 import { EventSourcePolyfill } from 'event-source-polyfill';
 import { apis } from '@/apis';
 import { apiPaths } from '@/constants/apis';
@@ -68,10 +69,23 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
         const data: InviteSSEType = JSON.parse(event.data);
         /* revalidateData */
         console.log(data);
+        queryClient.fetchQuery({
+          queryKey: ['notification'],
+          queryFn: apis.notification.getNotification,
+        });
+
+        const date = new Date(data.startDate);
+        queryClient.invalidateQueries({
+          queryKey: ['appointments', date.getMonth(), date.getMonth() + 1, date.getDate()],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['appointment', data.gatheringId],
+        });
+        toast('새로운 알림이 도착했습니다', { duration: 2000 });
       });
       eventSource.current = newSSE;
     },
-    [closeSSE]
+    [closeSSE, queryClient]
   );
 
   const closeSession = useCallback(() => {
@@ -106,6 +120,20 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
     };
     getInitialConnetSession();
   }, [connectSSE]);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      eventSource.current?.close();
+      eventSource.current = null;
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      eventSource.current?.close();
+      eventSource.current = null;
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
 
   const value = useMemo(
     () => ({

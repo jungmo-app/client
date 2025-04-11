@@ -24,7 +24,7 @@ const RootLayout = ({ children }: StrictPropsWithChildren) => {
             <MobileLayout>{children}</MobileLayout>
           </ErrorBoundary>
         </Providers>
-        <Toaster position="top-right" />
+        <Toaster position="bottom-right" />
       </body>
     </html>
   );
