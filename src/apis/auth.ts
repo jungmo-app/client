@@ -103,33 +103,13 @@ export const authApis = {
       return response;
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        const status = error.response.status;
-        const code = error.response.data.code as string;
-        const message = error.response.data.message as string;
-
+        const {
+          status,
+          data: { code, message },
+        } = error.response;
         throw new ApiError(status, code, message);
       }
       throw new ApiError(500, 'F002');
-    }
-  },
-
-  deleteCookie: async () => {
-    const refer = window.location.pathname;
-    try {
-      const response = await fetch(`/api/cookie?refer=${refer}`, {
-        method: 'POST',
-      });
-      if (response.status !== 200) {
-        throw new ApiError(400, 'DC001', '쿠기 삭제에 실패하였습니다.');
-      }
-      if (response.redirected) {
-        window.location.href = response.url;
-      }
-    } catch (error) {
-      if (error instanceof ApiError) {
-        throw error;
-      }
-      throw new ApiError(500, 'F001');
     }
   },
 } as const;

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useDeleteNotification } from '@/hooks/useMutate/useDeleteNotification';
 import { useReadNotification } from '@/hooks/useMutate/useReadNotification';
 import { NotificationType } from '@/types/notification';
-import { getTimeline } from '@/utils/date';
+import { getTimeline, parseKST } from '@/utils/date';
 
 interface NotificationProps {
   notification: NotificationType;
@@ -49,7 +49,7 @@ export default function Notification({ notification, isEdit }: NotificationProps
         </button>
       )}
       <div
-        className={`relative flex w-full gap-3 rounded-lg border border-gray-300 bg-background p-3 text-left shadow-sm ${
+        className={`relative flex w-full gap-3 rounded-lg border border-gray-300 bg-background p-3 text-left shadow-sm dark:border-gray-600 ${
           isRead && 'opacity-50'
         } hover:shadow-md`}
       >
@@ -64,10 +64,12 @@ export default function Notification({ notification, isEdit }: NotificationProps
         </div>
         <div className="flex flex-1 flex-col justify-between overflow-hidden">
           <div className="truncate text-sm font-semibold">{notification.title}</div>
-          <div className="mt-0.5 line-clamp-2 max-h-8 w-full break-words text-xs text-gray-700">
+          <div className="mt-0.5 line-clamp-2 max-h-8 w-full break-words text-xs text-gray-700 dark:text-gray-400">
             {notification.message}
           </div>
-          <div className="mt-1 self-end text-[10px] text-gray-400">{getTimeline(new Date(notification.createdAt))}</div>
+          <div className="mt-1 self-end text-[10px] text-gray-400">
+            {getTimeline(parseKST(new Date(notification.createdAt)))}
+          </div>
         </div>
       </div>
     </div>

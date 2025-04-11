@@ -2,6 +2,7 @@
 
 import { PropsWithChildren, createContext, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'react-hot-toast';
 import { EventSourcePolyfill } from 'event-source-polyfill';
 import { apis } from '@/apis';
 import { apiPaths } from '@/constants/apis';
@@ -29,7 +30,7 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
 
   const connectSSE = useCallback(
     async (retry = 2) => {
-      if (retry === 0) {
+      if (eventSource.current || retry === 0) {
         return;
       }
 
@@ -68,10 +69,23 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
         const data: InviteSSEType = JSON.parse(event.data);
         /* revalidateData */
         console.log(data);
+        queryClient.fetchQuery({
+          queryKey: ['notification'],
+          queryFn: apis.notification.getNotification,
+        });
+
+        const date = new Date(data.startDate);
+        queryClient.invalidateQueries({
+          queryKey: ['appointments', date.getMonth(), date.getMonth() + 1, date.getDate()],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['appointment', data.gatheringId],
+        });
+        toast('새로운 알림이 도착했습니다', { duration: 2000 });
       });
       eventSource.current = newSSE;
     },
-    [closeSSE]
+    [closeSSE, queryClient]
   );
 
   const closeSession = useCallback(() => {
@@ -81,21 +95,16 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
 
   const openSession = useCallback(async () => {
     console.log('session open');
-    /* try {
-      await connectSSE();
-    } catch {
-      console.log('sse error');
-    } */
 
     try {
-      /* await connectSSE(); */
       await queryClient.fetchQuery({ queryKey: ['notification'], queryFn: apis.notification.getNotification });
+      await connectSSE();
     } catch (error) {
       console.log(error);
       closeSSE();
       throw new Error('로그인 오류');
     }
-  }, [/* connectSSE, */ closeSSE, queryClient]);
+  }, [connectSSE, closeSSE, queryClient]);
 
   useEffect(() => {
     const getInitialConnetSession = async () => {
@@ -106,6 +115,14 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
     };
     getInitialConnetSession();
   }, [connectSSE]);
+
+  useEffect(() => {
+    window.addEventListener('beforeunload', closeSSE);
+    return () => {
+      closeSSE();
+      window.removeEventListener('beforeunload', closeSSE);
+    };
+  }, [closeSSE]);
 
   const value = useMemo(
     () => ({

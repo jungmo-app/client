@@ -9,4 +9,6 @@ export interface NotificationType {
   read: boolean;
 }
 
-export type InviteSSEType = Omit<NotificationType, 'notificationId'>;
+export interface InviteSSEType extends Omit<NotificationType, 'notificationId' | 'title' | 'profileImage'> {
+  startDate: string;
+}

@@ -1,19 +1,23 @@
 'use client';
 
-import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
+import { useContext } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apis } from '@/apis';
+import { SessionContext } from '@/contexts/SessionProvider';
 
 export const useDeleteAccount = (onSuccess?: () => void, onError?: () => void) => {
-  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { closeSession } = useContext(SessionContext);
   return useMutation({
     mutationFn: apis.user.deleteAccount,
     onSuccess: () => {
+      closeSession();
       if (onSuccess) {
         onSuccess();
       }
+      queryClient.clear();
       alert('계정이 삭제되었습니다.');
-      router.push('/login');
+      window.location.replace('/login');
     },
     onError: () => {
       if (onError) {

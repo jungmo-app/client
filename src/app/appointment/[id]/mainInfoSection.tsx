@@ -50,7 +50,7 @@ export default function MainInfoSection() {
   const handleClickCancleButton = () => {
     setIsEditMode(false);
     if (appointment) {
-      reset(appointment);
+      reset();
     }
   };
 
