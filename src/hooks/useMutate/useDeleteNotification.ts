@@ -5,17 +5,29 @@ import { apis } from '@/apis';
 import { NotificationType } from '@/types/notification';
 import { ApiError } from '@/utils/error';
 
+interface MutateCotextType {
+  previous: NotificationType[];
+}
+
 export const useDeleteNotification = () => {
   const queryClient = useQueryClient();
-  return useMutation<unknown, ApiError, number[]>({
+  return useMutation<unknown, ApiError, number[], MutateCotextType>({
     mutationFn: id => apis.notification.deleteNotification(id),
-    onSuccess: (_, variable) => {
+    onMutate: id => {
+      const previous = queryClient.getQueryData<NotificationType[]>(['notification']);
       queryClient.setQueryData<NotificationType[]>(['notification'], prev =>
-        prev ? prev.filter(item => !variable.includes(item.notificationId)) : []
+        prev ? prev.filter(item => id.includes(item.notificationId)) : []
       );
+      return { previous: previous ?? [] };
     },
-    onError: () => {
+    onError: (_err, _variables, context) => {
       alert('알림 삭제에 실패하였습니다');
+      if (context?.previous) {
+        queryClient.setQueryData(['notification'], context.previous);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['notification'] });
     },
   });
 };

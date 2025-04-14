@@ -19,7 +19,7 @@ export default function Notification({ notification, isEdit }: NotificationProps
   const { notificationId, gatheringId, read: isRead } = notification;
   const { mutate: deleteNotification, isPending } = useDeleteNotification();
   const { mutate: readNotification } = useReadNotification({
-    onSuccess: () => {
+    onMutate: () => {
       router.push(`/appointment/${gatheringId}`);
     },
   });
