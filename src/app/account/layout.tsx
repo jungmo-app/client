@@ -9,14 +9,12 @@ import { ApiError } from '@/utils/error';
 
 export default async function Layout({ children }: PropsWithChildren) {
   const queryClient = new QueryClient();
-  const userProfile = {};
 
   try {
-    const userData = await queryClient.fetchQuery<UserDataResponse>({
+    await queryClient.prefetchQuery<UserDataResponse>({
       queryKey: ['userData'],
       queryFn: apis.serverUser.getInfo,
     });
-    Object.assign(userProfile, { profileImage: userData.profileImage || '/samlpe.jpg' });
   } catch (error) {
     if (error instanceof ApiError && error.status === 401 && error.code.startsWith('T')) {
       redirect(`/login?refer=/account&date=${Date.now()}`);
