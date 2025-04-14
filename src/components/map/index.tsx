@@ -5,7 +5,6 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useLoadScript } from '@react-google-maps/api';
 import { Header } from '@/components';
 import { GOOGLE_MAP_FIELD } from '@/constants/place';
-import { getRadius } from '@/libs/map/calculateDistance';
 import { MarkerType, Position, SearchStatusType } from '@/types/map';
 import GoogleMapLoader from './googleMapLoader';
 import './map.css';
@@ -53,46 +52,49 @@ export default function Map({ isOpen, currentLocation, title, target, onSelect, 
     [methods, onSelect]
   );
 
-  const handleSearchPlace = (value: IFormInput) => {
+  const handleSearchPlace = async (value: IFormInput) => {
     if (!mapRef.current || !google.maps || !value.inputValue) {
       return;
     }
 
-    const service = new google.maps.places.PlacesService(mapRef.current);
+    const { Place } = (await google.maps.importLibrary('places')) as google.maps.PlacesLibrary;
+
     const center = mapRef.current.getCenter();
     const bounds = mapRef.current.getBounds();
 
-    if (!center || !bounds) {
+    if (!bounds || !center) {
       return;
     }
 
-    const radius = getRadius(center, bounds);
+    try {
+      const { places } = await Place.searchByText({
+        textQuery: value.inputValue,
+        fields: ['id', 'location', 'formattedAddress'],
+        locationBias: bounds,
+      });
 
-    const request = {
-      query: value.inputValue,
-      fields: ['name', 'geometry', 'place_id', 'adr_address'],
-      location: center,
-      radius: radius,
-    };
+      const newMarkers = places.map(place => ({
+        name: place.displayName ?? '',
+        position: {
+          lat: place.location?.lat() ?? 0,
+          lng: place.location?.lng() ?? 0,
+        },
+        placeId: place.id,
+        address: place.formattedAddress ?? '',
+      }));
 
-    service.textSearch(request, (result, status) => {
-      if (status === google.maps.places.PlacesServiceStatus.OK) {
-        const newMarkers = result?.map(result => ({
-          name: result.name,
-          position: { lat: result.geometry?.location?.lat() ?? 0, lng: result.geometry?.location?.lng() ?? 0 },
-          placeId: result.place_id,
-          address: result.adr_address,
-        }));
+      if (newMarkers.length > 0) {
+        setMarkers(newMarkers);
 
-        if (newMarkers) {
-          setMarkers(newMarkers);
-          if (newMarkers.length === 1) {
-            mapRef.current?.panTo(newMarkers[0].position);
-          }
-          setSearchStatus({ center, bounds });
+        if (newMarkers.length === 1) {
+          mapRef.current?.panTo(newMarkers[0].position);
         }
+
+        setSearchStatus({ center, bounds });
       }
-    });
+    } catch (error) {
+      console.error('Place search error:', error);
+    }
   };
 
   useEffect(() => {

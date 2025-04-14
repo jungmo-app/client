@@ -10,5 +10,6 @@ export const useLocation = (id: string, LocationQuery?: (typeof GOOGLE_MAP_FIELD
   return useQuery<google.maps.places.PlaceResult | null>({
     queryKey: ['location', id, ...query],
     queryFn: () => apis.place.getDetail(String(id), query, queryClient),
+    enabled: id.length > 0,
   });
 };

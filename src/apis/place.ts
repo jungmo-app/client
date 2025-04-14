@@ -8,6 +8,9 @@ import { apis } from '.';
 
 export const placeApis = {
   getDetail: async (placeId: string, fields: (typeof GOOGLE_MAP_FIELD)[number][], queryClient: QueryClient) => {
+    if (!placeId) {
+      return {} as google.maps.places.PlaceResult;
+    }
     const fieldString = fields.join(',');
     const response = await fetch(`/api/places?placeId=${placeId}&fields=${fieldString}`, {
       method: 'GET',
@@ -70,6 +73,9 @@ export const serverPlaceApis = {
     fields: (typeof GOOGLE_MAP_FIELD)[number][],
     queryClient: QueryClient
   ): Promise<google.maps.places.PlaceResult | null> => {
+    if (!placeId) {
+      return {} as google.maps.places.PlaceResult;
+    }
     const fieldString = fields.join(',');
     const response = await fetch(
       `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&fields=${fieldString}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY}&language=ko`,
