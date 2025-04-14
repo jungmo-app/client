@@ -119,7 +119,7 @@ export default function InfoForm() {
           <div className="flex flex-col items-center space-y-4">
             <div className="relative">
               <Avatar className="h-32 w-32">
-                <AvatarImage src={preview || ''} />
+                <AvatarImage priority src={preview || ''} />
                 <AvatarFallback>{form.watch('userName')}</AvatarFallback>
               </Avatar>
               <Input
