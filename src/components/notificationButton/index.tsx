@@ -1,16 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { Bell } from 'lucide-react';
 import { Button, Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
+import { useDeleteNotification } from '@/hooks/useMutate/useDeleteNotification';
 import { useNotification } from '@/hooks/useQuery/useNotification';
 import Notification from './notification';
 
 export default function NotificationButton() {
-  /* const router = useRouter(); */
-  const queryClient = useQueryClient();
   const { data: notification } = useNotification();
+  const { mutate: deleteNotification } = useDeleteNotification();
 
   const [isEdit, setIsEdit] = useState<boolean>(false);
 
@@ -21,8 +20,8 @@ export default function NotificationButton() {
   };
 
   const handleClickDeleteAllButton = async () => {
-    /* api */
-    queryClient.setQueryData(['notification'], []);
+    const notificationIdList = (notification ?? [])?.map(item => item.notificationId);
+    deleteNotification(notificationIdList);
     setIsEdit(false);
   };
 
