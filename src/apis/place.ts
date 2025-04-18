@@ -3,11 +3,34 @@ import { apiPaths } from '@/constants/apis';
 import { GOOGLE_MAP_FIELD, placeTypeTranslations } from '@/constants/place';
 import { customFetch } from '@/libs/interceptor';
 import { ApiResponse } from '@/types/apis';
+import { PlaceSearchDataType } from '@/types/map';
+import { ApiError } from '@/utils/error';
 import { snakeToSpace } from '@/utils/formatText';
 import { apis } from '.';
 
 export const placeApis = {
+  getSearchResult: async (keyword: string, center: google.maps.LatLng, radius: number) => {
+    const response = await fetch(
+      `/api/places/search?keyword=${keyword}&lat=${center.lat()}&lng=${center.lng}&radius=${radius}`,
+      {
+        method: 'GET',
+        next: { revalidate: 3600 },
+      }
+    );
+
+    const result = (await response.json()) as ApiResponse<PlaceSearchDataType[]>;
+
+    if (!response.ok) {
+      throw new ApiError(400, 'M002', result.message ?? '검색 결과 가져오기 실패');
+    }
+
+    const { data } = result;
+    return data as PlaceSearchDataType[];
+  },
   getDetail: async (placeId: string, fields: (typeof GOOGLE_MAP_FIELD)[number][], queryClient: QueryClient) => {
+    if (!placeId) {
+      return {} as google.maps.places.PlaceResult;
+    }
     const fieldString = fields.join(',');
     const response = await fetch(`/api/places?placeId=${placeId}&fields=${fieldString}`, {
       method: 'GET',
@@ -36,7 +59,8 @@ export const placeApis = {
       next: { revalidate: 3600 },
     });
     if (response?.status === 200) {
-      return response.data;
+      const data = Array.from(new Set(response.data.map(s => s.trim())));
+      return data;
     }
     throw new Error('api error');
   },
@@ -70,6 +94,9 @@ export const serverPlaceApis = {
     fields: (typeof GOOGLE_MAP_FIELD)[number][],
     queryClient: QueryClient
   ): Promise<google.maps.places.PlaceResult | null> => {
+    if (!placeId) {
+      return {} as google.maps.places.PlaceResult;
+    }
     const fieldString = fields.join(',');
     const response = await fetch(
       `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&fields=${fieldString}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY}&language=ko`,
