@@ -56,13 +56,17 @@ export default function SearchLocationBox({ onSubmit }: SearchLocationBoxProps) 
         remaining.splice(matchIndex, 1);
 
         return (
-          <mark key={index} className="bg-transparent font-semibold text-yellow-200 dark:text-yellow-600">
+          <mark key={index} className="bg-transparent font-normal">
             {char}
           </mark>
         );
       }
 
-      return <span key={index}>{char}</span>;
+      return (
+        <span key={index} className="font-bold">
+          {char}
+        </span>
+      );
     });
   };
 
