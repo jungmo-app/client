@@ -38,6 +38,23 @@ export default function SearchLocationBox({ onSubmit }: SearchLocationBoxProps) 
     setIsViewSuggestion(true);
   }, 500);
 
+  const highlightMatch = (text: string, keyword: string) => {
+    if (!keyword) return text;
+
+    const chars = keyword.split('').filter(Boolean);
+    const regex = new RegExp(`[${chars.join('')}]`, 'gi');
+
+    return text.split('').map((char, index) =>
+      regex.test(char) ? (
+        <mark key={index} className="bg-transparent font-semibold text-yellow-200 dark:text-yellow-600">
+          {char}
+        </mark>
+      ) : (
+        <span key={index}>{char}</span>
+      )
+    );
+  };
+
   return (
     <div className="relative px-4 pb-3 pt-1">
       <form className="relative" ref={targetRef} onSubmit={handleSubmit(handleSubmitKeyword)}>
@@ -60,7 +77,7 @@ export default function SearchLocationBox({ onSubmit }: SearchLocationBoxProps) 
                 className="flex h-10 w-full cursor-pointer items-center rounded-md p-4 hover:bg-blue-50 dark:hover:bg-gray-600"
                 onClick={() => handleClickSuggestion(item)}
               >
-                {item}
+                {highlightMatch(item, debouncedKeyword)}
               </div>
             ))}
           </div>

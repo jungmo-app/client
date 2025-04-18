@@ -68,7 +68,6 @@ const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderP
   ({ markers, target, searchStatus, currentLocation, onResearch, onSelect, onClose }, ref) => {
     const isDarkMode = window?.matchMedia && window?.matchMedia('(prefers-color-scheme: dark)').matches;
     const mapRef = useRef<google.maps.Map | null>(null);
-
     const [location, setLocation] = useState<Position>(currentLocation ?? DEFAULT_POSITION);
     const [isButtonVisible, setIsButtonVisible] = useState<boolean>(false);
     const [isUpdateVisible, setIsUpdateButtonVisible] = useState<boolean>(false);
