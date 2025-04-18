@@ -8,7 +8,6 @@ export async function POST() {
   const accessToken = cookies().get('accessToken')?.value;
   const refreshToken = cookies().get('refreshToken')?.value;
 
-  const cookieHeader = [`accessToken=${accessToken}`, `refreshToken=${refreshToken}`].join('; ');
   try {
     await axios.post(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.logout.slice(1)}`,
@@ -16,7 +15,7 @@ export async function POST() {
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          Cookie: cookieHeader,
+          Cookie: `refreshToken=${refreshToken};`,
         },
       }
     );
