@@ -12,7 +12,7 @@ interface SearchLocationBoxProps {
 
 export default function SearchLocationBox({ onSubmit }: SearchLocationBoxProps) {
   const { register, setValue, handleSubmit, watch } = useFormContext();
-  const inputValue = watch('inputValue');
+  const inputValue = watch('inputValue') as string;
   const latestKeyword = useRef<string>('');
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -71,32 +71,33 @@ export default function SearchLocationBox({ onSubmit }: SearchLocationBoxProps) 
   };
 
   const handleInputKeydown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (!suggestions || suggestions?.length === 0) {
+    if (!suggestions || suggestions?.length === 0 || !isViewSuggestion) {
       return;
     }
 
     if (e.key === 'ArrowDown') {
       setFocusIndex(prev => {
-        const index = prev + 1;
-        if (index > suggestions.length - 1) {
-          setKeyword(inputValue);
-          return -1;
-        }
-        setKeyword(suggestions[index]);
+        const index = ((prev + 2) % (suggestions.length + 1)) - 1;
+        const currentKeyword = index >= 0 ? suggestions[index] : inputValue;
+        setKeyword(currentKeyword);
+        requestAnimationFrame(() => {
+          inputRef.current?.setSelectionRange(currentKeyword.length, currentKeyword.length);
+        });
+
         return index;
       });
     }
 
     if (e.key === 'ArrowUp') {
       setFocusIndex(prev => {
-        const index = prev - 1;
-        if (index >= -1) {
-          setKeyword(index >= 0 ? suggestions[index] : inputValue);
-          return index;
-        }
-        const lastIndex = suggestions.length - 1;
-        setKeyword(suggestions[lastIndex]);
-        return lastIndex;
+        const index = ((prev + suggestions.length + 1) % (suggestions.length + 1)) - 1;
+        const currentKeyword = index >= 0 ? suggestions[index] : inputValue;
+        setKeyword(currentKeyword);
+        requestAnimationFrame(() => {
+          inputRef.current?.setSelectionRange(currentKeyword.length, currentKeyword.length);
+        });
+
+        return index;
       });
     }
   };
