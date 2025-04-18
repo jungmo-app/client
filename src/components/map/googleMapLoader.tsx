@@ -157,6 +157,7 @@ const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderP
             streetViewControl: false,
             zoomControl: false,
             scrollwheel: true,
+            gestureHandling: 'greedy',
           }}
           onIdle={handleIdleMap}
           onLoad={map => {
