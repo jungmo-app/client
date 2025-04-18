@@ -39,7 +39,8 @@ export const placeApis = {
       next: { revalidate: 3600 },
     });
     if (response?.status === 200) {
-      return response.data;
+      const data = Array.from(new Set(response.data.map(s => s.trim())));
+      return data;
     }
     throw new Error('api error');
   },
