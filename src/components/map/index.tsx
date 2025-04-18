@@ -1,11 +1,14 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useLoadScript } from '@react-google-maps/api';
+import { apis } from '@/apis';
 import { Header } from '@/components';
 import { GOOGLE_MAP_FIELD } from '@/constants/place';
-import { MarkerType, Position, SearchStatusType } from '@/types/map';
+import { getRadius } from '@/libs/map/calculateDistance';
+import { PlaceSearchDataType, Position, SearchStatusType } from '@/types/map';
 import GoogleMapLoader from './googleMapLoader';
 import './map.css';
 import SearchLocationBox from './searchLocationBox';
@@ -26,10 +29,11 @@ interface IFormInput {
 const GOOGLE_MAPS_LIBRARIES: ('places' | 'geometry')[] = ['places', 'geometry'];
 
 export default function Map({ isOpen, currentLocation, title, target, onSelect, onClose }: MapProps) {
+  const queryClient = useQueryClient();
   const methods = useForm<IFormInput>();
   const mapRef = useRef<google.maps.Map | null>(null);
 
-  const [markers, setMarkers] = useState<MarkerType[]>([]);
+  const [markers, setMarkers] = useState<PlaceSearchDataType[]>([]);
   const [searchStatus, setSearchStatus] = useState<SearchStatusType | null>(null);
 
   const { isLoaded, loadError } = useLoadScript({
@@ -57,8 +61,6 @@ export default function Map({ isOpen, currentLocation, title, target, onSelect, 
       return;
     }
 
-    const { Place } = (await google.maps.importLibrary('places')) as google.maps.PlacesLibrary;
-
     const center = mapRef.current.getCenter();
     const bounds = mapRef.current.getBounds();
 
@@ -66,28 +68,19 @@ export default function Map({ isOpen, currentLocation, title, target, onSelect, 
       return;
     }
 
+    const radius = getRadius(center, bounds);
+
     try {
-      const { places } = await Place.searchByText({
-        textQuery: value.inputValue,
-        fields: ['id', 'location', 'formattedAddress'],
-        locationBias: bounds,
+      const places = await queryClient.fetchQuery({
+        queryKey: ['searchPlace', value.inputValue, center.lat(), center.lng(), radius],
+        queryFn: () => apis.place.getSearchResult(value.inputValue, center, radius),
       });
 
-      const newMarkers = places.map(place => ({
-        name: place.displayName ?? '',
-        position: {
-          lat: place.location?.lat() ?? 0,
-          lng: place.location?.lng() ?? 0,
-        },
-        placeId: place.id,
-        address: place.formattedAddress ?? '',
-      }));
+      if (places.length > 0) {
+        setMarkers(places);
 
-      if (newMarkers.length > 0) {
-        setMarkers(newMarkers);
-
-        if (newMarkers.length === 1) {
-          mapRef.current?.panTo(newMarkers[0].position);
+        if (places.length === 1) {
+          mapRef.current?.panTo(places[0].location);
         }
 
         setSearchStatus({ center, bounds });

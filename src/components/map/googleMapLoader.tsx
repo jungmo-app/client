@@ -8,10 +8,10 @@ import { Button } from '@/components/ui';
 import { GOOGLE_MAP_FIELD } from '@/constants/place';
 import { isEqualPositionToCenter, isInRange } from '@/libs/map/calculateDistance';
 import { getCurrentLocation } from '@/libs/map/getCurrentLocation';
-import { MarkerType, Position, SearchStatusType } from '@/types/map';
+import { PlaceSearchDataType, Position, SearchStatusType } from '@/types/map';
 
 interface GoogleMapLoaderProps {
-  markers: MarkerType[];
+  markers: PlaceSearchDataType[];
   target?: (typeof GOOGLE_MAP_FIELD)[number][];
   searchStatus?: SearchStatusType | null;
   onResearch?: () => void;
@@ -164,11 +164,11 @@ const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderP
             setIsMapLoad(true);
           }}
         >
-          {markers.map((marker: MarkerType) => (
+          {markers.map((marker: PlaceSearchDataType) => (
             <MarkerF
-              key={marker.placeId}
-              position={marker.position}
-              onClick={() => handleClickMarker(marker.placeId)}
+              key={marker.place_id}
+              position={marker.location}
+              onClick={() => handleClickMarker(marker.place_id)}
             />
           ))}
         </GoogleMap>

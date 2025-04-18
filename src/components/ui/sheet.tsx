@@ -59,7 +59,7 @@ const SheetContent = React.forwardRef<React.ElementRef<typeof SheetPrimitive.Con
       <SheetPrimitive.Content
         ref={ref}
         className={cn(sheetVariants({ side }), 'mobile-container', className)}
-        aria-describedby="sheet"
+        aria-describedby={undefined}
         {...props}
       >
         {children}
