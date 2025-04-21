@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
+import { addAppointment } from '@/utils/updateAppointment';
 
 type AppointmentFormData = {
   title: string;
@@ -31,11 +32,7 @@ export const useCreateAppointment = () => {
 
     onSuccess: (_, variable) => {
       const date = new Date(variable.startDate);
-
-      queryClient.invalidateQueries({
-        queryKey: ['appointments', date.getFullYear(), date.getMonth() + 1, date.getDate()],
-      });
-
+      addAppointment(queryClient, date);
       router.push('/');
     },
 

@@ -2,12 +2,11 @@
 
 import { PropsWithChildren, createContext, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { toast } from 'react-hot-toast';
 import { EventSourcePolyfill } from 'event-source-polyfill';
 import { apis } from '@/apis';
 import { apiPaths } from '@/constants/apis';
+import { useSSEEvent } from '@/hooks/useSSEEvent';
 import { getCookie } from '@/libs/serverAction';
-import { InviteSSEType } from '@/types/notification';
 
 interface SessionContextType {
   openSession: () => Promise<void>;
@@ -23,10 +22,15 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
   const queryClient = useQueryClient();
   const eventSource = useRef<EventSource | null>(null);
 
+  const { inviteEvent, updateEvent, deleteEvent } = useSSEEvent();
+
   const closeSSE = useCallback(() => {
     eventSource.current?.close();
+    eventSource.current?.removeEventListener('invite', inviteEvent);
+    eventSource.current?.removeEventListener('delete', deleteEvent);
+    eventSource.current?.removeEventListener('update', updateEvent);
     eventSource.current = null;
-  }, []);
+  }, [inviteEvent, deleteEvent, updateEvent]);
 
   const connectSSE = useCallback(
     async (retry = 2) => {
@@ -63,29 +67,14 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
         }
       });
 
-      newSSE.addEventListener('sse', e => {
-        const event = e as MessageEvent;
-        console.log('event');
-        const data: InviteSSEType = JSON.parse(event.data);
-        /* revalidateData */
-        console.log(data);
-        queryClient.fetchQuery({
-          queryKey: ['notification'],
-          queryFn: apis.notification.getNotification,
-        });
+      newSSE.addEventListener('invite', inviteEvent);
 
-        const date = new Date(data.startDate);
-        queryClient.invalidateQueries({
-          queryKey: ['appointments', date.getMonth(), date.getMonth() + 1, date.getDate()],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ['appointment', data.gatheringId],
-        });
-        toast('새로운 알림이 도착했습니다', { duration: 2000 });
-      });
+      newSSE.addEventListener('update', updateEvent);
+
+      newSSE.addEventListener('delete', deleteEvent);
       eventSource.current = newSSE;
     },
-    [closeSSE, queryClient]
+    [closeSSE, inviteEvent, updateEvent, deleteEvent]
   );
 
   const closeSession = useCallback(() => {
