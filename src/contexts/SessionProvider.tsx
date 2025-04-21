@@ -7,7 +7,9 @@ import { EventSourcePolyfill } from 'event-source-polyfill';
 import { apis } from '@/apis';
 import { apiPaths } from '@/constants/apis';
 import { getCookie } from '@/libs/serverAction';
+import { DetailGatheringType, GatheringListResponse } from '@/types/gathering';
 import { InviteSSEType } from '@/types/notification';
+import { isSameDay } from '@/utils/date';
 
 interface SessionContextType {
   openSession: () => Promise<void>;
@@ -63,7 +65,7 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
         }
       });
 
-      newSSE.addEventListener('sse', e => {
+      newSSE.addEventListener('invite', e => {
         const event = e as MessageEvent;
         console.log('event');
         const data: InviteSSEType = JSON.parse(event.data);
@@ -82,6 +84,67 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
           queryKey: ['appointment', data.gatheringId],
         });
         toast('새로운 알림이 도착했습니다', { duration: 2000 });
+      });
+
+      newSSE.addEventListener('update', e => {
+        toast('새로운 알림이 도착했습니다', { duration: 2000 });
+        queryClient.fetchQuery({
+          queryKey: ['notification'],
+          queryFn: apis.notification.getNotification,
+        });
+
+        const event = e as MessageEvent;
+        const data = JSON.parse(event.data) as InviteSSEType;
+
+        const currentDate = new Date(data.startDate);
+
+        const prevData = queryClient.getQueryData<DetailGatheringType>(['appointment', data.gatheringId]);
+        if (prevData) {
+          const prevDate = new Date(prevData.startDate);
+
+          if (!isSameDay(prevDate, currentDate)) {
+            queryClient.invalidateQueries({
+              queryKey: ['appointments', prevDate.getFullYear(), prevDate.getMonth() + 1, prevDate.getDate()],
+            });
+            queryClient.invalidateQueries({
+              queryKey: ['appointments', currentDate.getFullYear(), currentDate.getMonth() + 1, currentDate.getDate()],
+            });
+          }
+
+          queryClient.invalidateQueries({
+            queryKey: ['appointment', data.gatheringId],
+          });
+          return;
+        }
+
+        queryClient.invalidateQueries({
+          queryKey: ['appointments', currentDate.getFullYear(), currentDate.getMonth() + 1, currentDate.getDate()],
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: ['appointment', data.gatheringId],
+        });
+        console.log(e);
+      });
+
+      newSSE.addEventListener('delete', e => {
+        toast('새로운 알림이 도착했습니다', { duration: 2000 });
+        queryClient.fetchQuery({
+          queryKey: ['notification'],
+          queryFn: apis.notification.getNotification,
+        });
+
+        const event = e as MessageEvent;
+        const data = JSON.parse(event.data) as InviteSSEType;
+
+        const currentDate = new Date(data.startDate);
+
+        queryClient.setQueryData<GatheringListResponse[]>(
+          ['appointments', currentDate.getFullYear(), currentDate.getMonth() + 1, currentDate.getDate()],
+          prev => (prev ? prev.filter(item => item.id !== data.gatheringId) : undefined)
+        );
+
+        queryClient.removeQueries({ queryKey: ['appointment', data.gatheringId] });
       });
       eventSource.current = newSSE;
     },
