@@ -13,7 +13,7 @@ export default function MainLocation() {
 
   const { data: appointment } = useAppointment(id);
 
-  const { mutate: editAppointment, isPending } = useEditAppointment(id, new Date(appointment?.startDate ?? ''));
+  const { mutate: editAppointment, isPending } = useEditAppointment(id);
 
   if (!appointment) {
     return;

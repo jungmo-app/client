@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
-import { DetailGatheringRespose, GatheringListResponse } from '@/types/gathering';
+import { DetailGatheringType, GatheringListResponse } from '@/types/gathering';
 import { isSameDay } from './date';
 
 export const updateAppointList = (queryClient: QueryClient, date: Date) => {
@@ -8,12 +8,8 @@ export const updateAppointList = (queryClient: QueryClient, date: Date) => {
   });
 };
 
-export const deletePrevAppointList = (
-  queryClient: QueryClient,
-  appointmentId: number,
-  data?: DetailGatheringRespose
-) => {
-  const prevData = data ?? queryClient.getQueryData<DetailGatheringRespose>(['appointment', appointmentId]);
+export const deletePrevAppointList = (queryClient: QueryClient, appointmentId: number, data?: DetailGatheringType) => {
+  const prevData = data ?? queryClient.getQueryData<DetailGatheringType>(['appointment', appointmentId]);
   if (!prevData) {
     return;
   }
@@ -26,28 +22,30 @@ export const deletePrevAppointList = (
   );
 };
 
-export const addAppointment = (addDate: Date, queryClient: QueryClient, addData?: DetailGatheringRespose) => {
+export const addAppointment = (queryClient: QueryClient, addDate: Date, addData?: DetailGatheringType) => {
   updateAppointList(queryClient, addDate);
   if (addData) {
-    queryClient.setQueryData<DetailGatheringRespose>(['appointment', addData.id], addData);
+    queryClient.setQueryData<DetailGatheringType>(['appointment', addData.id], addData);
   }
 };
 
 export const updateAppointment = (
   queryClient: QueryClient,
   id: number,
-  updateDate: Date,
-  updateData?: DetailGatheringRespose
+  updateDate?: Date,
+  updateData?: DetailGatheringType
 ) => {
-  const prevData = queryClient.getQueryData<DetailGatheringRespose>(['appointment', id]);
-  if (prevData && !isSameDay(new Date(prevData.startDate), updateDate)) {
-    deletePrevAppointList(queryClient, id, prevData);
+  const prevData = queryClient.getQueryData<DetailGatheringType>(['appointment', id]);
+
+  if (updateDate) {
+    if (prevData && !isSameDay(new Date(prevData.startDate), updateDate)) {
+      deletePrevAppointList(queryClient, id, prevData);
+    }
+    updateAppointList(queryClient, updateDate);
   }
 
-  updateAppointList(queryClient, updateDate);
-
   if (updateData) {
-    queryClient.setQueryData<DetailGatheringRespose>(['appointment', id], updateData);
+    queryClient.setQueryData<DetailGatheringType>(['appointment', id], updateData);
     return;
   }
 
