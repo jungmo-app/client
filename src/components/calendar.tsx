@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/utils/styles';
-import { Button } from './ui/button';
 
 interface CalendarProps {
   date: Date;

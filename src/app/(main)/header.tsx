@@ -6,6 +6,7 @@ import { useShallow } from 'zustand/react/shallow';
 import NotificationButton from '@/components/notificationButton';
 import { Button, Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
 import { useDateStore } from '@/store/appointmentStore';
+import DatePicker from './datePicker';
 
 export default function Header() {
   const { date, setDate } = useDateStore(
@@ -50,7 +51,9 @@ export default function Header() {
             </button>
           </PopoverTrigger>
           <PopoverContent>
-            <div>test</div>
+            <div className="h-72 w-64">
+              <DatePicker />
+            </div>
           </PopoverContent>
         </Popover>
 

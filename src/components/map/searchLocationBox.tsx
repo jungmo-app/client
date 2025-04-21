@@ -2,7 +2,7 @@ import { KeyboardEvent, useCallback, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui';
-import useDebounce from '@/hooks/useDebounce';
+import { useDebouncedValue } from '@/hooks/useDebounce';
 import useOutsideClick from '@/hooks/useOutsideClick';
 import { useSearchLocationKeyword } from '@/hooks/useQuery/useSearchLocationKeyword';
 
@@ -23,7 +23,7 @@ export default function SearchLocationBox({ onSubmit }: SearchLocationBoxProps) 
     latestKeyword.current = inputValue;
   }, [inputValue]);
 
-  const { value: debouncedKeyword } = useDebounce(inputValue, 500, handleDebounce);
+  const { value: debouncedKeyword } = useDebouncedValue(inputValue, 500, handleDebounce);
 
   const [isViewSuggestion, setIsViewSuggestion] = useState<boolean>(false);
   const { data: suggestions } = useSearchLocationKeyword(debouncedKeyword);

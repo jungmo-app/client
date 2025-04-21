@@ -3,6 +3,14 @@
 @tailwind utilities;
 
 @layer base {
+  .scrollbar-hide {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
   :root {
     --background: 0 0% 100%; /* 흰색 */
     --foreground: 222.2 47.4% 11.2%; /* 더 진한 검정-네이비 계열 */

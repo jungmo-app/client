@@ -1,0 +1,119 @@
+'use client';
+import { useEffect, useMemo, useRef, useState } from 'react';
+
+interface MonthPickerProps {
+  startYear: number;
+  endYear: number;
+  value: Date;
+  type: 'month' | 'year';
+  transition: 'month' | 'year';
+  onTransitionEnd: () => void;
+  onClickDay: (date: Date) => void;
+  onClickYear: () => void;
+}
+
+export default function MonthPicker({
+  startYear,
+  endYear,
+  value,
+  type,
+  transition,
+  onTransitionEnd,
+  onClickDay,
+  onClickYear,
+}: MonthPickerProps) {
+  const years = useMemo(
+    () => Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i),
+    [startYear, endYear]
+  );
+
+  const yearArr = useMemo(() => Array.from({ length: endYear - startYear + 1 }, () => null), []);
+
+  const yearRef = useRef<(HTMLButtonElement | null)[]>(yearArr);
+  const isYearView = useRef<Map<number, boolean>>(new Map());
+
+  const [currentYear, setCurrentYear] = useState<number>(value.getFullYear());
+
+  const handleClickDayButton = (year: number, month: number) => {
+    onClickDay(new Date(year, month));
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          isYearView.current.set(Number(entry.target.getAttribute('data-year')), entry.isIntersecting);
+        });
+        const visibleYear = Array.from(isYearView.current.entries())
+          .filter(([, visible]) => visible)
+          .sort((a, b) => a[0] - b[0]);
+
+        const year = visibleYear[0]?.[0];
+        if (year) {
+          setCurrentYear(year);
+        }
+      },
+      {
+        threshold: 0.01,
+      }
+    );
+
+    yearRef.current.forEach(el => {
+      if (el) {
+        observer.observe(el);
+      }
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    const index = value.getFullYear() - startYear;
+    const el = yearRef.current[index];
+
+    if (el) {
+      el.scrollIntoView({ behavior: 'auto', block: 'start' });
+    }
+  }, [startYear, value]);
+
+  return (
+    <>
+      <button
+        className="bg-background py-2 text-lg font-semibold hover:bg-gray-100 dark:hover:bg-gray-500"
+        onClick={onClickYear}
+      >
+        {currentYear}년
+      </button>
+      <div
+        className={`scrollbar-hide relative mb-2 flex-1 space-y-2 overflow-auto px-4 py-2 transition-all duration-200 ease-in-out ${transition === 'year' && type === 'month' ? 'scale-90 opacity-0' : 'scale-100 opacity-100'}`}
+        onTransitionEnd={() => {
+          if (transition === 'year' && type === 'month') {
+            onTransitionEnd();
+          }
+        }}
+      >
+        {years.map((year, index) => (
+          <div key={year}>
+            <div className="grid grid-cols-4">
+              {Array.from({ length: 12 }, (_, month) => (
+                <button
+                  key={month}
+                  data-year={year}
+                  className={`flex aspect-square items-center justify-center rounded-full py-3 text-center hover:bg-gray-100 dark:hover:bg-gray-500 ${year !== currentYear ? 'opacity-50' : 'opacity-100'} hover:opacity-100`}
+                  ref={el => {
+                    if (month === 0) yearRef.current[index] = el;
+                  }}
+                  onClick={() => handleClickDayButton(year, month)}
+                >
+                  {month + 1}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}

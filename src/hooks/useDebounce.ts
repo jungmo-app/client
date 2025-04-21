@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-const useDebounce = <T>(value: T, delay: number = 500, onDebounce?: () => void) => {
+export const useDebouncedValue = <T>(value: T, delay: number = 500, onDebounce?: () => void) => {
   const isInitial = useRef<boolean>(true);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -41,5 +41,3 @@ const useDebounce = <T>(value: T, delay: number = 500, onDebounce?: () => void) 
 
   return { value: debouncedValue, clearDebounce };
 };
-
-export default useDebounce;
