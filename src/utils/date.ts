@@ -1,9 +1,16 @@
-export const isSameDay = (date1: Date, date2: Date) => {
+export const isSameMonth = (date1: Date, date2: Date) => {
   if (date1.getFullYear() !== date2.getFullYear()) {
     return false;
   }
 
   if (date1.getMonth() !== date2.getMonth()) {
+    return false;
+  }
+  return true;
+};
+
+export const isSameDay = (date1: Date, date2: Date) => {
+  if (isSameMonth(date1, date2)) {
     return false;
   }
 

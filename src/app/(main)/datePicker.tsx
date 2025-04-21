@@ -1,20 +1,35 @@
 'use client';
 
 import { useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
+import { useDateStore } from '@/store/appointmentStore';
 import MonthPicker from './monthPicker';
 import YearPicker from './yearPicker';
 
-export default function DatePicker() {
+interface DatePickerProps {
+  onClickMonth?: () => void;
+}
+
+export default function DatePicker({ onClickMonth }: DatePickerProps) {
   const [type, setType] = useState<'month' | 'year'>('month');
   const [transition, setTransition] = useState<'month' | 'year'>('month');
-  const [date, setDate] = useState(new Date());
+  const { date, setDate } = useDateStore(
+    useShallow(state => ({
+      date: state.date,
+      setDate: state.setDate,
+    }))
+  );
 
-  const handleClickDayButton = (date: Date) => {
-    setDate(date);
+  const [currentDate, setCurrentDate] = useState(date);
+
+  const handleClickMonthButton = (updateDate: Date) => {
+    setCurrentDate(updateDate);
+    setDate(updateDate);
+    onClickMonth?.();
   };
 
   const handleClickYearButton = (year: Date) => {
-    setDate(year);
+    setCurrentDate(year);
     setTransition('month');
   };
 
@@ -34,16 +49,16 @@ export default function DatePicker() {
           endYear={2125}
           type={type}
           transition={transition}
-          value={date}
+          value={currentDate}
           onTransitionEnd={handleTransitionEnd}
-          onClickDay={handleClickDayButton}
+          onClickMonth={handleClickMonthButton}
           onClickYear={handleClickHeader}
         />
       ) : (
         <YearPicker
           startYear={1925}
           endYear={2125}
-          value={date}
+          value={currentDate}
           type={type}
           transition={transition}
           onTransitionEnd={handleTransitionEnd}

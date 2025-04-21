@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { CalendarRange, ChevronLeft, ChevronRight, User } from 'lucide-react';
 import Link from 'next/link';
 import { useShallow } from 'zustand/react/shallow';
@@ -9,6 +10,8 @@ import { useDateStore } from '@/store/appointmentStore';
 import DatePicker from './datePicker';
 
 export default function Header() {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
   const { date, setDate } = useDateStore(
     useShallow(state => ({
       date: state.date,
@@ -19,6 +22,9 @@ export default function Header() {
     setDate(prev => {
       const newDate = new Date(prev);
       newDate.setMonth(newDate.getMonth() - 1);
+      if (newDate.getMonth() === prev.getMonth()) {
+        return new Date(prev.getFullYear(), prev.getMonth(), 0);
+      }
       return newDate;
     });
   };
@@ -27,9 +33,17 @@ export default function Header() {
     setDate(prev => {
       const newDate = new Date(prev);
       newDate.setMonth(newDate.getMonth() + 1);
+      if (newDate.getMonth() === prev.getMonth() + 2) {
+        return new Date(prev.getFullYear(), prev.getMonth() + 2, 0);
+      }
       return newDate;
     });
   };
+
+  const handleOpenPopover = (value: boolean) => {
+    setIsOpen(value);
+  };
+
   return (
     <header className="flex h-14 items-center justify-between bg-background p-4">
       <Link href="/account">
@@ -41,7 +55,7 @@ export default function Header() {
         <Button size="icon" variant="ghost" aria-label="이전 달" onClick={handleClickPrevMonthButton}>
           <ChevronLeft />
         </Button>
-        <Popover>
+        <Popover open={isOpen} onOpenChange={handleOpenPopover}>
           <PopoverTrigger asChild>
             <button className="flex select-none items-center gap-2 text-nowrap" type="button" aria-label="날짜">
               <h1 className="text-xl font-semibold">
@@ -52,7 +66,7 @@ export default function Header() {
           </PopoverTrigger>
           <PopoverContent>
             <div className="h-72 w-64">
-              <DatePicker />
+              <DatePicker onClickMonth={() => setIsOpen(false)} />
             </div>
           </PopoverContent>
         </Popover>

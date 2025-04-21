@@ -1,5 +1,7 @@
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useDateStore } from '@/store/appointmentStore';
+import { isSameMonth } from '@/utils/date';
 
 interface MonthPickerProps {
   startYear: number;
@@ -8,7 +10,7 @@ interface MonthPickerProps {
   type: 'month' | 'year';
   transition: 'month' | 'year';
   onTransitionEnd: () => void;
-  onClickDay: (date: Date) => void;
+  onClickMonth: (date: Date) => void;
   onClickYear: () => void;
 }
 
@@ -19,7 +21,7 @@ export default function MonthPicker({
   type,
   transition,
   onTransitionEnd,
-  onClickDay,
+  onClickMonth,
   onClickYear,
 }: MonthPickerProps) {
   const years = useMemo(
@@ -27,7 +29,8 @@ export default function MonthPicker({
     [startYear, endYear]
   );
 
-  const yearArr = useMemo(() => Array.from({ length: endYear - startYear + 1 }, () => null), []);
+  const yearArr = useMemo(() => Array.from({ length: endYear - startYear + 1 }, () => null), [startYear, endYear]);
+  const date = useDateStore(state => state.date);
 
   const yearRef = useRef<(HTMLButtonElement | null)[]>(yearArr);
   const isYearView = useRef<Map<number, boolean>>(new Map());
@@ -35,7 +38,7 @@ export default function MonthPicker({
   const [currentYear, setCurrentYear] = useState<number>(value.getFullYear());
 
   const handleClickDayButton = (year: number, month: number) => {
-    onClickDay(new Date(year, month));
+    onClickMonth(new Date(year, month));
   };
 
   useEffect(() => {
@@ -101,7 +104,7 @@ export default function MonthPicker({
                 <button
                   key={month}
                   data-year={year}
-                  className={`flex aspect-square items-center justify-center rounded-full py-3 text-center hover:bg-gray-100 dark:hover:bg-gray-500 ${year !== currentYear ? 'opacity-50' : 'opacity-100'} hover:opacity-100`}
+                  className={`flex aspect-square items-center justify-center rounded-full py-3 text-center hover:bg-gray-100 dark:hover:bg-gray-500 ${isSameMonth(date, new Date(year, month)) && 'bg-sky-300 hover:bg-sky-200 dark:bg-sky-600 dark:hover:bg-sky-500'} ${year !== currentYear ? 'opacity-50' : 'opacity-100'} hover:opacity-100`}
                   ref={el => {
                     if (month === 0) yearRef.current[index] = el;
                   }}
