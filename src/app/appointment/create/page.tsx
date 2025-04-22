@@ -6,6 +6,7 @@ import { DateInput, DescriptionInput, PlaceInput, TitleInput } from '@/app/appoi
 import { AttendeeInput, Header } from '@/components';
 import { Button } from '@/components/ui';
 import { useCreateAppointment } from '@/hooks/useMutate/useCreateAppointment';
+import { useDateStore } from '@/store/appointmentStore';
 import { UserDataResponse } from '@/types/user';
 import { formattedDate } from '@/utils/date';
 
@@ -24,13 +25,14 @@ type AppointmentFormData = {
 
 export default function CreateAppointment() {
   const [attendees, setAttendees] = useState<UserDataResponse[]>([]);
+  const date = useDateStore(prev => prev.date);
 
   const { mutate: CreateAppointment, isPending } = useCreateAppointment();
 
   const methods = useForm<AppointmentFormData>({
     defaultValues: {
       title: '',
-      startDate: formattedDate(new Date()),
+      startDate: formattedDate(date),
       startTime: `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')}`,
       meetingLocation: { id: '', address: '', name: '' },
       memo: '',

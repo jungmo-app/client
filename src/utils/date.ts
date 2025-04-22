@@ -1,9 +1,16 @@
-export const isSameDay = (date1: Date, date2: Date) => {
+export const isSameMonth = (date1: Date, date2: Date) => {
   if (date1.getFullYear() !== date2.getFullYear()) {
     return false;
   }
 
   if (date1.getMonth() !== date2.getMonth()) {
+    return false;
+  }
+  return true;
+};
+
+export const isSameDay = (date1: Date, date2: Date) => {
+  if (!isSameMonth(date1, date2)) {
     return false;
   }
 
@@ -19,6 +26,17 @@ export const formattedDate = (date: Date) => {
   const day = date.getDate().toString().padStart(2, '0');
 
   return `${year}-${month}-${day}`;
+};
+
+export const formattedDateKr = (date: Date) => {
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const dayOfWeek = ['일', '월', '화', '수', '목', '금', '토'][date.getDay()];
+
+  const pad = (n: number) => n.toString().padStart(2, '0');
+
+  return `${year}년 ${pad(month)}월 ${pad(day)}일 ${dayOfWeek}요일`;
 };
 
 export const getTimeline = (date: Date) => {
@@ -52,4 +70,18 @@ export const getTimeline = (date: Date) => {
 export const parseKST = (date: Date) => {
   const kst = new Date(date.getTime() + 9 * 60 * 60 * 1000);
   return kst;
+};
+
+export const getPrevMonthDateList = (date: Date, n: number) => {
+  const currentYear = date.getFullYear();
+  const currentMonth = date.getMonth();
+
+  return Array.from({ length: n }, (_, i) => new Date(currentYear, currentMonth - i - 1)).reverse();
+};
+
+export const getNextMonthDateList = (date: Date, n: number) => {
+  const currentYear = date.getFullYear();
+  const currentMonth = date.getMonth();
+
+  return Array.from({ length: n }, (_, i) => new Date(currentYear, currentMonth + i + 1));
 };

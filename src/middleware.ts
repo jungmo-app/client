@@ -52,8 +52,9 @@ export const middleware = async (request: NextRequest) => {
       const isValid = await verifyToken(accessToken);
 
       if (isValid === false) {
-        const response = redirectTo(searchParams.get('refer'), request.nextUrl);
-        return await refreshAccessToken(response, request.nextUrl);
+        const response = redirectTo(searchParams.get('refer') ?? '/', request.nextUrl);
+        const res = await refreshAccessToken(response, request.nextUrl);
+        return res;
       }
 
       if (isValid === true) {

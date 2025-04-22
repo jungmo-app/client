@@ -78,11 +78,7 @@ export default function Map({ isOpen, currentLocation, title, target, onSelect, 
 
       if (places.length > 0) {
         setMarkers(places);
-
-        if (places.length === 1) {
-          mapRef.current?.panTo(places[0].location);
-        }
-
+        mapRef.current?.panTo(places[0].location);
         setSearchStatus({ center, bounds });
       }
     } catch (error) {

@@ -10,11 +10,13 @@ import { apis } from '.';
 
 export const placeApis = {
   getSearchResult: async (keyword: string, center: google.maps.LatLng, radius: number) => {
-    const [lat, lng] = [center.lat(), center.lng()];
-    const response = await fetch(`/api/places/search?keyword=${keyword}&lat=${lat}&lng=${lng}&radius=${radius}`, {
-      method: 'GET',
-      next: { revalidate: 3600 },
-    });
+    const response = await fetch(
+      `/api/places/search?keyword=${keyword}&lat=${center.lat()}&lng=${center.lng()}&radius=${radius}`,
+      {
+        method: 'GET',
+        next: { revalidate: 3600 },
+      }
+    );
 
     const result = (await response.json()) as ApiResponse<PlaceSearchDataType[]>;
 

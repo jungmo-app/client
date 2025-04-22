@@ -100,6 +100,7 @@ export const authApis = {
 
       return response;
     } catch (error) {
+      console.log(error);
       if (axios.isAxiosError(error) && error.response) {
         const {
           status,
