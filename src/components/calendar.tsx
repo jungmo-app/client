@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { isSameDay } from '@/utils/date';
 import { cn } from '@/utils/styles';
 
 interface CalendarProps {
   date: Date;
+  selectedDate?: Date;
   fontSize?: number;
   showAdjacentDays?: boolean;
   selected?: boolean;
@@ -17,6 +19,7 @@ const DAYS = ['일', '월', '화', '수', '목', '금', '토'] as const;
 
 export default function Calendar({
   date,
+  selectedDate,
   fontSize,
   showAdjacentDays = false,
   onSelect,
@@ -27,7 +30,6 @@ export default function Calendar({
 
   const year = date.getFullYear();
   const month = date.getMonth();
-  const day = date.getDate();
 
   const firstDay = new Date(year, month, 1).getDay();
   const lastDay = new Date(year, month + 1, 0);
@@ -118,7 +120,7 @@ export default function Calendar({
           <div key={`day-${num}`} className="flex size-full items-center justify-center">
             <Button
               variant="ghost"
-              className={`border border-solid font-normal ${num === day ? 'border-gray-400' : 'border-transparent'} ${(firstDay + num) % 7 === 0 ? 'text-blue-500' : (firstDay + num) % 7 === 1 ? 'text-red-500' : ''}`}
+              className={`border border-solid font-normal ${selectedDate && isSameDay(new Date(year, month, num), selectedDate) ? 'border-gray-400' : 'border-transparent'} ${(firstDay + num) % 7 === 0 ? 'text-blue-500' : (firstDay + num) % 7 === 1 ? 'text-red-500' : ''}`}
               style={{ width: '100%', height: '100%', padding: '2%' }}
               aria-label={`${num}일`}
               onClick={() => handleClickDay(num, month)}

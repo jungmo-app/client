@@ -72,7 +72,7 @@ export default function DatePickerContent({ value, onSelect }: ContentProps) {
         <div key={`${d.getFullYear()}.${d.getMonth() + 1}`} className="flex flex-col gap-5 text-lg font-semibold">
           <p className="ml-4 text-xl">{`${d.getFullYear()}년 ${d.getMonth() + 1}월`}</p>
           <div className="h-80">
-            <Calendar showAdjacentDays date={d} onSelect={handleSelect} />
+            <Calendar showAdjacentDays date={d} selectedDate={value} onSelect={handleSelect} />
           </div>
         </div>
       ))}

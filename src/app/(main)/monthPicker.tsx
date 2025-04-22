@@ -104,7 +104,7 @@ export default function MonthPicker({
                 <button
                   key={month}
                   data-year={year}
-                  className={`flex aspect-square items-center justify-center rounded-full py-3 text-center hover:bg-gray-100 dark:hover:bg-gray-500 ${isSameMonth(date, new Date(year, month)) && 'bg-sky-300 hover:bg-sky-200 dark:bg-sky-600 dark:hover:bg-sky-500'} ${year !== currentYear ? 'opacity-50' : 'opacity-100'} hover:opacity-100`}
+                  className={`flex aspect-square items-center justify-center rounded-full py-3 text-center hover:bg-gray-100 dark:hover:bg-gray-500 ${isSameMonth(date, new Date(year, month)) && 'bg-sky-200 hover:bg-sky-100 dark:bg-sky-600 dark:hover:bg-sky-500'} ${year !== currentYear ? 'opacity-50' : 'opacity-100'} hover:opacity-100`}
                   ref={el => {
                     if (month === 0) yearRef.current[index] = el;
                   }}

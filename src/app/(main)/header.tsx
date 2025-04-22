@@ -66,7 +66,11 @@ export default function Header() {
           </PopoverTrigger>
           <PopoverContent>
             <div className="h-72 w-64">
-              <DatePicker onClickMonth={() => setIsOpen(false)} />
+              <DatePicker
+                startYear={new Date().getFullYear() - 100}
+                endYear={new Date().getFullYear() + 100}
+                onClickMonth={() => setIsOpen(false)}
+              />
             </div>
           </PopoverContent>
         </Popover>

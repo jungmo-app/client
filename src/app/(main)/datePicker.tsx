@@ -8,9 +8,11 @@ import YearPicker from './yearPicker';
 
 interface DatePickerProps {
   onClickMonth?: () => void;
+  startYear: number;
+  endYear: number;
 }
 
-export default function DatePicker({ onClickMonth }: DatePickerProps) {
+export default function DatePicker({ startYear, endYear, onClickMonth }: DatePickerProps) {
   const [type, setType] = useState<'month' | 'year'>('month');
   const [transition, setTransition] = useState<'month' | 'year'>('month');
   const { date, setDate } = useDateStore(
@@ -45,8 +47,8 @@ export default function DatePicker({ onClickMonth }: DatePickerProps) {
     <div className="flex size-full flex-col overflow-hidden">
       {type === 'month' ? (
         <MonthPicker
-          startYear={1925}
-          endYear={2125}
+          startYear={startYear}
+          endYear={endYear}
           type={type}
           transition={transition}
           value={currentDate}
@@ -56,8 +58,8 @@ export default function DatePicker({ onClickMonth }: DatePickerProps) {
         />
       ) : (
         <YearPicker
-          startYear={1925}
-          endYear={2125}
+          startYear={startYear}
+          endYear={endYear}
           value={currentDate}
           type={type}
           transition={transition}

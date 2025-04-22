@@ -64,8 +64,6 @@ export default function Map({ isOpen, currentLocation, title, target, onSelect, 
     const center = mapRef.current.getCenter();
     const bounds = mapRef.current.getBounds();
 
-    console.log(center?.lat(), center?.lng(), bounds);
-
     if (!bounds || !center) {
       return;
     }
