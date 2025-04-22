@@ -57,12 +57,12 @@ export default function Header() {
         </Button>
         <Popover open={isOpen} onOpenChange={handleOpenPopover}>
           <PopoverTrigger asChild>
-            <button className="flex select-none items-center gap-2 text-nowrap" type="button" aria-label="날짜">
+            <Button variant="ghost" type="button" aria-label="날짜">
               <h1 className="text-xl font-semibold">
                 {date.getFullYear()}. {(date.getMonth() + 1).toString().padStart(2, '0')}
               </h1>
               <CalendarRange className="h-5 w-5" />
-            </button>
+            </Button>
           </PopoverTrigger>
           <PopoverContent>
             <div className="h-72 w-64">
