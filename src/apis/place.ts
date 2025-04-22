@@ -11,7 +11,7 @@ import { apis } from '.';
 export const placeApis = {
   getSearchResult: async (keyword: string, center: google.maps.LatLng, radius: number) => {
     const response = await fetch(
-      `/api/places/search?keyword=${keyword}&lat=${center.lat()}&lng=${center.lng}&radius=${radius}`,
+      `/api/places/search?keyword=${keyword}&lat=${center.lat()}&lng=${center.lng()}&radius=${radius}`,
       {
         method: 'GET',
         next: { revalidate: 3600 },

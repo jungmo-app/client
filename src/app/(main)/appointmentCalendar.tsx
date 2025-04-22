@@ -23,6 +23,7 @@ export default function AppointmentCalendar() {
   return (
     <Calendar
       showAdjacentDays
+      selected
       date={date}
       className="my-3 h-[240px] w-[500px] max-w-full gap-3 px-3"
       onSelect={handleClickDay}
