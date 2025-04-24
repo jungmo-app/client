@@ -52,7 +52,7 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'text/event-stream',
           },
-          heartbeatTimeout: 60 * 29 * 1000,
+          heartbeatTimeout: 60 * 30 * 1000,
         }
       );
 
@@ -66,7 +66,12 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
           if (response) {
             await connectSSE(retry - 1);
           }
+          return;
         }
+
+        setTimeout(() => {
+          connectSSE();
+        }, 3000);
       });
 
       newSSE.addEventListener('invite', inviteEvent);
