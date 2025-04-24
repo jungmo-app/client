@@ -12,11 +12,14 @@ export const middleware = async (request: NextRequest) => {
   const isStaticAsset = /\.(js|css|png|jpg|jpeg|svg|webp|ico|woff2?)$/.test(pathname);
   const isInternal = pathname.startsWith('/_next/') || pathname.startsWith('/favicon.ico');
 
+  console.log(pathname);
+
   if (isStaticAsset || isInternal) {
     return NextResponse.next();
   }
 
-  const isLoginPage = pathname.startsWith('/login');
+  const isLoginPage =
+    pathname.startsWith('/login') || pathname.startsWith('/signup') || pathname.startsWith('reset-password');
   const refer = searchParams.get('refer');
   const now = Date.now();
 

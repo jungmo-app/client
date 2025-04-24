@@ -9,6 +9,17 @@ export const getCookie = async (name: string) => {
   return cookie;
 };
 
+export const getCookieList = async (names: string[]) => {
+  const cookieStore = cookies();
+  return names.reduce(
+    (acc, name) => {
+      acc[name] = cookieStore.get(name)?.value;
+      return acc;
+    },
+    {} as Record<string, string | undefined>
+  );
+};
+
 export const redirectPath = (url: string) => {
   redirect(url);
 };

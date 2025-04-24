@@ -2,7 +2,7 @@ import axios from 'axios';
 import { apiPaths } from '@/constants/apis';
 import { baseAxios } from '@/libs/baseAxios';
 import { customFetch, privateClientFetch } from '@/libs/interceptor';
-import { getCookie } from '@/libs/serverAction';
+import { getCookieList } from '@/libs/serverAction';
 import {
   ChangePasswordPayload,
   LoginRequest,
@@ -21,8 +21,7 @@ export const authApis = {
     return response.data;
   },
   logout: async () => {
-    const accessToken = await getCookie('accessToken');
-    const refreshToken = await getCookie('refreshToken');
+    const { accessToken, refreshToken } = await getCookieList(['accessToken', 'refreshToken']);
 
     try {
       await baseAxios.post(
@@ -85,8 +84,7 @@ export const authApis = {
   },
   refreshToken: async () => {
     console.log('refreshToken');
-    const accessToken = await getCookie('accessToken');
-    const refreshToken = await getCookie('refreshToken');
+    const { accessToken, refreshToken } = await getCookieList(['accessToken', 'refreshToken']);
 
     try {
       const response = await axios.post(
