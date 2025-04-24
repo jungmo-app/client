@@ -1,7 +1,6 @@
 'use server';
 
-import { jwtVerify } from 'jose';
-import { JWTExpired } from 'jose/errors';
+import { errors, jwtVerify } from 'jose';
 
 const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
 
@@ -15,7 +14,7 @@ export const verifyToken = async (accessToken: string) => {
     });
     return true;
   } catch (error) {
-    if (error instanceof JWTExpired) {
+    if (error instanceof errors.JWTExpired || (error as { code?: string })?.code === 'ERR_JWT_EXPIRED') {
       return false;
     }
     /* console.log('* 검증 실패'); */

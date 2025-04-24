@@ -33,6 +33,7 @@ export default function SignupForm() {
   const onSubmit = async (data: SignupFormValues) => {
     register(data);
   };
+
   return (
     <Form {...form}>
       <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
@@ -96,7 +97,7 @@ export default function SignupForm() {
           type="submit"
           className="h-12 w-full rounded-full bg-blue-500 font-semibold text-white hover:bg-blue-600"
           style={{ marginTop: '42px' }}
-          disabled={isPending || Object.keys(form.formState.errors).length > 0}
+          disabled={isPending || Object.keys(form.formState.errors).length > 0 || !form.formState.isValid}
           aria-label="회원가입"
         >
           회원가입

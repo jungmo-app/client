@@ -29,6 +29,7 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
     eventSource.current?.removeEventListener('invite', inviteEvent);
     eventSource.current?.removeEventListener('delete', deleteEvent);
     eventSource.current?.removeEventListener('update', updateEvent);
+    eventSource.current?.removeEventListener('remove', deleteEvent);
     eventSource.current = null;
   }, [inviteEvent, deleteEvent, updateEvent]);
 
@@ -51,12 +52,13 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'text/event-stream',
           },
-          heartbeatTimeout: 60 * 30 * 1000,
+          heartbeatTimeout: 60 * 29 * 1000,
         }
       );
 
       newSSE.addEventListener('error', async error => {
         closeSSE();
+        console.log(error);
         const err = error as Event & { status: number };
         if (err.status === 401) {
           console.log('sse error');
@@ -72,6 +74,9 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
       newSSE.addEventListener('update', updateEvent);
 
       newSSE.addEventListener('delete', deleteEvent);
+
+      newSSE.addEventListener('remove', deleteEvent);
+
       eventSource.current = newSSE;
     },
     [closeSSE, inviteEvent, updateEvent, deleteEvent]
