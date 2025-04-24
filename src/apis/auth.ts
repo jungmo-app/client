@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { apiPaths } from '@/constants/apis';
+import { baseAxios } from '@/libs/baseAxios';
 import { customFetch, privateClientFetch } from '@/libs/interceptor';
-import { getCookie } from '@/libs/serverAction';
-import { ApiResponse } from '@/types/apis';
+import { getCookieList } from '@/libs/serverAction';
 import {
   ChangePasswordPayload,
   LoginRequest,
@@ -21,23 +21,26 @@ export const authApis = {
     return response.data;
   },
   logout: async () => {
-    try {
-      const response = await fetch('/api/logout', {
-        method: 'POST',
-      });
-      const res: ApiResponse = await response.json();
+    const { accessToken, refreshToken } = await getCookieList(['accessToken', 'refreshToken']);
 
-      if (response.status !== 200) {
-        const { status, code, message } = res;
+    try {
+      await baseAxios.post(
+        apiPaths.auth.logout,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            Cookie: `refreshToken=${refreshToken};`,
+          },
+        }
+      );
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        const { status } = error.response;
+        const { code, message } = error.response.data;
         throw new ApiError(status, code, message);
       }
-
-      return res.data;
-    } catch (error) {
-      if (error instanceof ApiError) {
-        throw error;
-      }
-      throw new ApiError(500, 'F001');
+      throw new ApiError(500, 'LS001', '서버 오류');
     }
   },
   register: async (payload: SignupFormValues) => {
@@ -81,8 +84,7 @@ export const authApis = {
   },
   refreshToken: async () => {
     console.log('refreshToken');
-    const accessToken = await getCookie('accessToken');
-    const refreshToken = await getCookie('refreshToken');
+    const { accessToken, refreshToken } = await getCookieList(['accessToken', 'refreshToken']);
 
     try {
       const response = await axios.post(

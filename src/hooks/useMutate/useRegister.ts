@@ -8,7 +8,12 @@ import { SessionContext } from '@/contexts/SessionProvider';
 import { SignupFormValues } from '@/types/auth';
 import { ApiError } from '@/utils/error';
 
-export const useRegister = () => {
+interface UseRegisterProps {
+  onSuccess?: () => void;
+  onError?: (error: ApiError) => void;
+}
+
+export const useRegister = ({ onSuccess, onError }: UseRegisterProps = {}) => {
   const router = useRouter();
   const { openSession, closeSession } = useContext(SessionContext);
   return useMutation<unknown, ApiError, SignupFormValues>({
@@ -16,6 +21,7 @@ export const useRegister = () => {
     onSuccess: async () => {
       try {
         await openSession();
+        onSuccess?.();
         alert('회원가입에 성공하였습니다.');
         router.push('/');
       } catch {
@@ -23,8 +29,8 @@ export const useRegister = () => {
         alert('회원가입에 실패하였습니다.');
       }
     },
-    onError: () => {
-      alert('회원가입에 실패하였습니다.');
+    onError: error => {
+      onError?.(error);
     },
   });
 };

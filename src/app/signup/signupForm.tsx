@@ -5,6 +5,7 @@ import { Button, Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
 import { useRegister } from '@/hooks/useMutate/useRegister';
 import { signupSchema } from '@/schemas/auth';
 import { SignupFormValues } from '@/types/auth';
+import { ApiError } from '@/utils/error';
 
 export default function SignupForm() {
   const form = useForm<SignupFormValues>({
@@ -17,7 +18,17 @@ export default function SignupForm() {
     mode: 'onChange',
   });
 
-  const { mutate: register, isPending } = useRegister();
+  const handleError = (error: ApiError) => {
+    if (error.code === 'C008') {
+      form.setError('email', {
+        message: '이미 존재하는 이메일입니다',
+      });
+      return;
+    }
+    alert('회원가입에 실패하였습니다');
+  };
+
+  const { mutate: register, isPending } = useRegister({ onError: handleError });
 
   const onSubmit = async (data: SignupFormValues) => {
     register(data);
@@ -85,7 +96,7 @@ export default function SignupForm() {
           type="submit"
           className="h-12 w-full rounded-full bg-blue-500 font-semibold text-white hover:bg-blue-600"
           style={{ marginTop: '42px' }}
-          disabled={isPending}
+          disabled={isPending || Object.keys(form.formState.errors).length > 0}
           aria-label="회원가입"
         >
           회원가입
