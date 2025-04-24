@@ -10,7 +10,7 @@ const queryClientOption: QueryClientConfig = {
       retry: false,
       refetchOnWindowFocus: false,
       networkMode: 'always',
-      staleTime: 0,
+      staleTime: 1000 * 60 * 5,
     },
     mutations: {
       networkMode: 'always',

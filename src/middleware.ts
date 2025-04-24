@@ -6,6 +6,7 @@ import { logout } from './libs/serverAction';
 export const middleware = async (request: NextRequest) => {
   const pathname = request.nextUrl.pathname;
   const searchParams = request.nextUrl.searchParams;
+  const refer = searchParams.get('refer');
   const accessToken = request.cookies.get('accessToken')?.value;
   const refreshToken = request.cookies.get('refreshToken')?.value;
 
@@ -18,16 +19,15 @@ export const middleware = async (request: NextRequest) => {
     return NextResponse.next();
   }
 
-  const isLoginPage =
-    pathname.startsWith('/login') || pathname.startsWith('/signup') || pathname.startsWith('reset-password');
-  const refer = searchParams.get('refer');
   const now = Date.now();
+  const isLoginPage =
+    pathname.startsWith('/login') || pathname.startsWith('/signup') || pathname.startsWith('/reset-password');
 
   const redirectToLogin = () => {
     const url = new URL('/login', request.url);
-    url.searchParams.set('refer', refer ?? '/');
+    url.searchParams.set('refer', pathname);
     url.searchParams.set('date', now.toString());
-    const response = NextResponse.redirect(url);
+    const response = isLoginPage ? NextResponse.next() : NextResponse.redirect(url);
     logout(response);
     return response;
   };
@@ -39,21 +39,21 @@ export const middleware = async (request: NextRequest) => {
   };
 
   if (!accessToken || !refreshToken) {
-    const response = isLoginPage ? NextResponse.next() : redirectToLogin();
-    logout(response);
-    return response;
+    return redirectToLogin();
   }
 
   const isValid = await verifyToken(accessToken);
 
-  if (isValid) {
-    return isLoginPage ? redirectToRefer() : NextResponse.next();
+  if (isValid === true) {
+    if (isLoginPage) {
+      return redirectToRefer();
+    }
+    return NextResponse.next();
   }
 
   if (isValid === false) {
     try {
-      console.log('token refresh');
-      const response = redirectToRefer();
+      const response = isLoginPage ? redirectToRefer() : NextResponse.next();
       const api = await apis.auth.refreshToken();
       const setCookieHeader = api.headers['set-cookie'];
       const cookies = Array.isArray(setCookieHeader) ? setCookieHeader : [setCookieHeader];
@@ -65,17 +65,9 @@ export const middleware = async (request: NextRequest) => {
       });
       return response;
     } catch {
-      const response = isLoginPage ? NextResponse.next() : redirectToLogin();
-      logout(response);
-      return response;
+      return redirectToLogin();
     }
   }
-
-  console.log('token invalid');
-
-  const response = isLoginPage ? NextResponse.next() : redirectToLogin();
-  logout(response);
-  return response;
 };
 
 export const config = {
