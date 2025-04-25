@@ -1,9 +1,13 @@
+import { z } from 'zod';
+import { createAppointmentSchema } from '@/schemas/appointment';
 import { UserDataResponse } from './user';
 
 export interface Location {
   id: number;
   placeId: string;
 }
+
+export type AppointmentFormDataType = z.infer<typeof createAppointmentSchema>;
 
 export interface CreateGatheringRequest {
   title: string;

@@ -3,27 +3,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
+import { AppointmentFormDataType } from '@/types/gathering';
 import { addAppointment } from '@/utils/updateAppointment';
-
-type AppointmentFormData = {
-  title: string;
-  startDate: string;
-  startTime: string;
-  meetingLocation: {
-    id: string;
-    address: string;
-    name: string;
-  };
-  memo: string;
-  userIds: number[];
-};
 
 export const useCreateAppointment = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: AppointmentFormData) =>
+    mutationFn: (payload: AppointmentFormDataType) =>
       apis.gathering.create({
         ...payload,
         endDate: payload.startDate,

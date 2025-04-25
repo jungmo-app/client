@@ -2,34 +2,25 @@
 
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { DateInput, DescriptionInput, PlaceInput, TitleInput } from '@/app/appointment/create';
 import { AttendeeInput, Header } from '@/components';
 import { Button } from '@/components/ui';
 import { useCreateAppointment } from '@/hooks/useMutate/useCreateAppointment';
+import { createAppointmentSchema } from '@/schemas/appointment';
 import { useDateStore } from '@/store/appointmentStore';
+import { AppointmentFormDataType } from '@/types/gathering';
 import { UserDataResponse } from '@/types/user';
 import { formattedDate } from '@/utils/date';
-
-type AppointmentFormData = {
-  title: string;
-  startDate: string;
-  startTime: string;
-  meetingLocation: {
-    id: string;
-    address: string;
-    name: string;
-  };
-  memo: string;
-  userIds: number[];
-};
 
 export default function CreateAppointment() {
   const [attendees, setAttendees] = useState<UserDataResponse[]>([]);
   const date = useDateStore(prev => prev.date);
 
-  const { mutate: CreateAppointment, isPending } = useCreateAppointment();
+  const { mutate: CreateAppointment, isPending, isSuccess } = useCreateAppointment();
 
-  const methods = useForm<AppointmentFormData>({
+  const methods = useForm<AppointmentFormDataType>({
+    resolver: zodResolver(createAppointmentSchema),
     defaultValues: {
       title: '',
       startDate: formattedDate(date),
@@ -41,7 +32,7 @@ export default function CreateAppointment() {
     mode: 'onChange',
   });
 
-  const handleSubmitAppointment = async (data: AppointmentFormData) => {
+  const handleSubmitAppointment = async (data: AppointmentFormDataType) => {
     CreateAppointment({ ...data, userIds: attendees.map(user => user.userId) });
   };
 
@@ -61,7 +52,7 @@ export default function CreateAppointment() {
               <Button
                 className="w-full rounded-xl"
                 size="lg"
-                disabled={!methods.formState.isValid || isPending}
+                disabled={!methods.formState.isValid || isPending || isSuccess}
                 aria-label="일정 추가"
                 onClick={methods.handleSubmit(handleSubmitAppointment)}
               >
