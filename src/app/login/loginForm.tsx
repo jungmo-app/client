@@ -22,6 +22,11 @@ export default function LoginForm() {
   });
 
   const handleLoginError = (error: ApiError) => {
+    if (error.code === 'C009' || error.code === 'C011') {
+      form.setError('email', { message: '존재하지 않는 회원입니다' });
+      return;
+    }
+
     if (error.status === 400) {
       form.setError('email', { message: '이메일 또는 비밀번호가 잘못되었습니다.' });
       form.setError('password', { message: '이메일 또는 비밀번호가 잘못되었습니다.' });
@@ -110,7 +115,7 @@ export default function LoginForm() {
 
       <Link href="https://jungmoserver.shop/oauth2/authorization/kakao">
         <Button
-          disabled={isPending}
+          disabled={isPending || isSuccess}
           variant="outline"
           aria-label="카카오톡 로그인"
           className="h-12 w-full rounded-full border-2 border-yellow-400 bg-yellow-400 font-semibold text-black hover:bg-yellow-500 dark:hover:border-yellow-600 dark:hover:bg-yellow-600 dark:hover:text-black"
