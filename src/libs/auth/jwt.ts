@@ -17,7 +17,6 @@ export const verifyToken = async (accessToken: string) => {
     if (error instanceof errors.JWTExpired || (error as { code?: string })?.code === 'ERR_JWT_EXPIRED') {
       return false;
     }
-    /* console.log('* 검증 실패'); */
     return undefined;
   }
 };

@@ -1,13 +1,7 @@
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 import { Header } from '@/components';
 import SignupForm from './signupForm';
 
 export default function SignupPage() {
-  const accessToken = cookies().get('accessToken')?.value;
-  if (accessToken) {
-    redirect('/');
-  }
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Header routeUrl="/login" />

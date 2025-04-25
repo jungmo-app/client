@@ -68,7 +68,6 @@ export default function InfoForm() {
   }
 
   const onSubmit = async (data: EditProfileFormValues) => {
-    console.log(data);
     editAccount({ ...data, profileImage: file, preview });
   };
 

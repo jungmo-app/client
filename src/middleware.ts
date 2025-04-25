@@ -13,8 +13,6 @@ export const middleware = async (request: NextRequest) => {
   const isStaticAsset = /\.(js|css|png|jpg|jpeg|svg|webp|ico|woff2?)$/.test(pathname);
   const isInternal = pathname.startsWith('/_next/') || pathname.startsWith('/favicon.ico');
 
-  console.log(pathname);
-
   if (isStaticAsset || isInternal) {
     return NextResponse.next();
   }

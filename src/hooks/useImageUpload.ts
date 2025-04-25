@@ -11,12 +11,10 @@ export const useImageUpload = ({ initialImage }: UseImageUploadProps = {}) => {
   const [error, setError] = useState<string | null>(null);
 
   const handleImageChange = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('change');
     const file = event.target.files?.[0];
     if (!file) return;
 
     const errorMessage = validateImageFile(file);
-    console.log(errorMessage);
     if (errorMessage) {
       setError(errorMessage);
       return;
