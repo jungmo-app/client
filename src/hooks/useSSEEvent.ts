@@ -55,10 +55,10 @@ export const useSSEEvent = () => {
 
   const deleteEvent = useCallback(
     (e: Event) => {
-      const { startDate: _, ...notification } = parseEvent(e);
+      const { startDate: startDate, ...notification } = parseEvent(e);
 
       updateNotification(queryClient, notification);
-      deleteAppointment(queryClient, notification.gatheringId);
+      deleteAppointment(queryClient, notification.gatheringId, startDate);
     },
     [queryClient]
   );

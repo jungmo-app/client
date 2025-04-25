@@ -28,7 +28,7 @@ type AttendeeSelectModalProps = {
 };
 
 export default function AttendeeSelectModal({ isOpen, value, onClose, onSelect }: AttendeeSelectModalProps) {
-  const { register, getValues } = useForm();
+  const { register, getValues, reset } = useForm();
 
   const [debouncedKeyword, setDeboundedKeyword] = useState<string>('');
   const [selectedUsers, setSelectedUsers] = useState<UserDataResponse[]>(value ?? []);
@@ -52,6 +52,7 @@ export default function AttendeeSelectModal({ isOpen, value, onClose, onSelect }
 
   const handleConfirm = () => {
     onSelect(selectedUsers);
+    reset();
     onClose();
   };
 
