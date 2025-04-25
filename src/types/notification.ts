@@ -9,6 +9,6 @@ export interface NotificationType {
   read: boolean;
 }
 
-export interface InviteSSEType extends Omit<NotificationType, 'title'> {
+export interface SSEDataType extends NotificationType {
   startDate: string;
 }
