@@ -13,7 +13,7 @@ export interface CreateGatheringRequest {
   meetingLocation: {
     placeId: string;
   };
-  memo: string;
+  memo: string | null;
   userIds: number[];
 }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import debounce from 'lodash.debounce';
 import { Search, X } from 'lucide-react';
@@ -28,9 +28,8 @@ type AttendeeSelectModalProps = {
 };
 
 export default function AttendeeSelectModal({ isOpen, value, onClose, onSelect }: AttendeeSelectModalProps) {
-  const { register, getValues, reset } = useForm();
+  const { register, getValues, setValue } = useForm();
 
-  const [searchResult, setSearchResult] = useState<UserDataResponse[]>([]);
   const [debouncedKeyword, setDeboundedKeyword] = useState<string>('');
   const [selectedUsers, setSelectedUsers] = useState<UserDataResponse[]>(value ?? []);
 
@@ -53,19 +52,17 @@ export default function AttendeeSelectModal({ isOpen, value, onClose, onSelect }
 
   const handleConfirm = () => {
     onSelect(selectedUsers);
-    reset();
-    setSearchResult([]);
+    setValue('searchValue', '');
+    setDeboundedKeyword('');
     onClose();
   };
 
   const handleClose = () => {
     setSelectedUsers(value ?? []);
+    setValue('searchValue', '');
+    setDeboundedKeyword('');
     onClose();
   };
-
-  useEffect(() => {
-    setSearchResult(searchList);
-  }, [searchList]);
 
   return (
     <Sheet open={isOpen} onOpenChange={handleClose}>
@@ -118,10 +115,10 @@ export default function AttendeeSelectModal({ isOpen, value, onClose, onSelect }
             <div className="flex size-full items-center justify-center text-red-600">
               검색 결과를 불러올 수 없습니다
             </div>
-          ) : searchResult.length > 0 ? (
+          ) : searchList.length > 0 ? (
             <ScrollArea className="flex-1">
               <div className="flex flex-col gap-1 space-y-2">
-                {searchResult.map(user => (
+                {searchList.map(user => (
                   <Button
                     key={user.userId}
                     variant="ghost"
