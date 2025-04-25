@@ -10,6 +10,7 @@ import { Avatar, AvatarImage, Badge, Input, Textarea } from '@/components/ui';
 import { useEditAppointment } from '@/hooks/useMutate/useEditAppointment';
 import { useAppointment } from '@/hooks/useQuery/useAppointment';
 import { UserDataResponse } from '@/types/user';
+import { ApiError } from '@/utils/error';
 
 export default function MainInfoSection() {
   const params = useParams();
@@ -20,10 +21,6 @@ export default function MainInfoSection() {
 
   const { data: appointment } = useAppointment(id);
 
-  const { mutate: editAppointment, isPending } = useEditAppointment(id, () => {
-    setIsEditMode(false);
-  });
-
   const { control, getValues, reset, setValue } = useForm({
     defaultValues: {
       title: appointment?.title ?? '',
@@ -32,6 +29,29 @@ export default function MainInfoSection() {
       description: appointment?.memo ?? '',
       userList: appointment?.gatheringUsers ?? [],
     },
+  });
+
+  const handleSuccess = () => {
+    setIsEditMode(false);
+  };
+
+  const handleError = (error: ApiError) => {
+    if (error.code === 'GL003') {
+      alert('자기 자신을 초대할 수 없습니다');
+      return;
+    }
+
+    if (error.code === 'G005') {
+      alert('초대한 참가자가 존재하지 않습니다');
+      return;
+    }
+
+    alert('모임 수정에 실패하였습니다');
+  };
+
+  const { mutate: editAppointment, isPending } = useEditAppointment(id, {
+    onSuccess: handleSuccess,
+    onError: handleError,
   });
 
   if (!appointment) {

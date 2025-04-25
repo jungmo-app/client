@@ -6,7 +6,12 @@ import { DetailGatheringType } from '@/types/gathering';
 import { ApiError } from '@/utils/error';
 import { updateAppointment } from '@/utils/updateAppointment';
 
-export const useAddLocation = (id: number) => {
+interface AddLocationOptionType {
+  onSuccess?: () => void;
+  onError?: (error: ApiError) => void;
+}
+
+export const useAddLocation = (id: number, option: AddLocationOptionType = {}) => {
   const queryClient = useQueryClient();
 
   return useMutation<number, ApiError, google.maps.places.PlaceResult>({
@@ -17,9 +22,10 @@ export const useAddLocation = (id: number) => {
         ? ({ ...prevData, location: [...prevData.locations, { ...variable, id: placeId }] } as DetailGatheringType)
         : undefined;
       updateAppointment(queryClient, id, undefined, updateData);
+      option.onSuccess?.();
     },
-    onError: () => {
-      alert('장소를 추가할 수 없습니다');
+    onError: error => {
+      option.onError?.(error);
     },
   });
 };

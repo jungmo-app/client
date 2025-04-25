@@ -7,12 +7,21 @@ import { Button } from '@/components/ui';
 import { useAddLocation } from '@/hooks/useMutate/useAddLocation';
 import { getCurrentLocation } from '@/libs/map/getCurrentLocation';
 import { Position } from '@/types/map';
+import { ApiError } from '@/utils/error';
 
 export default function Footer() {
   const params = useParams();
   const id = Number(params.id);
 
-  const { mutate: addLocation, isPending } = useAddLocation(id);
+  const handleError = (error: ApiError) => {
+    if (error.code === 'GL003') {
+      alert('이미 모임에 해당장소가 포함되어 있습니다.');
+      return;
+    }
+    alert('장소 추가에 실패하였습니다');
+  };
+
+  const { mutate: addLocation, isPending } = useAddLocation(id, { onError: handleError });
 
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [currentLocation, setCurrentLocation] = useState<Position | null>(null);
