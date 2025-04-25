@@ -34,7 +34,11 @@ export const useEditAccount = () => {
         prev ? { ...prev, userName, profileImage: preview } : undefined
       );
     },
-    onError: () => {
+    onError: (error: ApiError) => {
+      if (error.code === 'C010') {
+        alert('프로필 이미지를 수정하는데 실패하였습니다');
+        return;
+      }
       alert('수정에 실패하였습니다');
     },
   });

@@ -4,26 +4,27 @@ import { useContext } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apis } from '@/apis';
 import { SessionContext } from '@/contexts/SessionProvider';
+import { ApiError } from '@/utils/error';
 
-export const useDeleteAccount = (onSuccess?: () => void, onError?: () => void) => {
+interface DeleteAccountProps {
+  onSuccess?: () => void;
+  onError?: (error: ApiError) => void;
+}
+
+export const useDeleteAccount = ({ onSuccess, onError }: DeleteAccountProps = {}) => {
   const queryClient = useQueryClient();
   const { closeSession } = useContext(SessionContext);
-  return useMutation({
+  return useMutation<unknown, ApiError>({
     mutationFn: apis.user.deleteAccount,
     onSuccess: () => {
       closeSession();
-      if (onSuccess) {
-        onSuccess();
-      }
       queryClient.clear();
+      onSuccess?.();
       alert('계정이 삭제되었습니다.');
       window.location.replace('/login');
     },
-    onError: () => {
-      if (onError) {
-        onError();
-      }
-      alert('계정 삭제에 실패하였습니다.');
+    onError: error => {
+      onError?.(error);
     },
   });
 };
