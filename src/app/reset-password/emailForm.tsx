@@ -4,15 +4,16 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LoadingButton } from '@/components/common/LoadingButton';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from '@/components/ui';
+import { useRequestEmail } from '@/hooks/useMutate/useRequestEmail';
 import { setPasswordSchema } from '@/schemas/auth';
 import { SetPasswordFormValues } from '@/types/auth';
+import { ApiError } from '@/utils/error';
 
 interface EmailFormProps {
-  isPending: boolean;
-  onSubmit: (data: SetPasswordFormValues) => Promise<void>;
+  onSubmit: () => void;
 }
 
-export default function EmailForm({ isPending, onSubmit }: EmailFormProps) {
+export default function EmailForm({ onSubmit }: EmailFormProps) {
   const form = useForm<SetPasswordFormValues>({
     resolver: zodResolver(setPasswordSchema),
     defaultValues: {
@@ -21,8 +22,28 @@ export default function EmailForm({ isPending, onSubmit }: EmailFormProps) {
     mode: 'onChange',
   });
 
+  const handleSuccess = () => {
+    onSubmit();
+  };
+
+  const handleError = (error: ApiError) => {
+    if (error.code === 'C018') {
+      alert('이메일 전송에 실패하였습니다');
+      return;
+    }
+
+    if (error.code === 'C009' || error.code === 'C005') {
+      form.setError('email', { message: '존재하지 않는 회원입니다' });
+      return;
+    }
+
+    alert('초기화 링크 생성에 실패하였습니다');
+  };
+
+  const { mutate: requestEmail, isPending } = useRequestEmail({ onSuccess: handleSuccess, onError: handleError });
+
   const handleSubmit = (data: SetPasswordFormValues) => {
-    onSubmit(data);
+    requestEmail(data);
   };
   return (
     <div className="-mt-4">

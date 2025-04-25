@@ -1,16 +1,15 @@
 'use client';
 
-import { useRequestEmail } from '@/hooks/useMutate/useRequestEmail';
-import { SetPasswordFormValues } from '@/types/auth';
+import { useState } from 'react';
 import EmailForm from './emailForm';
 import RequestInfo from './requestInfo';
 
 export default function ResetRequest() {
-  const { mutate: requestEmail, isSuccess, isPending } = useRequestEmail();
+  const [isRequestSuccess, setIsRequestSuccess] = useState<boolean>(false);
 
-  const handleSubmit = async (data: SetPasswordFormValues) => {
-    requestEmail(data);
+  const handleSubmit = () => {
+    setIsRequestSuccess(true);
   };
 
-  return <>{isSuccess ? <RequestInfo /> : <EmailForm isPending={isPending} onSubmit={handleSubmit} />}</>;
+  return <>{isRequestSuccess ? <RequestInfo /> : <EmailForm onSubmit={handleSubmit} />}</>;
 }

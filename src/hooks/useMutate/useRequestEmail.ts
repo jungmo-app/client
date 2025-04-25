@@ -7,7 +7,7 @@ import { ApiError } from '@/utils/error';
 
 interface RequestEmailProps {
   onSuccess?: () => void;
-  onError?: (error?: ApiError) => void;
+  onError?: (error: ApiError) => void;
 }
 
 export const useRequestEmail = ({ onSuccess, onError }: RequestEmailProps = {}) => {
