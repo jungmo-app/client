@@ -62,7 +62,7 @@ export default function LoginForm() {
                     autoComplete="on"
                     error={Boolean(form.formState.errors.email)}
                     clearError={() => form.clearErrors('email')}
-                    readOnly={isPending}
+                    readOnly={isPending || isSuccess}
                     placeholder="이메일을 입력해주세요"
                     className="h-12 rounded-full border-gray-300 bg-gray-100 px-4"
                   />
@@ -84,7 +84,7 @@ export default function LoginForm() {
                     error={Boolean(form.formState.errors.password)}
                     clearError={() => form.clearErrors('password')}
                     type="password"
-                    readOnly={isPending}
+                    readOnly={isPending || isSuccess}
                     placeholder="비밀번호를 입력해주세요"
                     className="h-12 rounded-full border-gray-300 bg-gray-100 px-4"
                   />
