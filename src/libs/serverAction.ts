@@ -35,6 +35,7 @@ export const revalidateData = (tag: string) => {
 export const resetCookie = (res: NextResponse, name: string) => {
   res.cookies.set(name, '', {
     maxAge: 0,
+    expires: new Date(),
     path: '/',
     domain: '.jungmoserver.shop',
     httpOnly: true,

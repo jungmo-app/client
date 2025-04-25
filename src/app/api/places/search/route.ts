@@ -28,7 +28,6 @@ export async function GET(req: Request) {
     );
 
     if (!response.ok) {
-      console.log(response);
       const res = responseData(null, response.status, '지도 검색 결과를 가져올 수 없습니다', 'M002');
       return new Response(JSON.stringify(res), { status: response.status });
     }

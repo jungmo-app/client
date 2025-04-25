@@ -1,5 +1,4 @@
 import { QueryClient, dehydrate } from '@tanstack/react-query';
-import { redirect } from 'next/navigation';
 import { apis } from '@/apis';
 import { Header } from '@/components';
 import QueryClientProvider from '@/components/common/queryProvider';
@@ -24,9 +23,6 @@ export default async function Appointment({ params }: AppointmentProps) {
       queryFn: () => apis.serverGathering.getDetail(Number(id), queryClient),
     });
   } catch (error) {
-    if (error instanceof ApiError && error.status === 401 && error.code.startsWith('T')) {
-      redirect(`/login?refer=/appointment/${id}&date=${Date.now()}`);
-    }
     console.error(error);
   }
 

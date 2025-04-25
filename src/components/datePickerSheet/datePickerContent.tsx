@@ -18,7 +18,6 @@ export default function DatePickerContent({ value, onSelect }: ContentProps) {
 
   const handleSelect = (date: Date) => {
     onSelect(date);
-    console.log(date);
   };
 
   useEffect(() => {
@@ -51,7 +50,6 @@ export default function DatePickerContent({ value, onSelect }: ContentProps) {
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          console.log('aaa');
           setDateList(prev => [...prev, ...getNextMonthDateList(prev[prev.length - 1], 5)]);
         }
       });

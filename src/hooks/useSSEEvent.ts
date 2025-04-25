@@ -5,7 +5,7 @@ import { QueryClient, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { Event } from 'event-source-polyfill';
 import { apis } from '@/apis';
-import { InviteSSEType } from '@/types/notification';
+import { NotificationType, SSEDataType } from '@/types/notification';
 import { deleteAppointment, updateAppointList, updateAppointment } from '@/utils/updateAppointment';
 
 export const useSSEEvent = () => {
@@ -13,12 +13,15 @@ export const useSSEEvent = () => {
 
   const parseEvent = (e: Event) => {
     const event = e as MessageEvent;
-    const data = JSON.parse(event.data) as InviteSSEType;
+    const data = JSON.parse(event.data) as SSEDataType;
     return data;
   };
 
-  const updateNotification = (queryClient: QueryClient) => {
+  const updateNotification = (queryClient: QueryClient, notification: NotificationType) => {
     toast('새로운 알림이 도착했습니다', { duration: 2000 });
+    queryClient.setQueryData<NotificationType[]>(['notification'], prev =>
+      prev ? [notification, ...prev] : [notification]
+    );
     queryClient.fetchQuery({
       queryKey: ['notification'],
       queryFn: apis.notification.getNotification,
@@ -27,14 +30,14 @@ export const useSSEEvent = () => {
 
   const inviteEvent = useCallback(
     (e: Event) => {
-      updateNotification(queryClient);
-      const data = parseEvent(e);
-      const date = new Date(data.startDate);
+      const { startDate, ...notification } = parseEvent(e);
+      const date = new Date(startDate);
 
+      updateNotification(queryClient, notification);
       updateAppointList(queryClient, date);
 
       queryClient.invalidateQueries({
-        queryKey: ['appointment', data.gatheringId],
+        queryKey: ['appointment', notification.gatheringId],
       });
     },
     [queryClient]
@@ -42,20 +45,20 @@ export const useSSEEvent = () => {
 
   const updateEvent = useCallback(
     (e: Event) => {
-      updateNotification(queryClient);
-      const data = parseEvent(e);
+      const { startDate, ...notification } = parseEvent(e);
 
-      updateAppointment(queryClient, data.gatheringId, new Date(data.startDate));
+      updateNotification(queryClient, notification);
+      updateAppointment(queryClient, notification.gatheringId, new Date(startDate));
     },
     [queryClient]
   );
 
   const deleteEvent = useCallback(
     (e: Event) => {
-      updateNotification(queryClient);
-      const data = parseEvent(e);
+      const { startDate: startDate, ...notification } = parseEvent(e);
 
-      deleteAppointment(queryClient, data.gatheringId);
+      updateNotification(queryClient, notification);
+      deleteAppointment(queryClient, notification.gatheringId, startDate);
     },
     [queryClient]
   );

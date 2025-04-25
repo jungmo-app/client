@@ -8,16 +8,16 @@ export const updateAppointList = (queryClient: QueryClient, date: Date) => {
   });
 };
 
-export const deletePrevAppointList = (queryClient: QueryClient, appointmentId: number, data?: DetailGatheringType) => {
-  const prevData = data ?? queryClient.getQueryData<DetailGatheringType>(['appointment', appointmentId]);
-  if (!prevData) {
+export const deletePrevAppointList = (queryClient: QueryClient, appointmentId: number, date?: string) => {
+  const prevDate = date ?? queryClient.getQueryData<DetailGatheringType>(['appointment', appointmentId])?.startDate;
+  if (!prevDate) {
     return;
   }
 
-  const prevDate = new Date(prevData.startDate);
+  const updateDate = new Date(prevDate);
 
   queryClient.setQueryData<GatheringListResponse[]>(
-    ['appointments', prevDate.getFullYear(), prevDate.getMonth() + 1, prevDate.getDate()],
+    ['appointments', updateDate.getFullYear(), updateDate.getMonth() + 1, updateDate.getDate()],
     prev => (prev ? [...prev.filter(item => item.id !== appointmentId)] : undefined)
   );
 };
@@ -39,7 +39,7 @@ export const updateAppointment = (
 
   if (updateDate) {
     if (prevData && !isSameDay(new Date(prevData.startDate), updateDate)) {
-      deletePrevAppointList(queryClient, id, prevData);
+      deletePrevAppointList(queryClient, id, prevData.startDate);
     }
     updateAppointList(queryClient, updateDate);
   }
@@ -54,7 +54,7 @@ export const updateAppointment = (
   });
 };
 
-export const deleteAppointment = (queryClient: QueryClient, id: number) => {
-  deletePrevAppointList(queryClient, id);
+export const deleteAppointment = (queryClient: QueryClient, id: number, date?: string) => {
+  deletePrevAppointList(queryClient, id, date);
   queryClient.removeQueries({ queryKey: ['appointment', id] });
 };
