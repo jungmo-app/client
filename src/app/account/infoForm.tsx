@@ -32,7 +32,12 @@ export default function InfoForm() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [isEditMode, setIsEditMode] = useState(false);
-  const { mutate: editAccount, isPending } = useEditAccount();
+
+  const handleSuccess = () => {
+    setIsEditMode(false);
+  };
+
+  const { mutate: editAccount, isPending } = useEditAccount({ onSuccess: handleSuccess });
 
   const {
     preview,

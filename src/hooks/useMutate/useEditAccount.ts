@@ -11,7 +11,12 @@ interface PayloadType {
   preview: string;
 }
 
-export const useEditAccount = () => {
+interface EditAccountProps {
+  onSuccess?: () => void;
+  onError?: (error: ApiError) => void;
+}
+
+export const useEditAccount = ({ onSuccess, onError }: EditAccountProps = {}) => {
   const queryClient = useQueryClient();
 
   return useMutation<unknown, ApiError, PayloadType>({
@@ -28,11 +33,12 @@ export const useEditAccount = () => {
       return apis.user.editInfo(formData);
     },
     onSuccess: (_, variable) => {
-      alert('수정하였습니다');
       const { userName, preview } = variable;
       queryClient.setQueryData<UserDataResponse>(['userData'], prev =>
         prev ? { ...prev, userName, profileImage: preview } : undefined
       );
+      alert('수정하였습니다');
+      onSuccess?.();
     },
     onError: (error: ApiError) => {
       if (error.code === 'C010') {
@@ -40,6 +46,7 @@ export const useEditAccount = () => {
         return;
       }
       alert('수정에 실패하였습니다');
+      onError?.(error);
     },
   });
 };

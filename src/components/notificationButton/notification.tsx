@@ -49,15 +49,15 @@ export default function Notification({ notification, isEdit }: NotificationProps
         </button>
       )}
       <div
-        className={`relative flex w-full gap-3 rounded-lg border border-gray-300 bg-background p-3 text-left shadow-sm dark:border-gray-600 ${
+        className={`relative flex w-full items-center gap-3 rounded-lg border border-gray-300 bg-background p-3 text-left shadow-sm dark:border-gray-600 ${
           isRead && 'opacity-50'
         } hover:shadow-md`}
       >
-        <div className="flex flex-shrink-0 items-center gap-2">
+        <div className="relative flex size-7 items-center justify-center gap-2">
           <Image
+            fill
             src={notification.profileImage ?? '/sample.jpg'}
-            width={28}
-            height={28}
+            sizes="28px"
             alt="image"
             className="rounded-full"
           />
@@ -67,7 +67,7 @@ export default function Notification({ notification, isEdit }: NotificationProps
           <div className="mt-0.5 line-clamp-2 max-h-8 w-full break-words text-xs text-gray-700 dark:text-gray-400">
             {notification.message}
           </div>
-          <div className="mt-1 self-end text-[10px] text-gray-400">
+          <div className="self-end text-[10px] text-gray-400">
             {getTimeline(parseKST(new Date(notification.createdAt)))}
           </div>
         </div>
