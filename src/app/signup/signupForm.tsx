@@ -19,7 +19,7 @@ export default function SignupForm() {
   });
 
   const handleError = (error: ApiError) => {
-    if (error.code === 'C008') {
+    if (error.code === 'C008' || error.code === 'C011') {
       form.setError('email', {
         message: '이미 존재하는 이메일입니다',
       });
@@ -97,7 +97,7 @@ export default function SignupForm() {
           type="submit"
           className="h-12 w-full rounded-full bg-blue-500 font-semibold text-white hover:bg-blue-600"
           style={{ marginTop: '42px' }}
-          disabled={isPending || Object.keys(form.formState.errors).length > 0 || !form.formState.isValid}
+          disabled={isPending || !form.formState.isValid}
           aria-label="회원가입"
         >
           회원가입
