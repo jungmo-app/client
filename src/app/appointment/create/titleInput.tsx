@@ -20,7 +20,6 @@ export default function TitleInput() {
           name="title"
           control={control}
           render={({ field }) => <Input placeholder="일정 제목을 입력해주세요" className="bg-background" {...field} />}
-          rules={{ validate: { title: value => (value ? true : '제목을 입력해주세요') } }}
         />
         {errors.title && <span className="text-red-500">제목을 입력해주세요</span>}
       </div>

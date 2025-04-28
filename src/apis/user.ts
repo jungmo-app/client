@@ -8,6 +8,10 @@ import { ApiError } from '@/utils/error';
 
 export const userApis = {
   search: async (userCode: string) => {
+    if (!userCode) {
+      return [];
+    }
+
     const response = await privateClientFetch<UserDataResponse[]>(`${apiPaths.user.search}?userCode=${userCode}`, {
       method: 'GET',
       cache: 'no-store',

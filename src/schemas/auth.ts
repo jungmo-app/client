@@ -10,7 +10,7 @@ export type EditProfileFormValues = z.infer<typeof editProfileSchema>;
 
 export const loginSchema = z.object({
   email: commonSchemas.email,
-  password: z.string(),
+  password: z.string().min(1, '비밀번호를 입력해주세요'),
 });
 
 export const signupSchema = z.object({

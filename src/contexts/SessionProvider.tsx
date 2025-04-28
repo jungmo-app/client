@@ -95,7 +95,7 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
       await queryClient.fetchQuery({ queryKey: ['notification'], queryFn: apis.notification.getNotification });
       await connectSSE();
     } catch (error) {
-      console.log(error);
+      console.error(error);
       closeSSE();
       throw new Error('로그인 오류');
     }

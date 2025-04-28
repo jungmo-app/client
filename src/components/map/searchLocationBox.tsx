@@ -23,7 +23,7 @@ export default function SearchLocationBox({ onSubmit }: SearchLocationBoxProps) 
     latestKeyword.current = inputValue;
   }, [inputValue]);
 
-  const { value: debouncedKeyword } = useDebouncedValue(inputValue, 500, handleDebounce);
+  const { value: debouncedKeyword } = useDebouncedValue(inputValue, 200, handleDebounce);
 
   const [isViewSuggestion, setIsViewSuggestion] = useState<boolean>(false);
   const { data: suggestions } = useSearchLocationKeyword(debouncedKeyword);
@@ -56,14 +56,14 @@ export default function SearchLocationBox({ onSubmit }: SearchLocationBoxProps) 
         remaining.splice(matchIndex, 1);
 
         return (
-          <mark key={index} className="bg-transparent font-normal">
+          <mark key={index} className="bg-transparent font-normal text-current">
             {char}
           </mark>
         );
       }
 
       return (
-        <span key={index} className="font-bold">
+        <span key={index} className="font-bold text-current">
           {char}
         </span>
       );

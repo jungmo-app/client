@@ -1,5 +1,3 @@
-import nextConfigs from './nextConfigs/index.mjs';
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
@@ -13,12 +11,6 @@ const nextConfig = {
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
-  },
-  async rewrites() {
-    return nextConfigs.rewrites;
-  },
-  async redirects() {
-    return nextConfigs.redirects;
   },
 };
 export default nextConfig;

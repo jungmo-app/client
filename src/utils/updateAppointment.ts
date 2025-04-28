@@ -42,9 +42,6 @@ export const updateAppointment = (
       deletePrevAppointList(queryClient, id, prevData.startDate);
     }
     updateAppointList(queryClient, updateDate);
-  }
-
-  if (updateData) {
     queryClient.setQueryData<DetailGatheringType>(['appointment', id], updateData);
     return;
   }

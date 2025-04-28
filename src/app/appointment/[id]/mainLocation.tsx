@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { useEditAppointment } from '@/hooks/useMutate/useEditAppointment';
 import { useAppointment } from '@/hooks/useQuery/useAppointment';
 import { ChangePlaceType } from '@/types/map';
+import { ApiError } from '@/utils/error';
 import EditLocation from './editLocation';
 
 export default function MainLocation() {
@@ -13,7 +14,19 @@ export default function MainLocation() {
 
   const { data: appointment } = useAppointment(id);
 
-  const { mutate: editAppointment, isPending } = useEditAppointment(id);
+  const handleError = (error: ApiError) => {
+    if (error.code === 'GL001') {
+      alert('해당하는 모임장소가 존재하지 않습니다');
+      return;
+    }
+
+    if (error.code === 'GL003') {
+      alert('모임에 해당장소가 이미 포함되어 있습니다');
+      return;
+    }
+  };
+
+  const { mutate: editAppointment, isPending } = useEditAppointment(id, { onError: handleError });
 
   if (!appointment) {
     return;

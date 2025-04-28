@@ -2,14 +2,18 @@
 
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Calendar, LucideFileTerminal, PenLine, Settings } from 'lucide-react';
 import { useParams } from 'next/navigation';
+import { z } from 'zod';
 import { DatePickerSheet, TimePickerSheet } from '@/components';
 import AttendeeSelectModal from '@/components/modals/attendeeSelectModal';
 import { Avatar, AvatarImage, Badge, Input, Textarea } from '@/components/ui';
 import { useEditAppointment } from '@/hooks/useMutate/useEditAppointment';
 import { useAppointment } from '@/hooks/useQuery/useAppointment';
+import { mainInfoSchema } from '@/schemas/appointment';
 import { UserDataResponse } from '@/types/user';
+import { ApiError } from '@/utils/error';
 
 export default function MainInfoSection() {
   const params = useParams();
@@ -20,11 +24,8 @@ export default function MainInfoSection() {
 
   const { data: appointment } = useAppointment(id);
 
-  const { mutate: editAppointment, isPending } = useEditAppointment(id, () => {
-    setIsEditMode(false);
-  });
-
-  const { control, getValues, reset, setValue } = useForm({
+  const { control, getValues, reset, setValue, handleSubmit, formState } = useForm({
+    resolver: zodResolver(mainInfoSchema),
     defaultValues: {
       title: appointment?.title ?? '',
       startDate: appointment?.startDate ?? '',
@@ -32,6 +33,30 @@ export default function MainInfoSection() {
       description: appointment?.memo ?? '',
       userList: appointment?.gatheringUsers ?? [],
     },
+    mode: 'onChange',
+  });
+
+  const handleSuccess = () => {
+    setIsEditMode(false);
+  };
+
+  const handleError = (error: ApiError) => {
+    if (error.code === 'GL003') {
+      alert('자기 자신을 초대할 수 없습니다');
+      return;
+    }
+
+    if (error.code === 'G005') {
+      alert('초대한 참가자가 존재하지 않습니다');
+      return;
+    }
+
+    alert('모임 수정에 실패하였습니다');
+  };
+
+  const { mutate: editAppointment, isPending } = useEditAppointment(id, {
+    onSuccess: handleSuccess,
+    onError: handleError,
   });
 
   if (!appointment) {
@@ -77,19 +102,21 @@ export default function MainInfoSection() {
     setIsOpenSelectModal(true);
   };
 
-  const handleClickSaveButton = async () => {
+  const handleClickSaveButton = async (formData: z.infer<typeof mainInfoSchema>) => {
     if (!appointment) {
       return;
     }
 
+    const { title, startDate, startTime, description: memo, userList } = formData;
+
     const payload = {
-      title: getValues('title'),
-      startDate: getValues('startDate'),
-      endDate: getValues('startDate'),
-      startTime: getValues('startTime'),
-      meetingLocation: appointment?.meetingLocation,
-      memo: getValues('description'),
-      userIds: getValues('userList').map(user => user.userId),
+      title,
+      startDate,
+      endDate: startDate,
+      startTime,
+      meetingLocation: appointment.meetingLocation,
+      memo,
+      userIds: userList.map(user => user.userId),
     };
 
     editAppointment(payload);
@@ -106,7 +133,12 @@ export default function MainInfoSection() {
                 name="title"
                 control={control}
                 render={({ field }) => (
-                  <Input autoComplete="on" className="h-7 rounded-sm px-3 text-base font-semibold" {...field} />
+                  <Input
+                    autoComplete="on"
+                    className="h-7 rounded-sm px-3 text-base font-semibold placeholder:font-normal"
+                    {...field}
+                    placeholder="일정 제목을 입력해주세요"
+                  />
                 )}
               />
             ) : (
@@ -126,8 +158,8 @@ export default function MainInfoSection() {
                   >
                     <Badge
                       variant="destructive"
-                      className="rounded-full bg-green-500 text-white hover:bg-green-600"
-                      onClick={handleClickSaveButton}
+                      className={`rounded-full ${formState.isValid ? 'bg-green-500 text-white hover:bg-green-600' : 'bg-gray-300 hover:bg-gray-300'} `}
+                      onClick={handleSubmit(handleClickSaveButton)}
                     >
                       저장
                     </Badge>

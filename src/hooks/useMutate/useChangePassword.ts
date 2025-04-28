@@ -3,20 +3,22 @@
 import { useMutation } from '@tanstack/react-query';
 import { apis } from '@/apis';
 import { ChangePasswordPayload } from '@/types/auth';
+import { ApiError } from '@/utils/error';
 
-export const useChangePassword = (onSuccess?: () => void, onError?: () => void) => {
-  return useMutation({
+interface ChangePasswordProps {
+  onSuccess?: () => void;
+  onError?: (error: ApiError) => void;
+}
+
+export const useChangePassword = ({ onSuccess, onError }: ChangePasswordProps = {}) => {
+  return useMutation<unknown, ApiError, ChangePasswordPayload>({
     mutationFn: (payload: ChangePasswordPayload) => apis.auth.changePassword(payload),
     onSuccess: () => {
       alert('비밀번호를 변경하였습니다');
-      if (onSuccess) {
-        onSuccess();
-      }
+      onSuccess?.();
     },
-    onError: () => {
-      if (onError) {
-        onError();
-      }
+    onError: error => {
+      onError?.(error);
     },
   });
 };

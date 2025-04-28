@@ -1,7 +1,7 @@
 'use client';
 
 const GlobalError = ({ error }: { error: Error & { digest?: string } }) => {
-  console.log('@@ global error', error);
+  console.error('@@ global error', error);
 
   if (error.digest === 'NEXT_REDIRECT') {
     return;

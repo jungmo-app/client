@@ -25,6 +25,7 @@ import { ButtonContext } from '@/contexts/ButtonClickProvider';
 import { useChangePassword } from '@/hooks/useMutate/useChangePassword';
 import { changePasswordSchema } from '@/schemas/auth';
 import { ChangePasswordFormValues } from '@/types/auth';
+import { ApiError } from '@/utils/error';
 
 export default function ChangePasswordSheet() {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,12 +47,29 @@ export default function ChangePasswordSheet() {
     form.reset();
   };
 
-  const handleError = () => {
+  const handleError = (error: ApiError) => {
     changeClick(false);
-    form.setError('oldPassword', { message: '비밀번호가 잘못되었습니다' });
+    if (error.code === 'C005' || error.code === 'C012') {
+      form.setError('oldPassword', { message: '비밀번호가 잘못되었습니다' });
+      return;
+    }
+
+    if (error.code === 'C013') {
+      form.setError('newPassword', { message: '현재 비밀번호와 동일한 비밀번호로 설정할 수 없습니다' });
+      return;
+    }
+
+    if (error.code === 'C014') {
+      alert('소셜 로그인 한 사용자로, 비밀번호를 변경할 수 없습니다');
+      setIsOpen(false);
+      form.reset();
+      return;
+    }
+
+    alert('비밀번호 변경에 실패하였습니다');
   };
 
-  const { mutate: changePassword } = useChangePassword(handleSuccess, handleError);
+  const { mutate: changePassword } = useChangePassword({ onSuccess: handleSuccess, onError: handleError });
 
   const handleChangePassword = async (value: ChangePasswordFormValues) => {
     changeClick(true);

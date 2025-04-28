@@ -26,11 +26,6 @@ export default function PlaceInput() {
               onChange={location => field.onChange({ id: location.id, address: location.address, name: location.name })}
             />
           )}
-          rules={{
-            validate: {
-              id: value => (value.id ? true : '장소 정보를 입력해주세요'),
-            },
-          }}
         />
         {errors.meetingLocation && <span className="text-red-500">올바른 장소를 입력해주세요</span>}
       </div>
