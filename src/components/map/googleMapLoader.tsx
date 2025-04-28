@@ -175,7 +175,7 @@ const GoogleMapLoader = forwardRef<google.maps.Map | undefined, GoogleMapLoaderP
         </GoogleMap>
         {isButtonVisible && (
           <Button
-            className="absolute bottom-[20%] right-4 bg-background [&_svg]:size-5"
+            className="absolute bottom-[20%] right-2 bg-background [&_svg]:size-5"
             variant="ghost"
             size="icon"
             style={{ borderRadius: '9999px' }}
