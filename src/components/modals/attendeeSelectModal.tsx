@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import debounce from 'lodash.debounce';
 import { Search, X } from 'lucide-react';
@@ -18,7 +19,7 @@ import {
   SheetTitle,
 } from '@/components/ui';
 import { useSearchUserKeyword } from '@/hooks/useQuery/useSearchUserKeyword';
-import { UserDataResponse } from '@/types/user';
+import { UserDataResponse, UserInfoResponse } from '@/types/user';
 
 type AttendeeSelectModalProps = {
   isOpen: boolean;
@@ -28,6 +29,9 @@ type AttendeeSelectModalProps = {
 };
 
 export default function AttendeeSelectModal({ isOpen, value, onClose, onSelect }: AttendeeSelectModalProps) {
+  const queryClient = useQueryClient();
+  const userData = queryClient.getQueryData<UserInfoResponse>(['userData']);
+
   const { register, getValues, setValue } = useForm();
 
   const [debouncedKeyword, setDeboundedKeyword] = useState<string>('');
@@ -84,15 +88,17 @@ export default function AttendeeSelectModal({ isOpen, value, onClose, onSelect }
                       <AvatarFallback>{user.userName?.[0] ?? ''}</AvatarFallback>
                     </Avatar>
                     <span className="text-sm">{user.userName}</span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-4 w-4 p-0"
-                      aria-label="닫기"
-                      onClick={() => handleUserRemove(user.userId)}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
+                    {userData?.userCode !== user.userCode && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-4 w-4 p-0"
+                        aria-label="닫기"
+                        onClick={() => handleUserRemove(user.userId)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    )}
                   </div>
                 ))}
               </div>
