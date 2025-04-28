@@ -20,7 +20,7 @@ export const useDeleteAppointment = (id: number, date: Date, onSuccess?: () => v
       router.push('/');
     },
     onError: error => {
-      console.log(error);
+      console.error(error);
       alert('삭제에 실패하였습니다');
       if (onError) {
         onError();
