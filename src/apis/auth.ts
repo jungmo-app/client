@@ -9,18 +9,19 @@ import {
   SetPasswordFormValues,
   SignupFormValues,
 } from '@/types/auth';
+import { UserInfoResponse } from '@/types/user';
 import { ApiError } from '@/utils/error';
 
 export const authApis = {
   login: async (payload: LoginRequest) => {
-    const response = await customFetch(apiPaths.auth.login, {
+    const response = await customFetch<UserInfoResponse>(apiPaths.auth.login, {
       method: 'POST',
       body: JSON.stringify(payload),
     });
     return response.data;
   },
   register: async (payload: SignupFormValues) => {
-    const response = await customFetch(apiPaths.auth.register, {
+    const response = await customFetch<UserInfoResponse>(apiPaths.auth.register, {
       method: 'POST',
       body: JSON.stringify(payload),
     });
