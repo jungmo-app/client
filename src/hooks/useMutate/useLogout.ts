@@ -10,7 +10,7 @@ export const useLogout = (onSuccess?: () => void, onError?: () => void) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: apis.auth.logout,
+    mutationFn: apis.axios.logout,
     onSuccess: () => {
       closeSession();
       if (onSuccess) {

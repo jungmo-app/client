@@ -19,6 +19,10 @@ export default async function Providers({ children }: StrictPropsWithChildren) {
         queryKey: ['notification'],
         queryFn: apis.serverNotification.getNotification,
       });
+      await queryClient.prefetchQuery({
+        queryKey: ['userData'],
+        queryFn: apis.user.getInfo,
+      });
     } catch (error) {
       console.error(error);
     }

@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { apiPaths } from '@/constants/apis';
-import { baseAxios } from '@/libs/baseAxios';
 import { customFetch, privateClientFetch } from '@/libs/interceptor';
 import { getCookieList } from '@/libs/serverAction';
 import {
@@ -10,41 +9,19 @@ import {
   SetPasswordFormValues,
   SignupFormValues,
 } from '@/types/auth';
+import { UserInfoResponse } from '@/types/user';
 import { ApiError } from '@/utils/error';
 
 export const authApis = {
   login: async (payload: LoginRequest) => {
-    const response = await customFetch(apiPaths.auth.login, {
+    const response = await customFetch<UserInfoResponse>(apiPaths.auth.login, {
       method: 'POST',
       body: JSON.stringify(payload),
     });
     return response.data;
   },
-  logout: async () => {
-    const { accessToken, refreshToken } = await getCookieList(['accessToken', 'refreshToken']);
-
-    try {
-      await baseAxios.post(
-        apiPaths.auth.logout,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            Cookie: `refreshToken=${refreshToken};`,
-          },
-        }
-      );
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        const { status } = error.response;
-        const { code, message } = error.response.data;
-        throw new ApiError(status, code, message);
-      }
-      throw new ApiError(500, 'LS001', '서버 오류');
-    }
-  },
   register: async (payload: SignupFormValues) => {
-    const response = await customFetch(apiPaths.auth.register, {
+    const response = await customFetch<UserInfoResponse>(apiPaths.auth.register, {
       method: 'POST',
       body: JSON.stringify(payload),
     });

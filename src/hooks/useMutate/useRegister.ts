@@ -1,7 +1,7 @@
 'use client';
 
 import { useContext } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
 import { SessionContext } from '@/contexts/SessionProvider';
@@ -15,11 +15,14 @@ interface UseRegisterProps {
 
 export const useRegister = ({ onSuccess, onError }: UseRegisterProps = {}) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
+
   const { openSession, closeSession } = useContext(SessionContext);
   return useMutation<unknown, ApiError, SignupFormValues>({
     mutationFn: payload => apis.auth.register(payload),
-    onSuccess: async () => {
+    onSuccess: async data => {
       try {
+        queryClient.setQueryData(['userData'], data);
         await openSession();
         onSuccess?.();
         alert('회원가입에 성공하였습니다.');

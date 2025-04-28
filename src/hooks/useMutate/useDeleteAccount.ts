@@ -15,7 +15,7 @@ export const useDeleteAccount = ({ onSuccess, onError }: DeleteAccountProps = {}
   const queryClient = useQueryClient();
   const { closeSession } = useContext(SessionContext);
   return useMutation<unknown, ApiError>({
-    mutationFn: apis.user.deleteAccount,
+    mutationFn: apis.axios.deleteAccount,
     onSuccess: () => {
       closeSession();
       queryClient.clear();

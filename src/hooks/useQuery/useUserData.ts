@@ -6,5 +6,6 @@ export const useUserData = () => {
   return useQuery<UserInfoResponse>({
     queryKey: ['userData'],
     queryFn: apis.user.getInfo,
+    staleTime: 5 * 60 * 1000,
   });
 };
