@@ -1,6 +1,6 @@
 import { SiteConfig } from '@/types/config';
 
-export const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || '';
+export const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://front.jungmoserver.shop';
 
 export const siteConfig: SiteConfig = {
   name: '정모 : Jungmo',
