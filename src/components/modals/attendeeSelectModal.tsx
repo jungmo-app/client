@@ -81,7 +81,7 @@ export default function AttendeeSelectModal({ isOpen, value, onClose, onSelect }
                   <div key={user.userId} className="flex items-center gap-1 rounded-full bg-secondary px-2 py-1">
                     <Avatar className="h-5 w-5">
                       <AvatarImage src={user.profileImage} />
-                      <AvatarFallback>{user.userName[0]}</AvatarFallback>
+                      <AvatarFallback>{user.userName?.[0] ?? ''}</AvatarFallback>
                     </Avatar>
                     <span className="text-sm">{user.userName}</span>
                     <Button
