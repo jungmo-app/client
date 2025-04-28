@@ -1,10 +1,6 @@
-import axios from 'axios';
 import { apiPaths } from '@/constants/apis';
-import { baseAxios } from '@/libs/baseAxios';
 import { privateClientFetch, privateServerFetch } from '@/libs/interceptor';
-import { getCookieList } from '@/libs/serverAction';
 import { UserDataResponse, UserInfoResponse } from '@/types/user';
-import { ApiError } from '@/utils/error';
 
 export const userApis = {
   search: async (userCode: string) => {
@@ -28,25 +24,6 @@ export const userApis = {
     });
 
     return response.data;
-  },
-  deleteAccount: async () => {
-    const { accessToken, refreshToken } = await getCookieList(['accessToken', 'refreshToken']);
-    try {
-      await baseAxios.delete(apiPaths.user.deleteAccount, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          Cookie: `refreshToken=${refreshToken}`,
-        },
-        withCredentials: true,
-      });
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        const { status } = error.response;
-        const { code, message } = error.response.data;
-        throw new ApiError(status, code, message);
-      }
-      throw new ApiError(500, 'F001');
-    }
   },
   editInfo: async (payload: FormData) => {
     const response = await privateClientFetch(apiPaths.user.editInfo, {

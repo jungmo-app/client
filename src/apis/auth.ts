@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { apiPaths } from '@/constants/apis';
-import { baseAxios } from '@/libs/baseAxios';
 import { customFetch, privateClientFetch } from '@/libs/interceptor';
 import { getCookieList } from '@/libs/serverAction';
 import {
@@ -19,29 +18,6 @@ export const authApis = {
       body: JSON.stringify(payload),
     });
     return response.data;
-  },
-  logout: async () => {
-    const { accessToken, refreshToken } = await getCookieList(['accessToken', 'refreshToken']);
-
-    try {
-      await baseAxios.post(
-        apiPaths.auth.logout,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            Cookie: `refreshToken=${refreshToken};`,
-          },
-        }
-      );
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        const { status } = error.response;
-        const { code, message } = error.response.data;
-        throw new ApiError(status, code, message);
-      }
-      throw new ApiError(500, 'LS001', '서버 오류');
-    }
   },
   register: async (payload: SignupFormValues) => {
     const response = await customFetch(apiPaths.auth.register, {
