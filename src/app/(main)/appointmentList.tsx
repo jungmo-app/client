@@ -9,8 +9,15 @@ import { useAppointmentList } from '@/hooks/useQuery/useAppointmentList';
 import AppointmentCard from './appointmentCard';
 
 export default function AppointmentList() {
-  const { data: appointments, isPending } = useAppointmentList();
-  const [cardLoad, setCardLoad] = useState<Set<number>>(new Set());
+  const { data: appointments, isPending, isFetched } = useAppointmentList();
+  const [cardLoad, setCardLoad] = useState<Set<number>>(() => {
+    if (isFetched) {
+      const set = new Set<number>();
+      appointments?.forEach(appointment => set.add(appointment.id));
+      return set;
+    }
+    return new Set();
+  });
 
   const handleCardReady = useCallback((id: number) => {
     setCardLoad(prev => new Set(prev).add(id));
