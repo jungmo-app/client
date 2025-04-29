@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Skeleton from '@/components/common/Skeleton';
@@ -15,19 +15,27 @@ interface AppointmentCardProps {
 
 export default function AppointmentCard({ appointment, onLoad, isAllLoaded }: AppointmentCardProps) {
   const { id, meetingLocation: locationId } = appointment;
-  const isInitialRender = useRef(true);
+  const imgRef = useRef<HTMLImageElement>(null);
+  const isInitial = useRef<boolean>(true);
 
   const { data: locationData } = useLocation(locationId, ['name']);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
-  const delayTime = 500;
+  const isInstantLoad = useMemo(() => {
+    return imgRef.current?.complete && !!locationData;
+  }, [locationData]);
+
+  const delayTime = isAllLoaded || isInstantLoad ? 0 : 500;
 
   useEffect(() => {
-    if (isImageLoaded && locationData && isInitialRender.current) {
-      onLoad();
-      isInitialRender.current = false;
+    if (!isInitial.current) {
+      return;
     }
-  }, [isImageLoaded, locationData, onLoad]);
+    if ((isInstantLoad || (isImageLoaded && locationData)) && onLoad) {
+      onLoad();
+      isInitial.current = false;
+    }
+  }, [isImageLoaded, locationData, isInstantLoad, onLoad]);
 
   return (
     <Link href={`/appointment/${id}`} className="flex items-center gap-4 p-2">
@@ -35,6 +43,7 @@ export default function AppointmentCard({ appointment, onLoad, isAllLoaded }: Ap
         <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg">
           <Image
             fill
+            ref={imgRef}
             sizes="64px"
             src={appointment.profileImage ?? '/sample.jpg'}
             alt={appointment.title}

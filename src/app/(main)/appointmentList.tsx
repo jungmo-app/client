@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { PlusCircle } from 'lucide-react';
 import Link from 'next/link';
 import LoadingIcon from '@/components/common/loadingIcon';
@@ -9,8 +10,23 @@ import { useAppointmentList } from '@/hooks/useQuery/useAppointmentList';
 import AppointmentCard from './appointmentCard';
 
 export default function AppointmentList() {
+  const queryClient = useQueryClient();
   const { data: appointments, isPending } = useAppointmentList();
-  const [cardLoad, setCardLoad] = useState<Set<number>>(new Set());
+  const [cardLoad, setCardLoad] = useState<Set<number>>(() => {
+    const set = new Set<number>();
+    appointments?.forEach(appointment => {
+      const location = queryClient.getQueryData<google.maps.places.PlaceResult>([
+        'location',
+        appointment.meetingLocation,
+        'name',
+      ]);
+
+      if (location?.name) {
+        set.add(appointment.id);
+      }
+    });
+    return set;
+  });
 
   const handleCardReady = useCallback((id: number) => {
     setCardLoad(prev => new Set(prev).add(id));
