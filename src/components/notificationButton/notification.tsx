@@ -1,5 +1,6 @@
 'use client';
 
+import { clsx } from 'clsx';
 import { X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -41,7 +42,7 @@ export default function Notification({ notification }: NotificationProps) {
     <SwipeableNotification id={[notificationId]}>
       <div className="group relative w-full cursor-pointer" onClick={handleClickNotification}>
         <button
-          className="invisible absolute right-2 top-2 z-10 flex select-none items-center justify-center rounded-full p-[2px] hover:bg-gray-100 group-hover:visible"
+          className="invisible absolute right-2 top-2 z-10 flex select-none items-center justify-center rounded-full p-[2px] hover:bg-gray-100 group-hover:visible dark:hover:bg-gray-700"
           disabled={isPending}
           onClick={handleClickDeleteButton}
         >
@@ -49,9 +50,10 @@ export default function Notification({ notification }: NotificationProps) {
         </button>
 
         <div
-          className={`relative flex w-full items-center gap-3 rounded-lg border border-gray-300 bg-background p-3 text-left shadow-sm dark:border-gray-600 ${
+          className={clsx(
+            'dark:border-gray-600, relative flex w-full items-center gap-3 rounded-lg border border-gray-300 bg-background p-3 text-left shadow-sm hover:shadow-md',
             isRead && 'opacity-50'
-          } hover:shadow-md`}
+          )}
         >
           <div className="relative flex size-7 items-center justify-center gap-2">
             <Image
