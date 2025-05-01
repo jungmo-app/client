@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react';
 import { DndContext, DragEndEvent, PointerSensor, useDraggable, useSensor, useSensors } from '@dnd-kit/core';
+import { restrictToHorizontalAxis } from '@dnd-kit/modifiers';
 import { CSS } from '@dnd-kit/utilities';
 import { useDeleteNotification } from '@/hooks/useMutate/useDeleteNotification';
 
@@ -18,7 +19,7 @@ export const NotificationDndProvider = ({ children }: NotificationDndProviderPro
   const { mutate: deleteNotification } = useDeleteNotification();
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: { distance: 5, axis: 'x' },
+      activationConstraint: { distance: 5 },
     })
   );
 
@@ -30,7 +31,7 @@ export const NotificationDndProvider = ({ children }: NotificationDndProviderPro
     }
   };
   return (
-    <DndContext sensors={sensors} autoScroll={false} onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} autoScroll={false} modifiers={[restrictToHorizontalAxis]} onDragEnd={handleDragEnd}>
       {children}
     </DndContext>
   );
