@@ -68,13 +68,14 @@ export default function NotificationButton() {
                   알림이 없습니다
                 </div>
               )}
-
-              <button
-                className="absolute bottom-2 right-5 select-none text-xs text-gray-400 hover:text-gray-500"
-                onClick={handleClickDeleteAllButton}
-              >
-                전체 지우기
-              </button>
+              {notification.length > 0 && (
+                <button
+                  className="absolute bottom-2 right-5 select-none text-xs text-gray-400 hover:text-gray-500"
+                  onClick={handleClickDeleteAllButton}
+                >
+                  전체 지우기
+                </button>
+              )}
             </>
           )}
         </NotificationDndProvider>
