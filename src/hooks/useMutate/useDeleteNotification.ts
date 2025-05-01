@@ -16,7 +16,7 @@ export const useDeleteNotification = () => {
     onMutate: id => {
       const previous = queryClient.getQueryData<NotificationType[]>(['notification']);
       queryClient.setQueryData<NotificationType[]>(['notification'], prev =>
-        prev ? prev.filter(item => id.includes(item.notificationId)) : []
+        prev ? prev.filter(item => !id.includes(item.notificationId)) : []
       );
       return { previous: previous ?? [] };
     },

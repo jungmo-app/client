@@ -67,6 +67,25 @@ export const getTimeline = (date: Date) => {
   }
 };
 
+export const formatTime = (date: Date) => {
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  const isAM = hours < 12;
+  const displayHours = hours % 12 || 12; // 0시를 12시로 변환
+  const displayMinutes = minutes.toString().padStart(2, '0');
+
+  return `${isAM ? '오전' : '오후'} ${displayHours}:${displayMinutes}`;
+};
+
+export const getDay = (date: Date) => {
+  if (isSameDay(new Date(), date)) {
+    return formatTime(date);
+  }
+
+  return formattedDate(date);
+};
+
 export const parseKST = (date: Date) => {
   const kst = new Date(date.getTime() + 9 * 60 * 60 * 1000);
   return kst;
