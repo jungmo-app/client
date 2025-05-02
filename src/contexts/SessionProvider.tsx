@@ -92,8 +92,10 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
 
   const openSession = useCallback(async () => {
     try {
-      await queryClient.fetchQuery({ queryKey: ['notification'], queryFn: apis.notification.getNotification });
-      await connectSSE();
+      await Promise.all([
+        queryClient.fetchQuery({ queryKey: ['notification'], queryFn: apis.notification.getNotification }),
+        connectSSE(),
+      ]);
     } catch (error) {
       console.error(error);
       closeSSE();
@@ -105,11 +107,14 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
     const getInitialConnetSession = async () => {
       const accessToken = await getCookie('accessToken');
       if (accessToken) {
-        await connectSSE();
+        await Promise.all([
+          connectSSE(),
+          queryClient.fetchQuery({ queryKey: ['userData'], queryFn: apis.user.getInfo }),
+        ]);
       }
     };
     getInitialConnetSession();
-  }, [connectSSE]);
+  }, [connectSSE, queryClient]);
 
   useEffect(() => {
     window.addEventListener('beforeunload', closeSSE);

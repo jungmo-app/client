@@ -7,6 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
 import { Button } from '@/components/ui/button';
 import { useDeleteAppointment } from '@/hooks/useMutate/useDeleteAppointment';
 import { useAppointment } from '@/hooks/useQuery/useAppointment';
+import ChatButton from './chatButton';
 
 export default function HeaderTool() {
   const params = useParams();
@@ -38,6 +39,7 @@ export default function HeaderTool() {
       <Button variant="ghost" size="icon" aria-label="공유 버튼">
         <Share2 className="h-5 w-5" />
       </Button>
+      <ChatButton />
       {isEditable && (
         <Popover open={isOpenPopOver} onOpenChange={handleOpenPopover}>
           <PopoverTrigger asChild>
