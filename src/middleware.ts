@@ -52,7 +52,7 @@ export const middleware = async (request: NextRequest) => {
   if (isValid === false) {
     try {
       const response = isLoginPage ? redirectToRefer() : NextResponse.next();
-      const api = await apis.auth.refreshToken();
+      const api = await apis.axios.refreshToken();
       const setCookieHeader = api.headers['set-cookie'];
       const cookies = Array.isArray(setCookieHeader) ? setCookieHeader : [setCookieHeader];
       cookies.forEach(cookie => {

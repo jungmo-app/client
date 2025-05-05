@@ -1,11 +1,12 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { MessageSquare, SendHorizonal } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import { Button, ScrollArea, Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui';
 import { ChatType } from '@/types/chat';
 import { UserInfoResponse } from '@/types/user';
 import ChatBubble from './chatBubble';
+import ChatInput from './chatInput';
 
 export default function ChatButton() {
   const querClient = useQueryClient();
@@ -120,15 +121,7 @@ export default function ChatButton() {
             <ChatBubble isMe={false} message={['test2']} />
           </div>
         </ScrollArea>
-        <form className="mb-2 flex w-full max-w-mobile items-end gap-2 rounded-md p-2">
-          <textarea
-            className="flex h-40 w-full resize-none items-center rounded-md border border-gray-400 py-[9px] text-sm outline-none"
-            placeholder="메세지를 입력해주세요"
-          />
-          <Button variant="secondary" size="icon" style={{ borderRadius: '9999px' }}>
-            <SendHorizonal />
-          </Button>
-        </form>
+        <ChatInput />
       </SheetContent>
     </Sheet>
   );

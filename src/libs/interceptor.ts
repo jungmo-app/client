@@ -57,7 +57,7 @@ const privateFetch = async <T>(url: string, init?: RequestInit, options: Private
 
     if (response.status === 401 && isClient && requireAuth) {
       try {
-        await apis.auth.refreshToken();
+        await apis.axios.refreshToken();
         const newToken = await getCookie('accessToken');
         const retryResponse = await fetchApi(url, init, newToken);
         const res = await parseResponse<T>(retryResponse);

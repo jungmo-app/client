@@ -49,4 +49,33 @@ export const axiosApis = {
       throw new ApiError(500, 'F001');
     }
   },
+  refreshToken: async () => {
+    const { accessToken, refreshToken } = await getCookieList(['accessToken', 'refreshToken']);
+
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.refreshToken.slice(1)}`,
+        {},
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            Cookie: `refreshToken=${refreshToken};`,
+          },
+          withCredentials: true,
+        }
+      );
+
+      return response;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        const {
+          status,
+          data: { code, message },
+        } = error.response;
+        throw new ApiError(status, code, message);
+      }
+      throw new ApiError(500, 'F002');
+    }
+  },
 };
