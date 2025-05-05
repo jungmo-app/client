@@ -20,6 +20,14 @@ export const isSameDay = (date1: Date, date2: Date) => {
   return true;
 };
 
+export const isSameDateHourMinute = (date1: Date, date2: Date) => {
+  if (!isSameDay(date1, date2)) {
+    return false;
+  }
+
+  return date1.getHours() === date2.getHours() && date1.getMinutes() === date2.getMinutes();
+};
+
 export const formattedDate = (date: Date) => {
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, '0');

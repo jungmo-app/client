@@ -6,3 +6,7 @@ export interface ChatType {
   text: string;
   date: string;
 }
+
+export interface GroupChatType extends Omit<ChatType, 'text'> {
+  text: string[];
+}
