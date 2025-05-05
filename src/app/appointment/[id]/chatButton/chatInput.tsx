@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, FormEvent, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { SendHorizonal } from 'lucide-react';
 import { Button } from '@/components/ui';
 
@@ -26,11 +26,38 @@ export default function ChatInput() {
     resizeTextArea();
   };
 
+  const handleSubmit = () => {
+    if (!value.trim()) {
+      return;
+    }
+    /* API */
+    console.log(value);
+    setValue('');
+    requestAnimationFrame(resizeTextArea);
+  };
+
+  const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    handleSubmit();
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter') {
+      if (e.shiftKey) {
+        return;
+      }
+
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
   useEffect(() => {
     resizeTextArea();
   }, []);
+
   return (
-    <form className="mb-2 flex w-full max-w-mobile items-end gap-2 rounded-md p-2">
+    <form className="mb-2 flex w-full max-w-mobile items-end gap-2 rounded-md p-2" onSubmit={handleFormSubmit}>
       <textarea
         ref={inputRef}
         value={value}
@@ -38,6 +65,7 @@ export default function ChatInput() {
         className="flex w-full resize-none items-center overflow-hidden rounded-md border border-gray-400 px-2 py-[9px] text-sm outline-none"
         placeholder="메세지를 입력해주세요"
         onChange={handleChange}
+        onKeyDown={handleKeyDown}
       />
       <Button variant="secondary" size="icon" style={{ borderRadius: '9999px' }}>
         <SendHorizonal />
