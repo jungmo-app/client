@@ -1,6 +1,5 @@
 'use client';
 
-import { useQueryClient } from '@tanstack/react-query';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import { cva } from 'class-variance-authority';
 import { ChevronLeft, Menu, MessageSquare } from 'lucide-react';
@@ -15,7 +14,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui';
-import { UserInfoResponse } from '@/types/user';
 import { cn } from '@/utils/styles';
 import ChatInput from './chatInput';
 import ChatList from './chatList';
@@ -40,10 +38,6 @@ const sheetVariants = cva(
 );
 
 export default function ChatButton() {
-  const querClient = useQueryClient();
-  const data = querClient.getQueryData<UserInfoResponse>(['userData']);
-  console.log(data);
-
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -71,7 +65,8 @@ export default function ChatButton() {
                   <Menu className="size-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent className="w-[50%]">
+              <SheetContent className="w-[300px]">
+                <SheetTitle>참여자</SheetTitle>
                 <div>test</div>
               </SheetContent>
             </Sheet>
