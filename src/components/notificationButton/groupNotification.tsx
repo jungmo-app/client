@@ -3,12 +3,12 @@ import { clsx } from 'clsx';
 import { ChevronDown, ChevronUp, X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { SwipeableNotification } from '@/contexts/NotificationDnd';
 import { useDeleteNotification } from '@/hooks/useMutate/useDeleteNotification';
 import { useReadNotification } from '@/hooks/useMutate/useReadNotification';
 import { NotificationType } from '@/types/notification';
 import { getTimeline, parseKST } from '@/utils/date';
 import Notification from './notification';
+import { SwipeableNotification } from './swipeableNotification';
 
 interface GroupNotificationProps {
   notification: NotificationType[];
