@@ -52,11 +52,11 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
   }, [connectSSE, queryClient]);
 
   useEffect(() => {
-    window.addEventListener('beforeunload', closeSSE);
+    window.addEventListener('beforeunload', closeSession);
     return () => {
-      window.removeEventListener('beforeunload', closeSSE);
+      window.removeEventListener('beforeunload', closeSession);
     };
-  }, [closeSSE]);
+  }, [closeSession]);
 
   const value = useMemo(
     () => ({

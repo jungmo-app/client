@@ -5,11 +5,13 @@ import { useUserData } from '@/hooks/useQuery/useUserData';
 import { ChatType } from '@/types/chat';
 import { isSameDateHourMinute, isSameDay } from '@/utils/date';
 import ChatBubble from './chatBubble';
+import ScrollLoadingIcon from './scrollLoadingIcon';
 
 export default function ChatList() {
   const { data: userData } = useUserData();
   console.log(userData);
   const id = useRef<number>(11);
+  const [isPending, setIsPending] = useState<boolean>(false);
   const [chat, setChat] = useState<ChatType[]>([
     {
       id: 1,
@@ -103,7 +105,11 @@ export default function ChatList() {
     },
   ]);
 
-  const handleTopIntersect = useCallback(() => {
+  const handleTopIntersect = useCallback(async () => {
+    const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+    setIsPending(true);
+
+    await wait(3000);
     setChat(prev => {
       const newChat = Array.from({ length: 20 }, (_, index) => ({
         id: id.current + index,
@@ -116,6 +122,7 @@ export default function ChatList() {
       })) as ChatType[];
 
       id.current += 20;
+      setIsPending(false);
 
       return [...newChat, ...prev];
     });
@@ -123,11 +130,13 @@ export default function ChatList() {
 
   const { containerRef, targetRef: obserberRef } = useInfiniteScrollUp<HTMLDivElement, HTMLDivElement>({
     onIntersect: handleTopIntersect,
+    heightDelta: 32,
   });
 
   return (
     <ScrollArea ref={containerRef} className="relative mt-2 flex flex-shrink flex-grow flex-col px-2" position="bottom">
       <div className="flex flex-col gap-4 px-2 pb-2">
+        {isPending && <ScrollLoadingIcon />}
         <div ref={obserberRef} className="-mb-4" />
         {chat.map((item, i) => {
           return (
