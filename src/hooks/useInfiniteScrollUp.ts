@@ -21,7 +21,6 @@ export const useInfiniteScrollUp = <TTarget extends HTMLElement, TContainer exte
       entries.forEach(async entry => {
         if (entry.isIntersecting && containerRef.current) {
           const prevScrollHeight = containerRef.current.scrollHeight;
-          const prevScrollTop = containerRef.current.scrollTop;
           await onIntersect();
           requestAnimationFrame(() => {
             if (!containerRef.current) {
@@ -29,7 +28,11 @@ export const useInfiniteScrollUp = <TTarget extends HTMLElement, TContainer exte
             }
             const newScrollHeight = containerRef.current.scrollHeight;
             const heightDiff = newScrollHeight - prevScrollHeight;
-            containerRef.current.scrollTop = prevScrollTop + heightDiff - heightDelta;
+            if (containerRef.current.scrollTop === 0) {
+              containerRef.current.scrollTop += heightDiff - heightDelta;
+            }
+
+            console.log(containerRef.current.scrollTop);
           });
         }
       });
