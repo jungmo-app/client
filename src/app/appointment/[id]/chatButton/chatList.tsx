@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { ScrollArea } from '@/components/ui';
+import { useInfiniteScrollUp } from '@/hooks/useInfiniteScrollUp';
 import { useUserData } from '@/hooks/useQuery/useUserData';
 import { ChatType } from '@/types/chat';
 import { isSameDateHourMinute, isSameDay } from '@/utils/date';
@@ -8,8 +9,6 @@ import ChatBubble from './chatBubble';
 export default function ChatList() {
   const { data: userData } = useUserData();
   console.log(userData);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const obserberRef = useRef<HTMLDivElement>(null);
   const id = useRef<number>(11);
   const [chat, setChat] = useState<ChatType[]>([
     {
@@ -104,46 +103,27 @@ export default function ChatList() {
     },
   ]);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(entries => {
-      const entry = entries[0];
-      if (entry.isIntersecting && containerRef.current) {
-        const prevScrollHeight = containerRef.current.scrollHeight;
-        setChat(prev => {
-          const newChat = Array.from({ length: 20 }, (_, index) => ({
-            id: id.current + index,
-            userId: Math.random() < 0.5 ? 2 : 3,
-            profileImage: null,
-            userName: 'test3',
-            text: `test1test1`,
-            date: 'Sun May 04 2025 18:53:11 GMT+0900 (한국 표준시)',
-            unReadCount: 4,
-          })) as ChatType[];
+  const handleTopIntersect = useCallback(() => {
+    setChat(prev => {
+      const newChat = Array.from({ length: 20 }, (_, index) => ({
+        id: id.current + index,
+        userId: Math.random() < 0.5 ? 2 : 3,
+        profileImage: null,
+        userName: 'test3',
+        text: `test1test1`,
+        date: 'Sun May 04 2025 18:53:11 GMT+0900 (한국 표준시)',
+        unReadCount: 4,
+      })) as ChatType[];
 
-          id.current += 20;
+      id.current += 20;
 
-          return [...newChat, ...prev];
-        });
-
-        requestAnimationFrame(() => {
-          if (!containerRef.current) {
-            return;
-          }
-          const newScrollHeight = containerRef.current.scrollHeight;
-          const heightDiff = newScrollHeight - prevScrollHeight;
-          containerRef.current.scrollTop += heightDiff;
-        });
-      }
+      return [...newChat, ...prev];
     });
-
-    if (obserberRef.current) {
-      observer.observe(obserberRef.current);
-    }
-
-    return () => {
-      observer.disconnect();
-    };
   }, []);
+
+  const { containerRef, targetRef: obserberRef } = useInfiniteScrollUp<HTMLDivElement, HTMLDivElement>({
+    onIntersect: handleTopIntersect,
+  });
 
   return (
     <ScrollArea ref={containerRef} className="relative mt-2 flex flex-shrink flex-grow flex-col px-2" position="bottom">
