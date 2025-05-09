@@ -14,8 +14,8 @@ export default function ChatBubble({ isMe, chatData, time = false, date = false,
   return (
     <div>
       {date && (
-        <div className="flex w-full justify-center">
-          <div className="dark:bg- my-4 rounded-3xl bg-shadow-15 px-4 py-2 text-[10px] text-background dark:bg-white-shadow-15 dark:text-foreground">
+        <div className="my-4 flex w-full justify-center">
+          <div className="rounded-3xl bg-shadow-15 px-4 py-2 text-[10px] text-background dark:bg-white-shadow-15 dark:text-foreground">
             {formattedDateKr(new Date(chatData.date))}
           </div>
         </div>

@@ -116,7 +116,7 @@ export default function ChatButton() {
                   <Menu className="size-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent className="w-[280px]">
+              <SheetContent style={{ width: '60%' }}>
                 <SheetTitle>참여자</SheetTitle>
                 <ScrollArea>
                   <div className="mt-6 flex flex-col gap-8">
@@ -160,9 +160,8 @@ export default function ChatButton() {
             </Sheet>
           </div>
 
-          <ScrollArea className="relative mt-2 flex flex-shrink flex-grow flex-col px-2" position="bottom">
-            <ChatList />
-          </ScrollArea>
+          <ChatList />
+
           <ChatInput />
         </SheetPrimitive.Content>
       </SheetPortal>

@@ -1,7 +1,7 @@
 'use client';
 
 import { ChangeEvent, FormEvent, KeyboardEvent, useEffect, useRef, useState } from 'react';
-import { SendHorizonal } from 'lucide-react';
+import { ImagePlusIcon, SendHorizonal } from 'lucide-react';
 import { Button } from '@/components/ui';
 
 const MAX_LINE = 4;
@@ -57,16 +57,28 @@ export default function ChatInput() {
   }, []);
 
   return (
-    <form className="mb-2 flex w-full max-w-mobile items-end gap-2 rounded-md p-2" onSubmit={handleFormSubmit}>
+    <form
+      className="border-gray-200p-2 mb-2 flex w-full max-w-mobile items-end gap-2 rounded-md border-t px-2 py-2"
+      onSubmit={handleFormSubmit}
+    >
+      <Button
+        variant="secondary"
+        size="icon"
+        className="[&_svg]:size-5"
+        style={{ width: '40px', borderRadius: '9999px' }}
+      >
+        <ImagePlusIcon />
+      </Button>
       <textarea
         ref={inputRef}
         value={value}
         rows={1}
-        className="flex w-full resize-none items-center overflow-hidden rounded-md border border-gray-400 px-2 py-[9px] text-sm outline-none"
+        className="m-1 flex w-full resize-none items-center overflow-hidden rounded-md border border-gray-400 px-2 py-[9px] text-sm outline-none"
         placeholder="메세지를 입력해주세요"
         onChange={handleChange}
         onKeyDown={handleKeyDown}
       />
+
       <Button variant="secondary" size="icon" style={{ borderRadius: '9999px' }}>
         <SendHorizonal />
       </Button>

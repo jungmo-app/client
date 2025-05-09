@@ -10,7 +10,9 @@ interface ScrollAreaProps extends React.ComponentPropsWithRef<typeof ScrollAreaP
 
 const ScrollArea = React.forwardRef<React.ElementRef<typeof ScrollAreaPrimitive.Root>, ScrollAreaProps>(
   ({ className, children, position = 'top', ...props }, ref) => {
-    const viewportRef = React.useRef<HTMLDivElement>(null);
+    const viewportRef = React.useRef<HTMLDivElement | null>(null);
+
+    React.useImperativeHandle(ref, () => viewportRef.current as HTMLDivElement);
 
     React.useEffect(() => {
       const el = viewportRef.current;
@@ -32,7 +34,7 @@ const ScrollArea = React.forwardRef<React.ElementRef<typeof ScrollAreaPrimitive.
       }
     }, [position]);
     return (
-      <ScrollAreaPrimitive.Root ref={ref} className={cn('relative overflow-hidden', className)} {...props}>
+      <ScrollAreaPrimitive.Root className={cn('relative overflow-hidden', className)} {...props}>
         <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]" ref={viewportRef}>
           {children}
         </ScrollAreaPrimitive.Viewport>
