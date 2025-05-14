@@ -137,7 +137,7 @@ export default function ChatList() {
     <ScrollArea ref={containerRef} className="relative mt-2 flex flex-shrink flex-grow flex-col px-2" position="bottom">
       <div ref={obserberRef} />
       {isPending && <ScrollLoadingIcon />}
-      <div className="flex flex-col gap-4 px-2 pb-2">
+      <div className="flex w-full flex-1 flex-col gap-4 px-2 pb-2">
         {chat.map((item, i) => {
           return (
             <ChatBubble

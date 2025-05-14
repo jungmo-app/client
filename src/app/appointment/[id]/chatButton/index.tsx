@@ -101,9 +101,9 @@ export default function ChatButton() {
         <SheetPrimitive.Content
           className={cn(sheetVariants({ side: 'right' }), 'flex h-full flex-col')}
           aria-describedby={undefined}
-          style={{ padding: '0px', height: '100vh', overflow: 'hidden' }}
+          style={{ padding: '0px', height: '100vh', overflow: 'hidden', width: '100vw' }}
         >
-          <div className="flex items-center justify-between border-b border-gray-200 px-3 py-2 dark:border-gray-600">
+          <div className="flex flex-1 items-center justify-between border-b border-gray-200 px-3 py-2 dark:border-gray-600">
             <div className="flex items-center gap-4">
               <SheetClose>
                 <ChevronLeft className="size-5" />
