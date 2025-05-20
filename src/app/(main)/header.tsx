@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { CalendarRange, ChevronLeft, ChevronRight, User } from 'lucide-react';
 import Link from 'next/link';
 import { useShallow } from 'zustand/react/shallow';
@@ -44,6 +44,10 @@ export default function Header() {
     setIsOpen(value);
   };
 
+  const handleClickMonth = useCallback(() => {
+    setIsOpen(false);
+  }, []);
+
   return (
     <header className="flex h-14 items-center justify-between bg-background p-4">
       <Link href="/account">
@@ -69,7 +73,7 @@ export default function Header() {
               <DatePicker
                 startYear={new Date().getFullYear() - 100}
                 endYear={new Date().getFullYear() + 100}
-                onClickMonth={() => setIsOpen(false)}
+                onClickMonth={handleClickMonth}
               />
             </div>
           </PopoverContent>

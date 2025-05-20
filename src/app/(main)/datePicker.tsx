@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useDateStore } from '@/store/appointmentStore';
 import MonthPicker from './monthPicker';
@@ -24,24 +24,27 @@ export default function DatePicker({ startYear, endYear, onClickMonth }: DatePic
 
   const [currentDate, setCurrentDate] = useState(date);
 
-  const handleClickMonthButton = (updateDate: Date) => {
-    setCurrentDate(updateDate);
-    setDate(updateDate);
-    onClickMonth?.();
-  };
+  const handleClickMonthButton = useCallback(
+    (updateDate: Date) => {
+      setCurrentDate(updateDate);
+      setDate(updateDate);
+      onClickMonth?.();
+    },
+    [onClickMonth, setDate]
+  );
 
-  const handleClickYearButton = (year: Date) => {
+  const handleClickYearButton = useCallback((year: Date) => {
     setCurrentDate(year);
     setTransition('month');
-  };
+  }, []);
 
-  const handleClickHeader = () => {
+  const handleClickHeader = useCallback(() => {
     setTransition('year');
-  };
+  }, []);
 
-  const handleTransitionEnd = () => {
+  const handleTransitionEnd = useCallback(() => {
     setType(transition);
-  };
+  }, [transition]);
 
   return (
     <div className="flex size-full flex-col overflow-hidden">
