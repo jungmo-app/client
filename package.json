@@ -37,6 +37,7 @@
     "axios": "^1.7.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
+    "cookie": "^1.0.2",
     "eslint": "8.45.0",
     "event-source-polyfill": "^1.0.31",
     "framer-motion": "^12.7.4",

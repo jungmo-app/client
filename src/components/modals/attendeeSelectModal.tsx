@@ -18,7 +18,7 @@ import {
   SheetTitle,
 } from '@/components/ui';
 import { useSearchUserKeyword } from '@/hooks/useQuery/useSearchUserKeyword';
-import { UserDataResponse, UserInfoResponse } from '@/types/user';
+import { UserDataResponse, UserInfoResponse } from '@/types/auth';
 
 type AttendeeSelectModalProps = {
   isOpen: boolean;

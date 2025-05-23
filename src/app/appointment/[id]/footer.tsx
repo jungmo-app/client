@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Map from '@/components/map';
 import { Button } from '@/components/ui';
 import { useAddLocation } from '@/hooks/useMutate/useAddLocation';
+import { useAppointment } from '@/hooks/useQuery/useAppointment';
 import { getCurrentLocation } from '@/libs/map/getCurrentLocation';
 import { Position } from '@/types/map';
 import { ApiError } from '@/utils/error';
@@ -12,6 +13,8 @@ import { ApiError } from '@/utils/error';
 export default function Footer() {
   const params = useParams();
   const id = Number(params.id);
+
+  const { data: appointment } = useAppointment(id);
 
   const handleError = (error: ApiError) => {
     if (error.code === 'GL003') {
@@ -47,9 +50,14 @@ export default function Footer() {
     }
     addLocation(value);
   };
+
+  if (!appointment || appointment.authority !== 'WRITE') {
+    return;
+  }
+
   return (
-    <>
-      <div className="z-10 border-t bg-background fixed-mobile-bottom">
+    <div className="sticky bottom-0 border-t">
+      <div className="z-10 bg-background">
         <div className="bg-background p-4">
           <Button
             className="w-full rounded-xl"
@@ -69,6 +77,6 @@ export default function Footer() {
         onClose={handleCloseMap}
         onSelect={handleSelectLocation}
       />
-    </>
+    </div>
   );
 }

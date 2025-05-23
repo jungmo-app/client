@@ -3,7 +3,7 @@ import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { apis } from '@/apis';
 import QueryClientProvider from '@/components/common/queryProvider';
 import { ButtonContextProvider } from '@/contexts/ButtonClickProvider';
-import { UserDataResponse } from '@/types/user';
+import { UserDataResponse } from '@/types/auth';
 
 export default async function Layout({ children }: PropsWithChildren) {
   const queryClient = new QueryClient();

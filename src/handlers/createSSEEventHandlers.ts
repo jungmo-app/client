@@ -19,7 +19,7 @@ const createSSEEventHandlers = (queryClient: QueryClient) => {
     );
     queryClient.fetchQuery({
       queryKey: ['notification'],
-      queryFn: apis.notification.getNotification,
+      queryFn: () => apis.notification.getNotification(),
     });
   };
 

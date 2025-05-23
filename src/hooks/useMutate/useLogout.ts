@@ -4,14 +4,19 @@ import { useContext } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apis } from '@/apis';
 import { SessionContext } from '@/contexts/SessionProvider';
+import { setCookie } from '@/libs/serverAction';
 
 export const useLogout = (onSuccess?: () => void, onError?: () => void) => {
   const { closeSession } = useContext(SessionContext);
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: apis.axios.logout,
-    onSuccess: () => {
+    mutationFn: apis.auth.logout,
+    onSuccess: async () => {
+      await setCookie('accessToken', '', {
+        maxAge: 0,
+        expires: new Date(),
+      });
       closeSession();
       if (onSuccess) {
         onSuccess();

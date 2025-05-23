@@ -12,7 +12,7 @@ import { Avatar, AvatarImage, Badge, Input, Textarea } from '@/components/ui';
 import { useEditAppointment } from '@/hooks/useMutate/useEditAppointment';
 import { useAppointment } from '@/hooks/useQuery/useAppointment';
 import { mainInfoSchema } from '@/schemas/appointment';
-import { UserDataResponse } from '@/types/user';
+import { UserDataResponse } from '@/types/auth';
 import { ApiError } from '@/utils/error';
 
 export default function MainInfoSection() {

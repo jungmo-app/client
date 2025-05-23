@@ -1,6 +1,8 @@
+import { parse } from 'cookie';
 import { NextRequest, NextResponse } from 'next/server';
-import { apis } from './apis';
+import { apiPaths } from './constants/apis';
 import { verifyToken } from './libs/auth/jwt';
+import { baseAxios } from './libs/baseAxios';
 import { logout } from './libs/serverAction';
 
 export const middleware = async (request: NextRequest) => {
@@ -12,8 +14,9 @@ export const middleware = async (request: NextRequest) => {
 
   const isStaticAsset = /\.(js|css|png|jpg|jpeg|svg|webp|ico|woff2?)$/.test(pathname);
   const isInternal = pathname.startsWith('/_next/') || pathname.startsWith('/favicon.ico');
+  const isPageNavigation = request.headers.get('accept')?.includes('text/html');
 
-  if (isStaticAsset || isInternal) {
+  if (isStaticAsset || isInternal || !isPageNavigation) {
     return NextResponse.next();
   }
 
@@ -49,23 +52,58 @@ export const middleware = async (request: NextRequest) => {
     return NextResponse.next();
   }
 
-  if (isValid === false) {
+  if (isValid !== undefined) {
     try {
       const response = isLoginPage ? redirectToRefer() : NextResponse.next();
-      const api = await apis.axios.refreshToken();
+      const api = await baseAxios(apiPaths.auth.refreshToken, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Cookie: `refreshToken=${refreshToken}`,
+        },
+      });
+
       const setCookieHeader = api.headers['set-cookie'];
       const cookies = Array.isArray(setCookieHeader) ? setCookieHeader : [setCookieHeader];
       cookies.forEach(cookie => {
         if (!cookie) {
           return;
         }
-        response.headers.append('set-cookie', cookie);
+        const parsed = parse(cookie);
+
+        const name = Object.keys(parsed)[0];
+        const value = parsed[name];
+
+        if (!value) {
+          return;
+        }
+
+        response.cookies.set(name, value, {
+          httpOnly: cookie.includes('HttpOnly'),
+          secure: cookie.includes('Secure'),
+          sameSite: cookie.includes('SameSite=None') ? 'none' : cookie.includes('SameSite=Strict') ? 'strict' : 'lax',
+          path: '/',
+          maxAge: cookie.match(/Max-Age=(\d+)/)?.[1] ? Number(cookie.match(/Max-Age=(\d+)/)![1]) : undefined,
+          domain: cookie.match(/Domain=([^;]+)/)?.[1],
+        });
       });
+
+      console.log(api.data.data);
+      response.cookies.set('accessToken', api.data.data.accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7,
+      });
+
       return response;
-    } catch {
+    } catch (error) {
       return redirectToLogin();
     }
   }
+
+  return redirectToLogin();
 };
 
 export const config = {

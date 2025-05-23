@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apis } from '@/apis';
-import { UserInfoResponse } from '@/types/user';
+import { UserInfoResponse } from '@/types/auth';
 
 export const useUserData = () => {
   return useQuery<UserInfoResponse>({

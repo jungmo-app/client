@@ -1,6 +1,6 @@
 import { apiPaths } from '@/constants/apis';
 import { privateClientFetch, privateServerFetch } from '@/libs/interceptor';
-import { UserDataResponse, UserInfoResponse } from '@/types/user';
+import { UserDataResponse, UserInfoResponse } from '@/types/auth';
 
 export const userApis = {
   search: async (userCode: string) => {

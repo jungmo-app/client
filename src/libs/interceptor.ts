@@ -2,7 +2,7 @@ import axios from 'axios';
 import { apis } from '@/apis';
 import { ApiResponse } from '@/types/apis';
 import { ApiError } from '@/utils/error';
-import { getCookie } from './serverAction';
+import { getCookie, setCookie } from './serverAction';
 
 interface PrivateFetchOptions {
   isClient?: boolean;
@@ -49,20 +49,26 @@ const parseResponse = async <T>(response: Response) => {
   return res;
 };
 
-const privateFetch = async <T>(url: string, init?: RequestInit, options: PrivateFetchOptions = {}) => {
+const privateFetch = async <T>(url: string, init?: RequestInit, options: PrivateFetchOptions = {}, token?: string) => {
   const { isClient = false, requireAuth = true } = options;
   try {
-    const accessToken = requireAuth ? await getCookie('accessToken') : undefined;
+    const accessToken = token ?? (await getCookie('accessToken'));
     const response = await fetchApi(url, init, accessToken);
 
     if (response.status === 401 && isClient && requireAuth) {
       try {
-        await apis.axios.refreshToken();
-        const newToken = await getCookie('accessToken');
+        const { accessToken: newToken } = await apis.auth.refreshToken();
+        await setCookie('accessToken', newToken, {
+          maxAge: 60 * 60 * 24 * 7,
+        });
         const retryResponse = await fetchApi(url, init, newToken);
         const res = await parseResponse<T>(retryResponse);
         return res;
       } catch (error) {
+        await setCookie('accessToken', '', {
+          maxAge: 0,
+          expires: new Date(),
+        });
         alert('세션이 만료되었습니다');
         window.location.replace('/login');
 
@@ -91,12 +97,12 @@ const privateFetch = async <T>(url: string, init?: RequestInit, options: Private
   }
 };
 
-export const privateServerFetch = <T>(url: string, init?: RequestInit) => {
-  return privateFetch<T>(url, init);
+export const privateServerFetch = <T>(url: string, init?: RequestInit, accessToken?: string) => {
+  return privateFetch<T>(url, init, {}, accessToken);
 };
 
-export const privateClientFetch = <T>(url: string, init?: RequestInit) => {
-  return privateFetch<T>(url, init, { isClient: true });
+export const privateClientFetch = <T>(url: string, init?: RequestInit, accessToken?: string) => {
+  return privateFetch<T>(url, init, { isClient: true }, accessToken);
 };
 
 export const customFetch = async <T>(url: string, init?: RequestInit) => {

@@ -7,7 +7,7 @@ import { useSSE } from '@/hooks/useSSE';
 import { getCookie } from '@/libs/serverAction';
 
 interface SessionContextType {
-  openSession: () => Promise<void>;
+  openSession: (token?: string) => Promise<void>;
   closeSession: () => void;
 }
 
@@ -25,18 +25,24 @@ export const SessionContextProvider = ({ children }: PropsWithChildren) => {
     queryClient.removeQueries({ queryKey: ['notification'] });
   }, [closeSSE, queryClient]);
 
-  const openSession = useCallback(async () => {
-    try {
-      await Promise.all([
-        queryClient.fetchQuery({ queryKey: ['notification'], queryFn: apis.notification.getNotification }),
-        connectSSE(),
-      ]);
-    } catch (error) {
-      console.error(error);
-      closeSSE();
-      throw new Error('로그인 오류');
-    }
-  }, [connectSSE, closeSSE, queryClient]);
+  const openSession = useCallback(
+    async (token?: string) => {
+      try {
+        await Promise.all([
+          queryClient.fetchQuery({
+            queryKey: ['notification'],
+            queryFn: () => apis.notification.getNotification(token),
+          }),
+          connectSSE(),
+        ]);
+      } catch (error) {
+        console.error(error);
+        closeSSE();
+        throw new Error('로그인 오류');
+      }
+    },
+    [connectSSE, closeSSE, queryClient]
+  );
 
   useEffect(() => {
     const getInitialConnetSession = async () => {

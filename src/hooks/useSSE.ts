@@ -46,7 +46,7 @@ export const useSSE = () => {
         closeSSE();
         const err = error as Event & { status: number };
         if (err.status === 401) {
-          const response = await apis.axios.refreshToken();
+          const response = await apis.auth.refreshToken();
           if (response) {
             await connectSSE(retry - 1);
           }

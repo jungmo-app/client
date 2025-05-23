@@ -1,5 +1,6 @@
 'use server';
 import { revalidatePath, revalidateTag } from 'next/cache';
+import { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { NextResponse } from 'next/server';
@@ -18,6 +19,16 @@ export const getCookieList = async (names: string[]) => {
     },
     {} as Record<string, string | undefined>
   );
+};
+
+export const setCookie = async (name: string, value: string, option?: Partial<ResponseCookie>) => {
+  cookies().set(name, value, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+    path: '/',
+    ...option,
+  });
 };
 
 export const redirectPath = (url: string) => {

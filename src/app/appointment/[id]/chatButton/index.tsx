@@ -17,8 +17,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui';
+import { UserDataResponse } from '@/types/auth';
 import { DetailGatheringType } from '@/types/gathering';
-import { UserDataResponse } from '@/types/user';
 import { cn } from '@/utils/styles';
 import ChatInput from './chatInput';
 import ChatList from './chatList';

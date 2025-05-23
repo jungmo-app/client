@@ -5,8 +5,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apis } from '@/apis';
 import { SessionContext } from '@/contexts/SessionProvider';
-import { LoginRequest } from '@/types/auth';
-import { UserInfoResponse } from '@/types/user';
+import { setCookie } from '@/libs/serverAction';
+import { LoginRequest, LoginResponse } from '@/types/auth';
 import { ApiError } from '@/utils/error';
 
 interface LoginProps {
@@ -23,16 +23,21 @@ export const useLogin = ({ onSuccess, onError }: LoginProps = {}) => {
 
   const { openSession, closeSession } = useContext(SessionContext);
 
-  const mutation = useMutation<UserInfoResponse, ApiError, LoginRequest>({
+  const mutation = useMutation<LoginResponse, ApiError, LoginRequest>({
     mutationFn: payload => {
       setIsPending(true);
       return apis.auth.login(payload);
     },
-    onSuccess: async data => {
+    onSuccess: async ({ accessToken, ...userData }) => {
+      await setCookie('accessToken', accessToken, {
+        maxAge: 60 * 60 * 24 * 7,
+      });
+
       onSuccess?.();
       try {
-        QueryClient.setQueryData(['userData'], data);
-        await openSession();
+        QueryClient.setQueryData(['userData'], userData);
+        await openSession(accessToken);
+        console.log('success');
         const refer = params.get('refer');
         router.push(`${refer ?? '/'}`);
         router.refresh();

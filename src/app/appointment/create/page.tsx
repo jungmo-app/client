@@ -9,8 +9,8 @@ import { Button } from '@/components/ui';
 import { useCreateAppointment } from '@/hooks/useMutate/useCreateAppointment';
 import { createAppointmentSchema } from '@/schemas/appointment';
 import { useDateStore } from '@/store/appointmentStore';
+import { UserDataResponse } from '@/types/auth';
 import { AppointmentFormDataType } from '@/types/gathering';
-import { UserDataResponse } from '@/types/user';
 import { formattedDate } from '@/utils/date';
 
 export default function CreateAppointment() {
