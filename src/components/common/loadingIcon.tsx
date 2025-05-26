@@ -1,7 +1,7 @@
 export default function LoadingIcon() {
   return (
-    <div className="flex items-center justify-center">
-      <div className="h-10 w-10 animate-spin rounded-full border-4 border-dashed border-blue-500" />
+    <div className="relative size-8 animate-rotate rounded-full">
+      <div className="absolute inset-0 animate-clip-fix rounded-full border-[4px] border-blue-500" />
     </div>
   );
 }
