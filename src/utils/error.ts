@@ -1,6 +1,5 @@
 const defaultErrorMesdsage: Record<string, string> = {
   F001: '내부 서버 오류입니다.',
-  F002: 'AXIOS 오류 입니다',
   M001: '위치 데이터를 가져올 수 없습니다.',
 };
 

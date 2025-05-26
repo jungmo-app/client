@@ -1,9 +1,7 @@
-import { parse } from 'cookie';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiPaths } from './constants/apis';
 import { verifyToken } from './libs/auth/jwt';
-import { baseAxios } from './libs/baseAxios';
-import { logout } from './libs/serverAction';
+import { logout, setRawCookie } from './utils/cookie';
 
 export const middleware = async (request: NextRequest) => {
   const pathname = request.nextUrl.pathname;
@@ -55,7 +53,7 @@ export const middleware = async (request: NextRequest) => {
   if (isValid !== undefined) {
     try {
       const response = isLoginPage ? redirectToRefer() : NextResponse.next();
-      const api = await baseAxios(apiPaths.auth.refreshToken, {
+      const api = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.refreshToken.slice(1)}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -63,33 +61,15 @@ export const middleware = async (request: NextRequest) => {
         },
       });
 
-      const setCookieHeader = api.headers['set-cookie'];
-      const cookies = Array.isArray(setCookieHeader) ? setCookieHeader : [setCookieHeader];
-      cookies.forEach(cookie => {
-        if (!cookie) {
-          return;
-        }
-        const parsed = parse(cookie);
+      const rawSetCookie = api.headers.get('set-cookie');
 
-        const name = Object.keys(parsed)[0];
-        const value = parsed[name];
+      if (rawSetCookie) {
+        setRawCookie(rawSetCookie, response);
+      }
 
-        if (!value) {
-          return;
-        }
+      const result = await api.json();
 
-        response.cookies.set(name, value, {
-          httpOnly: cookie.includes('HttpOnly'),
-          secure: cookie.includes('Secure'),
-          sameSite: cookie.includes('SameSite=None') ? 'none' : cookie.includes('SameSite=Strict') ? 'strict' : 'lax',
-          path: '/',
-          maxAge: cookie.match(/Max-Age=(\d+)/)?.[1] ? Number(cookie.match(/Max-Age=(\d+)/)![1]) : undefined,
-          domain: cookie.match(/Domain=([^;]+)/)?.[1],
-        });
-      });
-
-      console.log(api.data.data);
-      response.cookies.set('accessToken', api.data.data.accessToken, {
+      response.cookies.set('accessToken', result.data.accessToken, {
         httpOnly: true,
         secure: true,
         sameSite: 'none',

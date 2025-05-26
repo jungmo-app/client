@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { apis } from '@/apis';
 import { ApiResponse } from '@/types/apis';
 import { ApiError } from '@/utils/error';
@@ -74,14 +73,6 @@ const privateFetch = async <T>(url: string, init?: RequestInit, options: Private
 
         if (error instanceof ApiError) {
           throw error;
-        }
-
-        if (axios.isAxiosError(error) && error.response) {
-          const {
-            status,
-            data: { code, message },
-          } = error.response;
-          throw new ApiError(status, code, message);
         }
 
         throw new ApiError(500, 'F001');
