@@ -1,20 +1,19 @@
-import axios from 'axios';
 import { apiPaths } from '@/constants/apis';
 import { customFetch, privateClientFetch } from '@/libs/interceptor';
-import { getCookieList } from '@/libs/serverAction';
 import {
   ChangePasswordPayload,
   LoginRequest,
+  LoginResponse,
+  RefreshTokenResponse,
   ResetPasswordPayload,
   SetPasswordFormValues,
   SignupFormValues,
+  UserInfoResponse,
 } from '@/types/auth';
-import { UserInfoResponse } from '@/types/user';
-import { ApiError } from '@/utils/error';
 
 export const authApis = {
   login: async (payload: LoginRequest) => {
-    const response = await customFetch<UserInfoResponse>(apiPaths.auth.login, {
+    const response = await customFetch<LoginResponse>(apiPaths.auth.login, {
       method: 'POST',
       body: JSON.stringify(payload),
     });
@@ -59,33 +58,23 @@ export const authApis = {
 
     return response.data;
   },
+  logout: async () => {
+    console.log('logout');
+    await privateClientFetch(apiPaths.auth.logout, {
+      method: 'POST',
+      credentials: 'include',
+    });
+  },
   refreshToken: async () => {
-    const { accessToken, refreshToken } = await getCookieList(['accessToken', 'refreshToken']);
-
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.auth.refreshToken.slice(1)}`,
-        {},
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            Cookie: `refreshToken=${refreshToken};`,
-          },
-          withCredentials: true,
-        }
-      );
-
-      return response;
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        const {
-          status,
-          data: { code, message },
-        } = error.response;
-        throw new ApiError(status, code, message);
-      }
-      throw new ApiError(500, 'F002');
-    }
+    const response = await customFetch<RefreshTokenResponse>(apiPaths.auth.refreshToken, {
+      method: 'POST',
+      credentials: 'include',
+    });
+    return response.data;
+  },
+  deleteAccount: async () => {
+    await privateClientFetch(apiPaths.user.deleteAccount, {
+      credentials: 'include',
+    });
   },
 } as const;

@@ -2,7 +2,6 @@
 
 import { useParams } from 'next/navigation';
 import { useAppointment } from '@/hooks/useQuery/useAppointment';
-import Footer from './footer';
 import VisitPlace from './visitPlace';
 
 export default function PlacesToVisit() {
@@ -18,13 +17,12 @@ export default function PlacesToVisit() {
   const locations = appointment.locations.filter((item): item is google.maps.places.PlaceResult & { id: number } => {
     return 'place_id' in item;
   });
-  const isEditable = appointment.authority === 'WRITE';
 
   return (
-    <div className="flex flex-grow flex-col space-y-4">
+    <div className="flex flex-grow flex-col">
       <h3 className="text-lg font-semibold">방문할 장소</h3>
 
-      <div className="flex flex-grow flex-col space-y-6">
+      <div className="flex flex-grow flex-col">
         {locations.length > 0 ? (
           locations.map(location => <VisitPlace key={location.id} place={location} />)
         ) : (
@@ -33,7 +31,6 @@ export default function PlacesToVisit() {
           </div>
         )}
       </div>
-      {isEditable && <Footer />}
     </div>
   );
 }

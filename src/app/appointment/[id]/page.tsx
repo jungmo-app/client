@@ -5,6 +5,7 @@ import QueryClientProvider from '@/components/common/queryProvider';
 import { DetailGatheringType } from '@/types/gathering';
 import { ApiError } from '@/utils/error';
 import AppointmentDetail from './appointmentDetail';
+import Footer from './footer';
 import HeaderTool from './headerTool';
 
 export const dynamic = 'force-dynamic';
@@ -35,6 +36,7 @@ export default async function Appointment({ params }: AppointmentProps) {
           <HeaderTool />
         </Header>
         <AppointmentDetail />
+        <Footer />
       </div>
     </QueryClientProvider>
   );

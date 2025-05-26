@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDateStore } from '@/store/appointmentStore';
 import { isSameMonth } from '@/utils/date';
 
@@ -13,6 +13,43 @@ interface MonthPickerProps {
   onClickMonth: (date: Date) => void;
   onClickYear: () => void;
 }
+
+const MonthRow = memo(
+  ({
+    year,
+    currentYear,
+    selectedDate,
+    onClick,
+    setRef,
+  }: {
+    year: number;
+    currentYear: number;
+    selectedDate: Date;
+    onClick: (year: number, month: number) => void;
+    setRef: (el: HTMLButtonElement | null) => void;
+  }) => (
+    <div key={year}>
+      <div className="grid grid-cols-4">
+        {Array.from({ length: 12 }, (_, month) => {
+          const isSelected = isSameMonth(selectedDate, new Date(year, month));
+          return (
+            <button
+              key={month}
+              data-year={year}
+              ref={month === 0 ? setRef : undefined}
+              className={`flex aspect-square items-center justify-center rounded-full py-3 text-center hover:bg-gray-100 dark:hover:bg-gray-500 ${
+                isSelected ? 'bg-sky-200 hover:bg-sky-100 dark:bg-sky-600 dark:hover:bg-sky-500' : ''
+              } ${year !== currentYear ? 'opacity-50' : 'opacity-100'} hover:opacity-100`}
+              onClick={() => onClick(year, month)}
+            >
+              {month + 1}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  )
+);
 
 export default function MonthPicker({
   startYear,
@@ -37,9 +74,16 @@ export default function MonthPicker({
 
   const [currentYear, setCurrentYear] = useState<number>(value.getFullYear());
 
-  const handleClickDayButton = (year: number, month: number) => {
-    onClickMonth(new Date(year, month));
-  };
+  const handleClickDayButton = useCallback(
+    (year: number, month: number) => {
+      onClickMonth(new Date(year, month));
+    },
+    [onClickMonth]
+  );
+
+  const handleSetRef = useCallback((el: HTMLButtonElement | null, index: number) => {
+    yearRef.current[index] = el;
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -98,25 +142,18 @@ export default function MonthPicker({
         }}
       >
         {years.map((year, index) => (
-          <div key={year}>
-            <div className="grid grid-cols-4">
-              {Array.from({ length: 12 }, (_, month) => (
-                <button
-                  key={month}
-                  data-year={year}
-                  className={`flex aspect-square items-center justify-center rounded-full py-3 text-center hover:bg-gray-100 dark:hover:bg-gray-500 ${isSameMonth(date, new Date(year, month)) && 'bg-sky-200 hover:bg-sky-100 dark:bg-sky-600 dark:hover:bg-sky-500'} ${year !== currentYear ? 'opacity-50' : 'opacity-100'} hover:opacity-100`}
-                  ref={el => {
-                    if (month === 0) yearRef.current[index] = el;
-                  }}
-                  onClick={() => handleClickDayButton(year, month)}
-                >
-                  {month + 1}
-                </button>
-              ))}
-            </div>
-          </div>
+          <MonthRow
+            key={year}
+            year={year}
+            currentYear={currentYear}
+            selectedDate={date}
+            setRef={el => handleSetRef(el, index)}
+            onClick={handleClickDayButton}
+          />
         ))}
       </div>
     </>
   );
 }
+
+MonthRow.displayName = 'MonthRow';

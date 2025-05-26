@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apis } from '@/apis';
-import { UserInfoResponse } from '@/types/user';
+import { UserInfoResponse } from '@/types/auth';
 import { ApiError } from '@/utils/error';
 
 export const useUserData = () => {

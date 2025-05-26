@@ -1,15 +1,13 @@
 'use client';
 
-import { PropsWithChildren, createContext, useCallback, useEffect, useMemo, useRef } from 'react';
+import { PropsWithChildren, createContext, useCallback, useEffect, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { EventSourcePolyfill } from 'event-source-polyfill';
 import { apis } from '@/apis';
-import { apiPaths } from '@/constants/apis';
-import { useSSEEvent } from '@/hooks/useSSEEvent';
+import { useSSE } from '@/hooks/useSSE';
 import { getCookie } from '@/libs/serverAction';
 
 interface SessionContextType {
-  openSession: () => Promise<void>;
+  openSession: (token?: string) => Promise<void>;
   closeSession: () => void;
 }
 
@@ -20,104 +18,51 @@ export const SessionContext = createContext<SessionContextType>({
 
 export const SessionContextProvider = ({ children }: PropsWithChildren) => {
   const queryClient = useQueryClient();
-  const eventSource = useRef<EventSource | null>(null);
-
-  const { inviteEvent, updateEvent, deleteEvent } = useSSEEvent();
-
-  const closeSSE = useCallback(() => {
-    eventSource.current?.close();
-    eventSource.current?.removeEventListener('invite', inviteEvent);
-    eventSource.current?.removeEventListener('delete', deleteEvent);
-    eventSource.current?.removeEventListener('update', updateEvent);
-    eventSource.current?.removeEventListener('remove', deleteEvent);
-    eventSource.current = null;
-  }, [inviteEvent, deleteEvent, updateEvent]);
-
-  const connectSSE = useCallback(
-    async (retry = 2) => {
-      if (eventSource.current || retry === 0) {
-        return;
-      }
-
-      const accessToken = await getCookie('accessToken');
-
-      if (!accessToken) {
-        return;
-      }
-
-      const newSSE = new EventSourcePolyfill(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}${apiPaths.notification.subscribe.slice(1)}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'text/event-stream',
-          },
-          heartbeatTimeout: 60 * 60 * 1000,
-        }
-      );
-
-      newSSE.addEventListener('error', async error => {
-        closeSSE();
-        const err = error as Event & { status: number };
-        if (err.status === 401) {
-          const response = await apis.auth.refreshToken();
-          if (response) {
-            await connectSSE(retry - 1);
-          }
-          return;
-        }
-
-        setTimeout(() => {
-          connectSSE();
-        }, 3000);
-      });
-
-      newSSE.addEventListener('invite', inviteEvent);
-
-      newSSE.addEventListener('update', updateEvent);
-
-      newSSE.addEventListener('delete', deleteEvent);
-
-      newSSE.addEventListener('remove', deleteEvent);
-
-      eventSource.current = newSSE;
-    },
-    [closeSSE, inviteEvent, updateEvent, deleteEvent]
-  );
+  const { connectSSE, closeSSE } = useSSE();
 
   const closeSession = useCallback(() => {
     closeSSE();
     queryClient.removeQueries({ queryKey: ['notification'] });
   }, [closeSSE, queryClient]);
 
-  const openSession = useCallback(async () => {
-    try {
-      await queryClient.fetchQuery({ queryKey: ['notification'], queryFn: apis.notification.getNotification });
-      await connectSSE();
-    } catch (error) {
-      console.error(error);
-      closeSSE();
-      throw new Error('로그인 오류');
-    }
-  }, [connectSSE, closeSSE, queryClient]);
+  const openSession = useCallback(
+    async (token?: string) => {
+      try {
+        await Promise.all([
+          queryClient.fetchQuery({
+            queryKey: ['notification'],
+            queryFn: () => apis.notification.getNotification(token),
+          }),
+          connectSSE(),
+        ]);
+      } catch (error) {
+        console.error(error);
+        closeSSE();
+        throw new Error('로그인 오류');
+      }
+    },
+    [connectSSE, closeSSE, queryClient]
+  );
 
   useEffect(() => {
     const getInitialConnetSession = async () => {
       const accessToken = await getCookie('accessToken');
       if (accessToken) {
-        await connectSSE();
+        await Promise.all([
+          connectSSE(),
+          queryClient.fetchQuery({ queryKey: ['userData'], queryFn: apis.user.getInfo }),
+        ]);
       }
     };
     getInitialConnetSession();
-  }, [connectSSE]);
+  }, [connectSSE, queryClient]);
 
   useEffect(() => {
-    window.addEventListener('beforeunload', closeSSE);
+    window.addEventListener('beforeunload', closeSession);
     return () => {
-      closeSSE();
-      window.removeEventListener('beforeunload', closeSSE);
+      window.removeEventListener('beforeunload', closeSession);
     };
-  }, [closeSSE]);
+  }, [closeSession]);
 
   const value = useMemo(
     () => ({

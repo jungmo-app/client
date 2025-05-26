@@ -1,4 +1,4 @@
-import { KeyboardEvent, useCallback, useRef, useState } from 'react';
+import { KeyboardEvent, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui';
@@ -13,17 +13,12 @@ interface SearchLocationBoxProps {
 export default function SearchLocationBox({ onSubmit }: SearchLocationBoxProps) {
   const { register, setValue, handleSubmit, watch } = useFormContext();
   const inputValue = watch('inputValue') as string;
-  const latestKeyword = useRef<string>('');
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const [focusIndex, setFocusIndex] = useState<number>(-1);
   const [keyword, setKeyword] = useState<string>('');
 
-  const handleDebounce = useCallback(() => {
-    latestKeyword.current = inputValue;
-  }, [inputValue]);
-
-  const { value: debouncedKeyword } = useDebouncedValue(inputValue, 200, handleDebounce);
+  const { value: debouncedKeyword } = useDebouncedValue(inputValue, 200);
 
   const [isViewSuggestion, setIsViewSuggestion] = useState<boolean>(false);
   const { data: suggestions } = useSearchLocationKeyword(debouncedKeyword);

@@ -14,12 +14,11 @@ import {
   ScrollArea,
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
 } from '@/components/ui';
 import { useSearchUserKeyword } from '@/hooks/useQuery/useSearchUserKeyword';
-import { UserDataResponse, UserInfoResponse } from '@/types/user';
+import { UserDataResponse, UserInfoResponse } from '@/types/auth';
 
 type AttendeeSelectModalProps = {
   isOpen: boolean;
@@ -128,7 +127,6 @@ export default function AttendeeSelectModal({ isOpen, value, onClose, onSelect }
       <SheetContent side="bottom" className="flex w-full flex-col">
         <SheetHeader>
           <SheetTitle>참석자 추가</SheetTitle>
-          <SheetDescription>참석자 추가 시트</SheetDescription>
         </SheetHeader>
 
         <div className="mt-2 flex h-[60vh] flex-col gap-4">

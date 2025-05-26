@@ -35,7 +35,7 @@ export default function AppointmentList() {
   const isLoaded = appointments?.every(appointment => cardLoad.has(appointment.id)) ?? true;
 
   return (
-    <div className="flex flex-grow flex-col space-y-6 p-4">
+    <div className="flex flex-grow flex-col space-y-6 overflow-auto p-4">
       <h2 className="text-lg font-semibold">나의 일정 {!isPending && appointments?.length}</h2>
       {isPending ? (
         <div className="flex flex-grow items-center justify-center">

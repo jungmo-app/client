@@ -4,16 +4,47 @@ import * as React from 'react';
 import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area';
 import { cn } from '@/utils/styles';
 
-const ScrollArea = React.forwardRef<
-  React.ElementRef<typeof ScrollAreaPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
->(({ className, children, ...props }, ref) => (
-  <ScrollAreaPrimitive.Root ref={ref} className={cn('relative overflow-hidden', className)} {...props}>
-    <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]">{children}</ScrollAreaPrimitive.Viewport>
-    <ScrollBar />
-    <ScrollAreaPrimitive.Corner />
-  </ScrollAreaPrimitive.Root>
-));
+interface ScrollAreaProps extends React.ComponentPropsWithRef<typeof ScrollAreaPrimitive.Root> {
+  position?: 'top' | 'middle' | 'bottom';
+}
+
+const ScrollArea = React.forwardRef<React.ElementRef<typeof ScrollAreaPrimitive.Root>, ScrollAreaProps>(
+  ({ className, children, position = 'top', ...props }, ref) => {
+    const viewportRef = React.useRef<HTMLDivElement | null>(null);
+
+    React.useImperativeHandle(ref, () => viewportRef.current as HTMLDivElement);
+
+    React.useEffect(() => {
+      const el = viewportRef.current;
+      if (!el) {
+        return;
+      }
+
+      if (position === 'top') {
+        el.scrollTop = el.scrollHeight;
+        return;
+      }
+
+      if (position === 'middle') {
+        el.scrollTop = el.scrollHeight / 2 - el.clientHeight / 2;
+      }
+
+      if (position === 'bottom') {
+        el.scrollTop = el.scrollHeight;
+      }
+    }, [position]);
+    return (
+      <ScrollAreaPrimitive.Root className={cn('relative overflow-hidden', className)} {...props}>
+        <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]" ref={viewportRef}>
+          {children}
+        </ScrollAreaPrimitive.Viewport>
+        <ScrollBar />
+        <ScrollAreaPrimitive.Corner />
+      </ScrollAreaPrimitive.Root>
+    );
+  }
+);
+
 ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName;
 
 const ScrollBar = React.forwardRef<

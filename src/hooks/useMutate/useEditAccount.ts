@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apis } from '@/apis';
-import { UserDataResponse } from '@/types/user';
+import { UserDataResponse } from '@/types/auth';
 import { ApiError } from '@/utils/error';
 
 interface PayloadType {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Button, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui';
 import { formattedDateKr } from '@/utils/date';
 import { cn } from '@/utils/styles';
@@ -16,11 +16,14 @@ export default function DatePickerSheet({ value, onSelect, classNames }: DatePic
   const [currentDate, setCurrentDate] = useState(value ?? new Date());
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const handleSelectDay = (date: Date) => {
-    setCurrentDate(date);
-    onSelect(date);
-    setIsOpen(false);
-  };
+  const handleSelectDay = useCallback(
+    (date: Date) => {
+      setCurrentDate(date);
+      onSelect(date);
+      setIsOpen(false);
+    },
+    [onSelect]
+  );
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>

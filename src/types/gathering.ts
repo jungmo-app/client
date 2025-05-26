@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { createAppointmentSchema } from '@/schemas/appointment';
-import { UserDataResponse } from './user';
+import { UserDataResponse } from './auth';
 
 export interface Location {
   id: number;

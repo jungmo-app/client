@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface YearPickerProps {
   startYear: number;
@@ -10,6 +10,27 @@ interface YearPickerProps {
   onTransitionEnd: () => void;
   onClickYear: (year: Date) => void;
 }
+
+interface DecadeRowProps {
+  year: number;
+  currentDecade: number;
+  onClickYear: (year: number) => void;
+  setRef: (el: HTMLButtonElement | null) => void;
+}
+
+const DecadeRow = memo(({ year, currentDecade, onClickYear, setRef }: DecadeRowProps) => {
+  return (
+    <button
+      key={year}
+      data-year={year}
+      className={`aspect-square w-full rounded-full text-center hover:bg-gray-100 dark:hover:bg-gray-500 ${year >= currentDecade && year <= currentDecade + 9 ? 'opacity-100' : 'opacity-50'} hover:opacity-100`}
+      ref={el => setRef(el)}
+      onClick={() => onClickYear(year)}
+    >
+      {year}
+    </button>
+  );
+});
 
 export default function YearPicker({
   startYear,
@@ -35,9 +56,21 @@ export default function YearPicker({
   const decadeStartYears = useRef<(HTMLButtonElement | null)[]>(decadeYears);
   const isDecadeView = useRef<Map<number, boolean>>(new Map());
 
-  const handleClickYearButton = (year: number) => {
-    onClickYear(new Date(year, 0));
-  };
+  const handleClickYearButton = useCallback(
+    (year: number) => {
+      onClickYear(new Date(year, 0));
+    },
+    [onClickYear]
+  );
+
+  const handleSetRef = useCallback(
+    (el: HTMLButtonElement | null, year: number) => {
+      if (year % 10 === 0) {
+        decadeStartYears.current[Math.ceil((year - startYear) / 10)] = el;
+      }
+    },
+    [startYear]
+  );
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -71,7 +104,7 @@ export default function YearPicker({
   }, []);
 
   useEffect(() => {
-    const index = Math.ceil((value.getFullYear() - Math.ceil(startYear / 10) * 10) / 10);
+    const index = Math.floor((value.getFullYear() - startYear) / 10);
     const el = decadeStartYears.current[index];
     if (el) {
       el.scrollIntoView({ behavior: 'auto', block: 'start' });
@@ -92,21 +125,17 @@ export default function YearPicker({
         }}
       >
         {years.map(year => (
-          <button
+          <DecadeRow
             key={year}
-            data-year={year % 10 === 0 ? year : undefined}
-            className={`aspect-square w-full rounded-full text-center hover:bg-gray-100 dark:hover:bg-gray-500 ${year >= currentDecade && year <= currentDecade + 9 ? 'opacity-100' : 'opacity-50'} hover:opacity-100`}
-            ref={el => {
-              if (year % 10 === 0) {
-                decadeStartYears.current[Math.ceil((year - startYear) / 10)] = el;
-              }
-            }}
-            onClick={() => handleClickYearButton(year)}
-          >
-            {year}
-          </button>
+            year={year}
+            currentDecade={currentDecade}
+            setRef={el => handleSetRef(el, year)}
+            onClickYear={handleClickYearButton}
+          />
         ))}
       </div>
     </>
   );
 }
+
+DecadeRow.displayName = 'DecadeRow';

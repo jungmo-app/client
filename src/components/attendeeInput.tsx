@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Users } from 'lucide-react';
 import { Card, Input, Label } from '@/components/ui';
-import { UserDataResponse } from '@/types/user';
+import { UserDataResponse } from '@/types/auth';
 import AttendeeSelectModal from './modals/attendeeSelectModal';
 
 type AttendeeInputProps = {
