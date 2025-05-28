@@ -80,6 +80,16 @@ module.exports = {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-8px)' },
         },
+        rotate: {
+          '100%': { transform: 'rotate(360deg)' },
+        },
+        prixClipFix: {
+          '0%': { clipPath: 'polygon(50% 50%,0 0,0 0,0 0,0 0,0 0)' },
+          '25%': { clipPath: 'polygon(50% 50%,0 0,100% 0,100% 0,100% 0,100% 0)' },
+          '50%': { clipPath: 'polygon(50% 50%,0 0,100% 0,100% 100%,100% 100%,100% 100%)' },
+          '75%': { clipPath: 'polygon(50% 50%,0 0,100% 0,100% 100%,0 100%,0 100%)' },
+          '100%': { clipPath: 'polygon(50% 50%,0 0,100% 0,100% 100%,0 100%,0 0)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -87,6 +97,8 @@ module.exports = {
         'zoom-in': 'zoom-in 0.3s ease-out forwards',
         'zoom-out': 'zoom-out 0.3s ease-out forwards',
         'bounce-up-down': 'bounce-up-down 0.8s infinite ease-in-out',
+        rotate: 'rotate 1s linear infinite',
+        'clip-fix': 'prixClipFix 2s linear infinite',
       },
     },
   },
