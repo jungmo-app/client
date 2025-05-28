@@ -20,7 +20,10 @@ export const middleware = async (request: NextRequest) => {
 
   const now = Date.now();
   const isLoginPage =
-    pathname.startsWith('/login') || pathname.startsWith('/signup') || pathname.startsWith('/reset-password');
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/signup') ||
+    pathname.startsWith('/reset-password') ||
+    pathname.startsWith('/oauth2');
 
   const redirectToLogin = () => {
     const url = new URL('/login', request.url);
