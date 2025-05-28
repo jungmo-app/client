@@ -29,9 +29,9 @@ export const useLogout = (onSuccess?: () => void, onError?: () => void) => {
     window.location.replace('/login');
   };
 
-  const handleErrorLogout = (error: ApiError) => {
+  const handleErrorLogout = async (error: ApiError) => {
     if (error.code === 'C006' || error.code.startsWith('T')) {
-      handleSuccessLogout();
+      await handleSuccessLogout();
       return;
     }
 
