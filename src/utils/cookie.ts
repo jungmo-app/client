@@ -1,4 +1,5 @@
 import { parse } from 'cookie';
+import { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import { NextResponse } from 'next/server';
 
 export const splitCookiesString = (cookiesHeader: string): string[] => {
@@ -48,18 +49,18 @@ export const setRawCookie = (rawCookie: string, response: NextResponse) => {
   });
 };
 
-export const resetCookie = (res: NextResponse, name: string) => {
+export const resetCookie = (res: NextResponse, name: string, option?: Partial<ResponseCookie>) => {
   res.cookies.set(name, '', {
     maxAge: 0,
     expires: new Date(),
     path: '/',
-    domain: '.jungmoserver.shop',
     httpOnly: true,
     secure: true,
+    ...option,
   });
 };
 
 export const logout = (res: NextResponse) => {
   resetCookie(res, 'accessToken');
-  resetCookie(res, 'refreshToken');
+  resetCookie(res, 'refreshToken', { domain: '.jungmoserver.shop' });
 };
