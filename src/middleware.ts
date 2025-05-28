@@ -37,11 +37,11 @@ export const middleware = async (request: NextRequest) => {
     return NextResponse.redirect(url);
   };
 
-  if (!accessToken || !refreshToken) {
+  if (!refreshToken) {
     return redirectToLogin();
   }
 
-  const isValid = await verifyToken(accessToken);
+  const isValid = accessToken ? await verifyToken(accessToken) : false;
 
   if (isValid === true) {
     if (isLoginPage) {
