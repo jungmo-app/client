@@ -20,10 +20,7 @@ export const middleware = async (request: NextRequest) => {
 
   const now = Date.now();
   const isLoginPage =
-    pathname.startsWith('/login') ||
-    pathname.startsWith('/signup') ||
-    pathname.startsWith('/reset-password') ||
-    pathname.startsWith('/oauth2');
+    pathname.startsWith('/login') || pathname.startsWith('/signup') || pathname.startsWith('/reset-password');
 
   const redirectToLogin = () => {
     const url = new URL('/login', request.url);
@@ -35,6 +32,9 @@ export const middleware = async (request: NextRequest) => {
   };
 
   const redirectToRefer = () => {
+    if (pathname.startsWith('/login/oauth2')) {
+      return NextResponse.next();
+    }
     const url = new URL(refer ?? '/', request.url);
     url.searchParams.set('date', now.toString());
     return NextResponse.redirect(url);
