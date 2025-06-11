@@ -16,14 +16,11 @@ export default function HeaderTool() {
   const { data: appointment } = useAppointment(id);
   const [isOpenPopOver, setIsOpenPopover] = useState(false);
 
-  const { mutate: deleteAppointment, isPending } = useDeleteAppointment(
-    id,
-    new Date(appointment?.startDate ?? ''),
-    () => {},
-    () => {
+  const { mutate: deleteAppointment, isPending } = useDeleteAppointment(id, {
+    onError: () => {
       setIsOpenPopover(false);
-    }
-  );
+    },
+  });
 
   const handleOpenPopover = (value: boolean) => {
     setIsOpenPopover(value);

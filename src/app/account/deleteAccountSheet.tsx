@@ -36,7 +36,6 @@ export default function DeleteAccountSheet() {
       alert('이미 탈퇴한 유저입니다');
       setIsOpen(false);
       queryClient.clear();
-      /* api 로그아웃 구현? */
       router.replace('/login');
       return;
     }

@@ -74,6 +74,7 @@ export const authApis = {
   },
   deleteAccount: async () => {
     await privateClientFetch(apiPaths.user.deleteAccount, {
+      method: 'DELETE',
       credentials: 'include',
     });
   },
