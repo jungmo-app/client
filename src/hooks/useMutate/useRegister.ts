@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { apis } from '@/apis';
 import { SessionContext } from '@/contexts/SessionProvider';
-import { SignupFormValues } from '@/types/auth';
+import { SignupFormValues, UserInfoResponse } from '@/types/auth';
 import { ApiError } from '@/utils/error';
 
 interface UseRegisterProps {
@@ -18,7 +18,7 @@ export const useRegister = ({ onSuccess, onError }: UseRegisterProps = {}) => {
   const queryClient = useQueryClient();
 
   const { openSession, closeSession } = useContext(SessionContext);
-  return useMutation<unknown, ApiError, SignupFormValues>({
+  return useMutation<UserInfoResponse, ApiError, SignupFormValues>({
     mutationFn: payload => apis.auth.register(payload),
     onSuccess: async data => {
       try {
