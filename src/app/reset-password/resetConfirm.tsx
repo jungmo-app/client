@@ -1,8 +1,10 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
+import Loading from '@/app/loading';
 import { Button, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from '@/components/ui';
 import { usePasswordReset } from '@/hooks/useMutate/usePasswordReset';
 import { resetPasswordSchema } from '@/schemas/auth';
@@ -15,6 +17,9 @@ interface ResetConfirmProps {
 
 export default function ResetConfirm({ token }: ResetConfirmProps) {
   const router = useRouter();
+
+  const [isRedirecting, setIsRedirecting] = useState<boolean>(true);
+
   const form = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
@@ -44,60 +49,81 @@ export default function ResetConfirm({ token }: ResetConfirmProps) {
     resetPassword({ token, ...data });
   };
 
+  useEffect(() => {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) {
+      window.location.href = `jungmo://reset-password?token=${token}`;
+      setTimeout(() => {
+        setIsRedirecting(false);
+      }, 1500);
+      return;
+    }
+
+    setIsRedirecting(false);
+  }, [token]);
+
   return (
-    <div style={{ marginTop: '8px' }}>
-      <p className="text-gray-500">새로 변경할 비밀번호를 입력해주세요.</p>
-      <Form {...form}>
-        <form className="mt-6 space-y-6" onSubmit={form.handleSubmit(handleSubmit)}>
-          <FormField
-            control={form.control}
-            name="newPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>새 비밀번호</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    autoComplete="new-password"
-                    className="h-12 rounded-full px-4"
-                    {...field}
-                    placeholder="새 비밀번호를 입력해주세요"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>새 비밀번호 확인</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    autoComplete="new-password"
-                    className="h-12 rounded-full px-4"
-                    {...field}
-                    placeholder="새 비밀번호를 다시 입력해주세요"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button
-            type="submit"
-            disabled={isPending || !form.formState.isValid}
-            className="h-12 w-full rounded-full bg-blue-500 font-semibold hover:bg-blue-600"
-            style={{ marginTop: '42px' }}
-            aria-label="비밀번호 변경"
-          >
-            비밀번호 변경하기
-          </Button>
-        </form>
-      </Form>
-    </div>
+    <>
+      {isRedirecting ? (
+        <div className="flex size-full items-center justify-center">
+          <Loading />
+        </div>
+      ) : (
+        <div className="mt-2">
+          <p className="text-gray-500">새로 변경할 비밀번호를 입력해주세요.</p>
+          <Form {...form}>
+            <form className="mt-6 space-y-6" onSubmit={form.handleSubmit(handleSubmit)}>
+              <FormField
+                control={form.control}
+                name="newPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>새 비밀번호</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        autoComplete="new-password"
+                        className="h-12 rounded-full px-4"
+                        {...field}
+                        placeholder="새 비밀번호를 입력해주세요"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>새 비밀번호 확인</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        autoComplete="new-password"
+                        className="h-12 rounded-full px-4"
+                        {...field}
+                        placeholder="새 비밀번호를 다시 입력해주세요"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="submit"
+                disabled={isPending || !form.formState.isValid}
+                className="h-12 w-full rounded-full bg-blue-500 font-semibold hover:bg-blue-600"
+                style={{ marginTop: '42px' }}
+                aria-label="비밀번호 변경"
+              >
+                비밀번호 변경하기
+              </Button>
+            </form>
+          </Form>
+        </div>
+      )}
+    </>
   );
 }
