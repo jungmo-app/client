@@ -1,15 +1,12 @@
 import { useCallback, useRef, useState } from 'react';
 import { ScrollArea } from '@/components/ui';
 import { useInfiniteScrollUp } from '@/hooks/useInfiniteScrollUp';
-import { useUserData } from '@/hooks/useQuery/useUserData';
 import { ChatType } from '@/types/chat';
 import { isSameDateHourMinute, isSameDay } from '@/utils/date';
 import ChatBubble from './chatBubble';
 import ScrollLoadingIcon from './scrollLoadingIcon';
 
 export default function ChatList() {
-  const { data: userData } = useUserData();
-  console.log(userData);
   const id = useRef<number>(11);
   const [isPending, setIsPending] = useState<boolean>(false);
   const [chat, setChat] = useState<ChatType[]>([
