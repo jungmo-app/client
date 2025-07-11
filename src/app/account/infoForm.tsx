@@ -47,6 +47,7 @@ export default function InfoForm() {
     resetImage,
   } = useImageUpload({
     initialImage: userData?.profileImage,
+    options: { size: 10 },
   });
 
   const form = useForm<EditProfileFormValues>({
