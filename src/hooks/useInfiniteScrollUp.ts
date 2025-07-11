@@ -23,16 +23,18 @@ export const useInfiniteScrollUp = <TTarget extends HTMLElement, TContainer exte
           const prevScrollHeight = containerRef.current.scrollHeight;
           await onIntersect();
           requestAnimationFrame(() => {
-            if (!containerRef.current) {
-              return;
-            }
-            const newScrollHeight = containerRef.current.scrollHeight;
-            const heightDiff = newScrollHeight - prevScrollHeight;
-            if (containerRef.current.scrollTop === 0) {
-              containerRef.current.scrollTop += heightDiff - heightDelta;
-            }
+            setTimeout(() => {
+              if (!containerRef.current) return;
 
-            console.log(containerRef.current.scrollTop);
+              const newScrollHeight = containerRef.current.scrollHeight;
+              const heightDiff = newScrollHeight - prevScrollHeight;
+
+              console.log(containerRef.current.scrollTop);
+
+              if (containerRef.current.scrollTop === 0 || /^((?!chrome|android).)*safari/i.test(navigator.userAgent)) {
+                containerRef.current.scrollTop += heightDiff - heightDelta;
+              }
+            }, 0);
           });
         }
       });
